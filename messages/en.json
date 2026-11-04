@@ -113,7 +113,10 @@
     "term": "Term",
     "meaning": "Meaning",
     "buttons": "Buttons",
-    "inputs": "Inputs"
+    "inputs": "Inputs",
+    "imageSearch": "Image search",
+    "imageSearchNote": "Writers pick cover and inline photos from Unsplash. Picking a photo tells Unsplash it was used and credits the photographer under the image.",
+    "noPhotoSelected": "No photo picked yet."
   },
   "Vocabulary": {
     "sparks": "Sparks",
@@ -128,5 +131,33 @@
     "burningNowMeaning": "Trending stories",
     "weeklySpark": "Weekly spark",
     "weeklySparkMeaning": "A writing prompt every Monday"
+  },
+  "Unsplash": {
+    "trigger": "Search Unsplash",
+    "title": "Free photos from Unsplash",
+    "description": "Pick a photo for your story. The photographer is credited automatically.",
+    "searchLabel": "Search photos",
+    "placeholder": "Try “campfire”, “ocean” or “city at night”",
+    "suggestions": [
+      "campfire",
+      "forest",
+      "ocean",
+      "city at night",
+      "books",
+      "mountains"
+    ],
+    "idle": "Search for a photo, or start with one of these:",
+    "empty": "No photos for “{query}”. Try another word.",
+    "loading": "Loading…",
+    "loadMore": "More photos",
+    "usePhoto": "Use photo by {name}: {alt}",
+    "untitled": "untitled photo",
+    "signIn": "Sign in to search photos.",
+    "notConfigured": "Photo search isn't set up yet.",
+    "rateLimited": "We've reached Unsplash's hourly limit. Try again a little later.",
+    "error": "Photo search isn't working right now. Try again in a moment.",
+    "credit": "Photo by <author>{name}</author> on <unsplash>Unsplash</unsplash>",
+    "poweredBy": "Photos from <unsplash>Unsplash</unsplash>, free to use.",
+    "close": "Close"
   }
 }

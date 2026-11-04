@@ -16,6 +16,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { anonRole, authenticatedRole, authUid, authUsers } from "drizzle-orm/supabase";
 import type { TiptapDoc } from "@/lib/domain/content";
+import type { ImageCredit } from "@/lib/domain/unsplash";
 
 /**
  * Source of truth for tables and RLS policies. `npm run db:generate` turns
@@ -101,6 +102,10 @@ export const stories = pgTable(
     publishedAt: timestamp("published_at", { withTimezone: true }),
     readingTime: integer("reading_time").notNull().default(1),
     coverUrl: text("cover_url"),
+    // Alt text is required whenever there's a cover (enforced in the publish flow).
+    coverAlt: text("cover_alt").notNull().default(""),
+    // Who to credit for the cover (e.g. an Unsplash photographer). Null for the writer's own uploads.
+    coverCredit: jsonb("cover_credit").$type<ImageCredit>(),
     canonicalUrl: text("canonical_url"),
     ...timestamps,
     deletedAt: timestamp("deleted_at", { withTimezone: true }),
@@ -115,6 +120,7 @@ export const stories = pgTable(
     check("stories_subtitle_length", sql`char_length(${t.subtitle}) <= 280`),
     check("stories_slug_format", sql`${t.slug} ~ '^[a-z0-9]+(-[a-z0-9]+)*$'`),
     check("stories_reading_time_positive", sql`${t.readingTime} >= 1`),
+    check("stories_cover_alt_length", sql`char_length(${t.coverAlt}) <= 300`),
     check(
       "stories_live_has_published_at",
       sql`${t.status} = 'draft' or ${t.publishedAt} is not null`,

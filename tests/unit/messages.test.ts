@@ -2,13 +2,14 @@ import { describe, expect, it } from "vitest";
 import en from "../../messages/en.json";
 import es from "../../messages/es.json";
 
-type Tree = { [key: string]: string | Tree };
+type Tree = { [key: string]: string | string[] | Tree };
 
 function flatten(tree: Tree, prefix = ""): Map<string, string> {
   const out = new Map<string, string>();
   for (const [key, value] of Object.entries(tree)) {
     const path = prefix ? `${prefix}.${key}` : key;
     if (typeof value === "string") out.set(path, value);
+    else if (Array.isArray(value)) value.forEach((item, index) => out.set(`${path}.${index}`, item));
     else for (const [k, v] of flatten(value, path)) out.set(k, v);
   }
   return out;
@@ -33,8 +34,8 @@ function args(message: string): string[] {
   return [...names].sort();
 }
 
-const enFlat = flatten(en as Tree);
-const esFlat = flatten(es as Tree);
+const enFlat = flatten(en as unknown as Tree);
+const esFlat = flatten(es as unknown as Tree);
 
 describe("messages", () => {
   it("has the same keys in English and Spanish", () => {

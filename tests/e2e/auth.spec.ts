@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { waitForMagicLink } from "./mailpit";
+import { signInWithMagicLink } from "./sign-in";
 
 test("rejects an invalid email with a readable message", async ({ page }) => {
   await page.goto("/en/login");
@@ -11,23 +12,24 @@ test("rejects an invalid email with a readable message", async ({ page }) => {
 });
 
 test("signs in with a magic link and signs out again", async ({ page }) => {
-  const email = `e2e-${Date.now()}-${Math.floor(Math.random() * 1e4)}@fogata.test`;
-
-  await page.goto("/es/login");
-  await page.getByLabel("Correo electrónico").fill(email);
-  await page.getByRole("button", { name: "Envíame un enlace para entrar" }).click();
-  await expect(page.getByTestId("magic-link-sent")).toContainText(email);
-
-  const link = await waitForMagicLink(email);
-  expect(link).toContain("/auth/confirm?next=%2Fes");
-  await page.goto(link);
-
+  await signInWithMagicLink(page, "es");
   await expect(page).toHaveURL(/\/es$/);
   await page.getByTestId("account-menu").click();
   // New accounts get a username derived from the email.
   await expect(page.getByText(/@e2e\d+/)).toBeVisible();
   await page.getByTestId("sign-out").click();
   await expect(page.getByTestId("sign-in-link")).toBeVisible();
+});
+
+test("magic links return to the page the reader came from", async ({ page }) => {
+  const email = `e2e-next-${Date.now()}@fogata.test`;
+  await page.goto("/en/login?next=%2Fen%2Fdesign");
+  await page.getByLabel("Email").fill(email);
+  await page.getByRole("button", { name: "Email me a sign-in link" }).click();
+  const link = await waitForMagicLink(email);
+  expect(link).toContain("/auth/confirm?next=%2Fen%2Fdesign");
+  await page.goto(link);
+  await expect(page).toHaveURL(/\/en\/design$/);
 });
 
 test("an expired or reused link explains what happened", async ({ page }) => {

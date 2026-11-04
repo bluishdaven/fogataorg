@@ -258,6 +258,37 @@ describe("stories", () => {
   });
 });
 
+describe("story covers", () => {
+  it("let authors set a credited cover, with bounded alt text", async () => {
+    await scenario(async (h) => {
+      const author = await h.createUser();
+      const story = await makeStory(h, author);
+      const credit = {
+        source: "unsplash" as const,
+        photoId: "Fg4tA0campfire",
+        authorName: "Ana Ruiz",
+        authorUrl: "https://unsplash.com/@anaruiz_photo",
+        photoUrl: "https://unsplash.com/photos/x-Fg4tA0campfire",
+      };
+      const [updated] = await h.as(h.claimsFor(author), (tx) =>
+        tx
+          .update(stories)
+          .set({ coverUrl: "https://images.unsplash.com/photo-1?ixid=x", coverAlt: "Una fogata en la playa", coverCredit: credit })
+          .where(eq(stories.id, story.id))
+          .returning({ coverCredit: stories.coverCredit }),
+      );
+      expect(updated?.coverCredit).toEqual(credit);
+
+      await expectPgError(
+        h.as(h.claimsFor(author), (tx) =>
+          tx.update(stories).set({ coverAlt: "x".repeat(301) }).where(eq(stories.id, story.id)),
+        ),
+        PG.checkViolation,
+      );
+    });
+  });
+});
+
 describe("story_topics", () => {
   it("are visible only when the story is visible", async () => {
     await scenario(async (h) => {

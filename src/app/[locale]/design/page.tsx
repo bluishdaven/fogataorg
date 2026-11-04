@@ -4,6 +4,7 @@ import { FlameLogo } from "@/components/flame-logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { UnsplashDemo } from "@/components/unsplash/unsplash-demo";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("Design");
@@ -115,6 +116,12 @@ export default async function DesignPage() {
           <Label htmlFor="design-email">Email</Label>
           <Input id="design-email" type="email" placeholder="you@example.com" />
         </div>
+      </section>
+
+      <section aria-labelledby="image-search" className="flex flex-col gap-4">
+        <h2 id="image-search" className="font-serif text-2xl font-semibold">{t("imageSearch")}</h2>
+        <p className="max-w-2xl text-sm text-muted-foreground">{t("imageSearchNote")}</p>
+        <UnsplashDemo />
       </section>
 
       <section aria-labelledby="vocabulary" className="flex flex-col gap-4">

@@ -15,6 +15,13 @@
       "when": 1793825145023,
       "tag": "20261104204545_triggers_and_grants",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793826997355,
+      "tag": "20261104211637_stories_cover_image",
+      "breakpoints": true
     }
   ]
 }

@@ -113,7 +113,10 @@
     "term": "Término",
     "meaning": "Significado",
     "buttons": "Botones",
-    "inputs": "Campos"
+    "inputs": "Campos",
+    "imageSearch": "Búsqueda de imágenes",
+    "imageSearchNote": "Quienes escriben eligen fotos de portada y del texto en Unsplash. Al elegir una foto se le avisa a Unsplash que se usó y se da crédito a quien la tomó, debajo de la imagen.",
+    "noPhotoSelected": "Todavía no has elegido una foto."
   },
   "Vocabulary": {
     "sparks": "Chispas",
@@ -128,5 +131,33 @@
     "burningNowMeaning": "Historias en tendencia",
     "weeklySpark": "La chispa de la semana",
     "weeklySparkMeaning": "Una propuesta de escritura cada lunes"
+  },
+  "Unsplash": {
+    "trigger": "Buscar en Unsplash",
+    "title": "Fotos gratuitas de Unsplash",
+    "description": "Elige una foto para tu historia. Se da crédito a quien la tomó automáticamente.",
+    "searchLabel": "Buscar fotos",
+    "placeholder": "Prueba con «fogata», «mar» o «ciudad de noche»",
+    "suggestions": [
+      "fogata",
+      "bosque",
+      "mar",
+      "ciudad de noche",
+      "libros",
+      "montañas"
+    ],
+    "idle": "Busca una foto o empieza con alguna de estas:",
+    "empty": "No hay fotos para «{query}». Prueba con otra palabra.",
+    "loading": "Cargando…",
+    "loadMore": "Más fotos",
+    "usePhoto": "Usar foto de {name}: {alt}",
+    "untitled": "foto sin título",
+    "signIn": "Entra para buscar fotos.",
+    "notConfigured": "La búsqueda de fotos aún no está configurada.",
+    "rateLimited": "Llegamos al límite por hora de Unsplash. Vuelve a intentarlo un poco más tarde.",
+    "error": "La búsqueda de fotos no funciona en este momento. Vuelve a intentarlo en un momento.",
+    "credit": "Foto de <author>{name}</author> en <unsplash>Unsplash</unsplash>",
+    "poweredBy": "Fotos de <unsplash>Unsplash</unsplash>, de uso libre.",
+    "close": "Cerrar"
   }
 }
