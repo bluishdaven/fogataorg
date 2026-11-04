@@ -1,0 +1,133 @@
+{
+  "Metadata": {
+    "title": "Fogata — stories around the fire",
+    "titleTemplate": "%s · Fogata",
+    "description": "A warm, bilingual home for long-form stories in English and Spanish. Read, write and share around the campfire."
+  },
+  "Common": {
+    "skipToContent": "Skip to content",
+    "loading": "Loading…",
+    "minRead": "{minutes} min read",
+    "languageName": {
+      "en": "English",
+      "es": "Spanish"
+    },
+    "languageBadge": {
+      "en": "EN",
+      "es": "ES"
+    },
+    "draft": "Draft",
+    "unlisted": "Unlisted"
+  },
+  "Nav": {
+    "primary": "Main",
+    "home": "Home",
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "account": "Your account",
+    "profile": "Your profile",
+    "design": "Style guide"
+  },
+  "Theme": {
+    "label": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "sepia": "Sepia",
+    "system": "System"
+  },
+  "Language": {
+    "label": "Language",
+    "current": "Language: {language}",
+    "en": "English",
+    "es": "Español"
+  },
+  "Home": {
+    "eyebrow": "Stories around the fire",
+    "title": "Pull up a seat. Someone is telling a story.",
+    "lede": "Fogata is a bilingual home for long-form writing. No ads, no feeds built to keep you scrolling, just stories in English and Spanish and the people who tell them.",
+    "latest": "Fresh from the fire",
+    "empty": "No stories yet. Run npm run db:seed to light the first fire.",
+    "allLanguages": "Stories in English and Spanish"
+  },
+  "StoryCard": {
+    "byline": "{name}",
+    "readStory": "Read “{title}”"
+  },
+  "Story": {
+    "by": "By {name}",
+    "publishedOn": "Published {date}",
+    "writtenIn": "Written in {language}",
+    "notFoundTitle": "Story not found",
+    "moreFrom": "More from {name}"
+  },
+  "Profile": {
+    "stories": "Stories",
+    "joined": "On Fogata since {date}",
+    "noStories": "{name} hasn't published a story yet.",
+    "storyCount": "{count, plural, =0 {No stories} one {# story} other {# stories}}"
+  },
+  "Auth": {
+    "title": "Sign in to Fogata",
+    "subtitle": "No passwords. We'll email you a link that signs you in.",
+    "emailLabel": "Email",
+    "emailPlaceholder": "you@example.com",
+    "sendLink": "Email me a sign-in link",
+    "sending": "Sending…",
+    "or": "or",
+    "google": "Continue with Google",
+    "checkEmailTitle": "Check your email",
+    "checkEmailBody": "We sent a sign-in link to {email}. It expires in one hour.",
+    "useDifferentEmail": "Use a different email",
+    "terms": "By continuing you agree to treat others around the fire with care.",
+    "errorTitle": "That link didn't work",
+    "errorBody": "Sign-in links expire after an hour and work once. Request a new one below.",
+    "rateLimited": "Too many attempts. Wait a minute and try again.",
+    "signedInAs": "Signed in as {name}"
+  },
+  "Validation": {
+    "email": "Enter a valid email address.",
+    "username": "Use 3–30 letters, numbers or underscores.",
+    "generic": "Something went wrong. Please try again."
+  },
+  "Footer": {
+    "tagline": "A .org, not an ad network. No ads, no selling data, no dark patterns.",
+    "rights": "Stories belong to the people who wrote them.",
+    "support": "Fogata runs on donations. Ways to support it are coming soon."
+  },
+  "NotFound": {
+    "title": "This trail goes cold",
+    "body": "We couldn't find that page. It may have moved, or the link may be mistyped.",
+    "home": "Back to the fire"
+  },
+  "Design": {
+    "title": "Style guide",
+    "lede": "The living reference for Fogata's tokens and components. Switch themes in the header to check every pairing.",
+    "colors": "Color tokens",
+    "type": "Type",
+    "reading": "Reading measure",
+    "readingSample": "Reading comes first. Typography, speed and calm beat feature count. The line you are reading is set at the same size, leading and measure as a story body, so it should sit comfortably between 65 and 75 characters.",
+    "components": "Components",
+    "brand": "Brand",
+    "flameCaption": "The flame flickers gently and holds still when reduced motion is on.",
+    "vocabulary": "Campfire vocabulary",
+    "vocabularyNote": "Spanish UI uses the Spanish terms; English UI uses the English terms. First use always explains the plain meaning.",
+    "term": "Term",
+    "meaning": "Meaning",
+    "buttons": "Buttons",
+    "inputs": "Inputs"
+  },
+  "Vocabulary": {
+    "sparks": "Sparks",
+    "sparksMeaning": "Applause for a story",
+    "circle": "Circle",
+    "circleMeaning": "A community publication",
+    "ember": "Ember",
+    "emberMeaning": "A saved highlight",
+    "saved": "Saved",
+    "savedMeaning": "Your reading list",
+    "burningNow": "Burning now",
+    "burningNowMeaning": "Trending stories",
+    "weeklySpark": "Weekly spark",
+    "weeklySparkMeaning": "A writing prompt every Monday"
+  }
+}

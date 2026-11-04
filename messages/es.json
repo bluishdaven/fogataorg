@@ -1,0 +1,133 @@
+{
+  "Metadata": {
+    "title": "Fogata — historias alrededor del fuego",
+    "titleTemplate": "%s · Fogata",
+    "description": "Un hogar cálido y bilingüe para historias largas en español e inglés. Lee, escribe y comparte alrededor de la fogata."
+  },
+  "Common": {
+    "skipToContent": "Saltar al contenido",
+    "loading": "Cargando…",
+    "minRead": "{minutes} min de lectura",
+    "languageName": {
+      "en": "inglés",
+      "es": "español"
+    },
+    "languageBadge": {
+      "en": "EN",
+      "es": "ES"
+    },
+    "draft": "Borrador",
+    "unlisted": "No listada"
+  },
+  "Nav": {
+    "primary": "Principal",
+    "home": "Inicio",
+    "signIn": "Entrar",
+    "signOut": "Salir",
+    "account": "Tu cuenta",
+    "profile": "Tu perfil",
+    "design": "Guía de estilo"
+  },
+  "Theme": {
+    "label": "Tema",
+    "light": "Claro",
+    "dark": "Oscuro",
+    "sepia": "Sepia",
+    "system": "Sistema"
+  },
+  "Language": {
+    "label": "Idioma",
+    "current": "Idioma: {language}",
+    "en": "English",
+    "es": "Español"
+  },
+  "Home": {
+    "eyebrow": "Historias alrededor del fuego",
+    "title": "Acércate. Alguien está contando una historia.",
+    "lede": "Fogata es un hogar bilingüe para la escritura larga. Sin anuncios, sin feeds hechos para que no dejes de deslizar: solo historias en español e inglés y la gente que las cuenta.",
+    "latest": "Recién salidas del fuego",
+    "empty": "Todavía no hay historias. Ejecuta npm run db:seed para encender la primera fogata.",
+    "allLanguages": "Historias en español e inglés"
+  },
+  "StoryCard": {
+    "byline": "{name}",
+    "readStory": "Leer «{title}»"
+  },
+  "Story": {
+    "by": "Por {name}",
+    "publishedOn": "Publicada el {date}",
+    "writtenIn": "Escrita en {language}",
+    "notFoundTitle": "Historia no encontrada",
+    "moreFrom": "Más de {name}"
+  },
+  "Profile": {
+    "stories": "Historias",
+    "joined": "En Fogata desde {date}",
+    "noStories": "{name} todavía no ha publicado una historia.",
+    "storyCount": "{count, plural, =0 {Sin historias} one {# historia} other {# historias}}"
+  },
+  "Auth": {
+    "title": "Entra a Fogata",
+    "subtitle": "Sin contraseñas. Te enviamos un enlace por correo para entrar.",
+    "emailLabel": "Correo electrónico",
+    "emailPlaceholder": "tu@ejemplo.com",
+    "sendLink": "Envíame un enlace para entrar",
+    "sending": "Enviando…",
+    "or": "o",
+    "google": "Continuar con Google",
+    "checkEmailTitle": "Revisa tu correo",
+    "checkEmailBody": "Enviamos un enlace para entrar a {email}. Caduca en una hora.",
+    "useDifferentEmail": "Usar otro correo",
+    "terms": "Al continuar aceptas tratar con cuidado a quienes se sientan alrededor del fuego.",
+    "errorTitle": "Ese enlace no funcionó",
+    "errorBody": "Los enlaces para entrar caducan en una hora y solo funcionan una vez. Pide uno nuevo aquí abajo.",
+    "rateLimited": "Demasiados intentos. Espera un minuto y vuelve a intentarlo.",
+    "signedInAs": "Sesión iniciada como {name}"
+  },
+  "Validation": {
+    "email": "Escribe un correo electrónico válido.",
+    "username": "Usa de 3 a 30 letras, números o guiones bajos.",
+    "generic": "Algo salió mal. Vuelve a intentarlo."
+  },
+  "Footer": {
+    "tagline": "Un .org, no una red de anuncios. Sin anuncios, sin vender datos, sin trucos.",
+    "rights": "Las historias pertenecen a quienes las escribieron.",
+    "support": "Fogata vive de donaciones. Pronto podrás apoyarla."
+  },
+  "NotFound": {
+    "title": "Aquí se pierde el rastro",
+    "body": "No encontramos esa página. Quizá cambió de lugar o el enlace tiene un error.",
+    "home": "Volver a la fogata"
+  },
+  "Design": {
+    "title": "Guía de estilo",
+    "lede": "La referencia viva de los tokens y componentes de Fogata. Cambia de tema en el encabezado para revisar cada combinación.",
+    "colors": "Tokens de color",
+    "type": "Tipografía",
+    "reading": "Ancho de lectura",
+    "readingSample": "Lo primero es leer. La tipografía, la velocidad y la calma importan más que la cantidad de funciones. Esta línea usa el mismo tamaño, interlineado y ancho que el cuerpo de una historia, así que debería quedar cómoda entre 65 y 75 caracteres.",
+    "components": "Componentes",
+    "brand": "Marca",
+    "flameCaption": "La llama parpadea suavemente y se queda quieta cuando el movimiento reducido está activado.",
+    "vocabulary": "Vocabulario de la fogata",
+    "vocabularyNote": "La interfaz en español usa los términos en español y la interfaz en inglés usa los términos en inglés. La primera vez siempre se explica el significado.",
+    "term": "Término",
+    "meaning": "Significado",
+    "buttons": "Botones",
+    "inputs": "Campos"
+  },
+  "Vocabulary": {
+    "sparks": "Chispas",
+    "sparksMeaning": "Aplausos para una historia",
+    "circle": "Fogata",
+    "circleMeaning": "Una publicación comunitaria (círculo)",
+    "ember": "Brasa",
+    "emberMeaning": "Un fragmento destacado y guardado",
+    "saved": "Leña guardada",
+    "savedMeaning": "Tu lista de lectura",
+    "burningNow": "Lo que arde",
+    "burningNowMeaning": "Historias en tendencia",
+    "weeklySpark": "La chispa de la semana",
+    "weeklySparkMeaning": "Una propuesta de escritura cada lunes"
+  }
+}
