@@ -1,5 +1,24 @@
 # Changelog
 
+## Unsplash photo search (2026-11-04)
+
+**Demo**: add `UNSPLASH_ACCESS_KEY` to `.env.local` (see `docs/SETUP.md`), restart `npm run dev`,
+sign in, open `/en/design` → Image search → **Search Unsplash**. Type or tap a suggestion, pick a
+photo, and it appears as a figure credited "Photo by … on Unsplash".
+
+- Picker dialog with debounced search, suggestions, masonry results with color placeholders,
+  "More photos", keyboard and screen-reader labels, and clear messages for signed-out,
+  not-configured and rate-limited states. Spanish and English UI.
+- Server-side proxy (`/api/unsplash/search`): signed-in only, Zod-validated, results cached for
+  hours so writers share the hourly quota.
+- Follows Unsplash's API guidelines: hotlinked and resized images that keep `ixid`, a download
+  event when a photo is picked, and photographer credit with referral links.
+- `stories.cover_alt` and `stories.cover_credit` columns, ready for the Phase 1 publish flow.
+- Tests: 21 unit/component, 1 RLS, 4 e2e (including a check that sign-in returns writers to the
+  page they came from).
+- Copy: Fogata is no longer described as a "bilingual platform" in the UI or README; language
+  support is unchanged.
+
 ## Phase 0 — Foundation (2026-11-04)
 
 **Demo** (after `npm run setup && npm run dev`):

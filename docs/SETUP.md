@@ -25,6 +25,22 @@ npm run dev       # http://localhost:3000
 3. In `supabase/config.toml`, set `[auth.external.google] enabled = true`.
 4. Set `NEXT_PUBLIC_AUTH_GOOGLE_ENABLED=true` in `.env.local`.
 
+### Unsplash photo search
+
+Writers can search Unsplash for cover and inline photos. Without a key the picker shows
+"Photo search isn't set up yet."
+
+1. Create an app at https://unsplash.com/oauth/applications (free). It starts in **demo mode**:
+   50 API requests per hour, which is plenty for development since searches are cached.
+2. Put the **Access Key** in `.env.local` as `UNSPLASH_ACCESS_KEY=…` and restart `npm run dev`.
+   Try it at `/en/design` → Image search (you need to be signed in).
+3. Spanish searches: email api@unsplash.com with your application ID to enable the `lang` beta,
+   then set `UNSPLASH_LANG_BETA=true`. Until then, Spanish queries are matched as if they were
+   English and results can be weaker.
+4. Before launch, apply for **production** access (1,000 requests/hour) from the app's page. Unsplash
+   reviews that we hotlink their image URLs, report downloads when a photo is picked, and credit
+   photographers. All three are built in.
+
 ## Deploying (owner steps, not automated)
 
 These need accounts only the project owner can create. Free tiers work for previews; see the
@@ -70,6 +86,8 @@ Never run `npm run db:seed` against production; it refuses unless you pass `--al
    | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | publishable key |
    | `NEXT_PUBLIC_AUTH_GOOGLE_ENABLED` | `true` once Google is configured |
    | `DATABASE_URL` | transaction pooler URL (port 6543) |
+   | `UNSPLASH_ACCESS_KEY` | Unsplash access key (optional) |
+   | `UNSPLASH_LANG_BETA` | `true` once Unsplash enables the `lang` beta |
 
    The secret key is **not** needed by the app; keep it out of Vercel until a feature needs it.
 3. `next build` reads published stories to prerender listings, so the build needs `DATABASE_URL`.

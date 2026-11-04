@@ -51,6 +51,14 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   Post-login redirects go through `safeNextPath()`.
 - **Domain rules** (`src/lib/domain/`) are pure TypeScript with unit tests: locales, routes, slugs,
   reading time, content text, redirects, Zod schemas. UI and data layers import from here.
+- **Unsplash photos** (`src/lib/domain/unsplash.ts`, `src/lib/unsplash/`, `src/components/unsplash/`).
+  Their API guidelines are conditions of use, so keep all four: (1) the access key stays on the
+  server (`/api/unsplash/search` proxies searches, signed-in only, cached for hours); (2) images are
+  hotlinked from `images.unsplash.com`, resized with `unsplashImageUrl()` which keeps the `ixid`
+  param (use `UnsplashImage`, never re-host or proxy through `/_next/image`); (3) picking a photo
+  calls `trackUnsplashSelection()` (their "download" event); (4) every displayed Unsplash photo gets
+  `UnsplashCredit` ("Photo by X on Unsplash" with UTM links). Store `ImageCredit` next to the image
+  (`stories.cover_credit`; inline images will carry it as a node attr).
 - **Rendering stored content.** `StoryBody` renders Tiptap JSON through an allowlist of node and
   mark types. Never use `dangerouslySetInnerHTML` for user content.
 
@@ -80,6 +88,9 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   platform is picked (Open Collective, GitHub Sponsors or Ko-fi).
 - **Dates render in UTC** until readers can choose a time zone (Phase 3 onboarding).
 - **Reading speed** 238 wpm (EN) / 218 wpm (ES).
+- **Unsplash hotlinking over privacy-maximal re-hosting**: Unsplash requires it. Readers' browsers
+  load those images from Unsplash's CDN, which sees their IP. The privacy policy (Phase 5) must say
+  so. Unsplash is not an ad network and sets no cookies on image requests.
 
 ## Known gaps / follow-ups
 
@@ -93,3 +104,7 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   `/auth/confirm` to a confirm-button page.
 - Google sign-in doesn't yet save the reader's locale on first sign-in (magic links do).
 - Turnstile on sign-up, rate limits and new-account limits are not in yet (spec: Trust & safety).
+  That includes a per-writer limit on photo searches; today only caching protects the Unsplash quota.
+- Unsplash is wired into the style guide only. Phase 1 must add it to the publish flow (cover) and
+  the editor (`/` → Unsplash inserts an `image` node with alt text and credit), and extend
+  `StoryBody` to render `image` nodes from allowed hosts with their credit.
