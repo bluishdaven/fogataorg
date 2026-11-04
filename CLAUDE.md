@@ -28,6 +28,9 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   reads use `'use cache'` + `cacheTag` in `src/lib/data/*`. Never read request data at the top of a
   layout. Client hooks like `usePathname()` outside Suspense also block prerendering: read
   `window.location` in event handlers instead.
+- **Partial prefetching** also prerenders with the reader's cookies, where clock reads
+  (`Date.now()`) are errors. Anything that checks a session or the current time must call
+  `await connection()` first, as `getViewer()` does.
 - **Routing.** UI pages live under `src/app/[locale]/` (`/en`, `/es`). Share URLs `/@handle` and
   `/@handle/slug` have no prefix: `src/proxy.ts` rewrites them to `/{locale}/u/...` using the
   `NEXT_LOCALE` cookie, then `Accept-Language`. Link to them with `next/link` and

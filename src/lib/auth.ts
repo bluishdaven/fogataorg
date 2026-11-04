@@ -1,5 +1,6 @@
 import "server-only";
 import { eq } from "drizzle-orm";
+import { connection } from "next/server";
 import { cache } from "react";
 import { profiles } from "@/lib/db/schema";
 import { withRls, type RlsClaims } from "@/lib/db/rls";
@@ -18,6 +19,9 @@ export type Viewer = {
  * Deduplicated per request.
  */
 export const getViewer = cache(async (): Promise<Viewer | null> => {
+  // Session checks compare token expiry with the clock, so they must run per request,
+  // never in a (runtime) prerender. Without this, partial prefetching trips on Date.now().
+  await connection();
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase.auth.getClaims();
   if (error || !data?.claims?.sub) return null;
