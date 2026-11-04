@@ -1,5 +1,5 @@
 /**
- * Seeds a LOCAL database with 8 writers, 14 topics and 20 bilingual stories.
+ * Seeds a LOCAL database with 8 writers, 14 topics and 20 stories (10 ES, 10 EN).
  * Idempotent: re-running updates the same rows (matched by email / slug).
  *
  *   npm run db:seed              local Supabase only

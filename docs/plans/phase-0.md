@@ -1,8 +1,8 @@
 # Phase 0 — Foundation
 
 Goal: a deployable skeleton where every later feature has a home. Readers can switch language and
-theme, sign in with a magic link (Google when credentials exist), and browse 20 seeded bilingual
-stories. Lint, typecheck, unit, RLS and e2e tests run locally and in CI.
+theme, sign in with a magic link (Google when credentials exist), and browse 20 seeded stories in
+Spanish and English. Lint, typecheck, unit, RLS and e2e tests run locally and in CI.
 
 ## Decisions made before building
 
@@ -43,7 +43,7 @@ stories. Lint, typecheck, unit, RLS and e2e tests run locally and in CI.
 ## Tables (this phase)
 
 - `profiles` — created by trigger on `auth.users` insert; case-insensitive unique username.
-- `topics` — bilingual names; read-only for users.
+- `topics` — names in ES and EN; read-only for users.
 - `stories` — Tiptap JSON + plain text, status, language, soft delete, unique slug per author.
 - `story_topics` — join table, max 5 topics per story enforced by trigger.
 

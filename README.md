@@ -1,7 +1,7 @@
 # Fogata.org
 
-Stories around the fire. A warm, bilingual (Spanish and English) home for long-form reading and
-writing. No ads, no selling data, no dark patterns.
+Stories around the fire. A warm home for long-form reading and writing. No ads, no selling data,
+no dark patterns.
 
 ```bash
 npm install

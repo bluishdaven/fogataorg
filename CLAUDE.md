@@ -1,6 +1,6 @@
 # Fogata.org
 
-Bilingual (ES/EN) long-form reading and writing platform. Product spec: `docs/PRODUCT_SPEC.md`.
+Long-form reading and writing platform; the UI ships in English and Spanish. Product spec: `docs/PRODUCT_SPEC.md`.
 Phase plans: `docs/plans/`. What shipped: `docs/CHANGELOG.md`. Setup and deploys: `docs/SETUP.md`.
 
 @AGENTS.md

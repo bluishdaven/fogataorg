@@ -2,7 +2,7 @@
   "Metadata": {
     "title": "Fogata — historias alrededor del fuego",
     "titleTemplate": "%s · Fogata",
-    "description": "Un hogar cálido y bilingüe para historias largas en español e inglés. Lee, escribe y comparte alrededor de la fogata."
+    "description": "Un hogar cálido para historias largas. Lee, escribe y comparte alrededor de la fogata."
   },
   "Common": {
     "skipToContent": "Saltar al contenido",
@@ -44,10 +44,9 @@
   "Home": {
     "eyebrow": "Historias alrededor del fuego",
     "title": "Acércate. Alguien está contando una historia.",
-    "lede": "Fogata es un hogar bilingüe para la escritura larga. Sin anuncios, sin feeds hechos para que no dejes de deslizar: solo historias en español e inglés y la gente que las cuenta.",
+    "lede": "Fogata es un hogar cálido para la escritura larga. Sin anuncios, sin feeds hechos para que no dejes de deslizar: solo historias y la gente que las cuenta.",
     "latest": "Recién salidas del fuego",
-    "empty": "Todavía no hay historias. Ejecuta npm run db:seed para encender la primera fogata.",
-    "allLanguages": "Historias en español e inglés"
+    "empty": "Todavía no hay historias. Ejecuta npm run db:seed para encender la primera fogata."
   },
   "StoryCard": {
     "byline": "{name}",

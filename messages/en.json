@@ -2,7 +2,7 @@
   "Metadata": {
     "title": "Fogata — stories around the fire",
     "titleTemplate": "%s · Fogata",
-    "description": "A warm, bilingual home for long-form stories in English and Spanish. Read, write and share around the campfire."
+    "description": "A warm home for long-form stories. Read, write and share around the campfire."
   },
   "Common": {
     "skipToContent": "Skip to content",
@@ -44,10 +44,9 @@
   "Home": {
     "eyebrow": "Stories around the fire",
     "title": "Pull up a seat. Someone is telling a story.",
-    "lede": "Fogata is a bilingual home for long-form writing. No ads, no feeds built to keep you scrolling, just stories in English and Spanish and the people who tell them.",
+    "lede": "Fogata is a warm home for long-form writing. No ads, no feeds built to keep you scrolling, just stories and the people who tell them.",
     "latest": "Fresh from the fire",
-    "empty": "No stories yet. Run npm run db:seed to light the first fire.",
-    "allLanguages": "Stories in English and Spanish"
+    "empty": "No stories yet. Run npm run db:seed to light the first fire."
   },
   "StoryCard": {
     "byline": "{name}",

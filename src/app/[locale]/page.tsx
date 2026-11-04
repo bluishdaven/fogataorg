@@ -22,12 +22,9 @@ export default async function HomePage() {
       </section>
 
       <section aria-labelledby="latest-title" className="max-w-3xl">
-        <div className="flex items-baseline justify-between gap-4 border-b border-border pb-3">
-          <h2 id="latest-title" className="font-serif text-2xl font-semibold">
-            {t("latest")}
-          </h2>
-          <p className="text-sm text-muted-foreground">{t("allLanguages")}</p>
-        </div>
+        <h2 id="latest-title" className="border-b border-border pb-3 font-serif text-2xl font-semibold">
+          {t("latest")}
+        </h2>
         <Suspense fallback={<StoryListSkeleton />}>
           <LatestStories empty={t("empty")} />
         </Suspense>
