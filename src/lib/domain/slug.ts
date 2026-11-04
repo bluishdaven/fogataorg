@@ -1,12 +1,14 @@
 /**
  * URL slugs for stories, topics and circles. Accents are folded so
- * "Canción de cuna" → "cancion-de-cuna"; ñ becomes n.
+ * "Canción de cuna" → "cancion-de-cuna"; ñ becomes n; apostrophes vanish
+ * ("don't" → "dont").
  */
 export function slugify(input: string, maxLength = 80): string {
   const slug = input
     .normalize("NFKD")
     .replace(/\p{M}+/gu, "")
     .toLowerCase()
+    .replace(/['’]/g, "")
     .replace(/&/g, " and ")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");

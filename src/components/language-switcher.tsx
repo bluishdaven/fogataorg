@@ -46,7 +46,8 @@ export function LanguageSwitcher() {
         <Button
           variant="ghost"
           size="sm"
-          aria-label={t("current", { language: t(locale) })}
+          // Visible text ("EN") must be part of the accessible name (WCAG 2.5.3).
+          aria-label={t("current", { language: locale.toUpperCase() })}
           disabled={pending}
           data-testid="language-switcher"
         >
