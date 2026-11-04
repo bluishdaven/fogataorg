@@ -253,6 +253,54 @@
     letter-spacing: 0.6em;
     color: var(--muted-foreground);
   }
+  .prose-fogata .pull-quote {
+    font-size: 1.5em;
+    line-height: 1.35;
+    font-style: italic;
+    text-align: center;
+    color: var(--ember-text);
+    margin-block: 1.6em;
+    padding-inline: 1em;
+    text-wrap: balance;
+  }
+  .prose-fogata .callout {
+    background: var(--secondary);
+    border-radius: var(--radius-lg);
+    padding: 0.9em 1.1em;
+    font-family: var(--font-sans);
+    font-size: 0.9em;
+    line-height: 1.55;
+  }
+  .prose-fogata .figure {
+    margin-block: 1.8em;
+  }
+  .prose-fogata .figure figcaption {
+    margin-top: 0.6em;
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    line-height: 1.4;
+    text-align: center;
+    color: var(--muted-foreground);
+  }
+  .prose-fogata .figure-wide {
+    position: relative;
+    left: 50%;
+    width: min(calc(100vw - 2rem), 1100px);
+    transform: translateX(-50%);
+  }
+  .prose-fogata pre {
+    font-family: var(--font-mono);
+    font-size: 0.8em;
+    line-height: 1.6;
+    background: var(--muted);
+    border-radius: var(--radius-lg);
+    padding: 1em 1.2em;
+    overflow-x: auto;
+  }
+  .prose-fogata pre code {
+    background: none;
+    padding: 0;
+  }
   .prose-fogata code {
     font-family: var(--font-mono);
     font-size: 0.85em;
@@ -271,4 +319,26 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Editor (Tiptap) */
+.editor-body p.is-empty::before,
+.editor-body h2.is-empty::before,
+.editor-body h3.is-empty::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  color: var(--muted-foreground);
+  opacity: 0.8;
+}
+.editor-body p.is-empty:not(.is-editor-empty)::before {
+  /* Only hint on the empty line the cursor is on, not every blank paragraph. */
+  content: none;
+}
+.editor-body .ProseMirror-selectednode {
+  outline: none;
+}
+.editor-body :focus-visible {
+  outline: none;
 }

@@ -28,6 +28,8 @@ const BLOCK_TYPES = new Set([
   "orderedList",
   "codeBlock",
   "horizontalRule",
+  "pullQuote",
+  "callout",
 ]);
 
 /** Plain text of a document, one line per block. Used for search, excerpts and reading time. */

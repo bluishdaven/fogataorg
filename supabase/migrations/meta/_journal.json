@@ -22,6 +22,20 @@
       "when": 1793826997355,
       "tag": "20261104211637_stories_cover_image",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793828369186,
+      "tag": "20261104213929_story_editing",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793828369496,
+      "tag": "20261104213930_story_images_bucket",
+      "breakpoints": true
     }
   ]
 }

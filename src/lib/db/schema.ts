@@ -16,6 +16,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { anonRole, authenticatedRole, authUid, authUsers } from "drizzle-orm/supabase";
 import type { TiptapDoc } from "@/lib/domain/content";
+import type { PendingChanges } from "@/lib/domain/stories";
 import type { ImageCredit } from "@/lib/domain/unsplash";
 
 /**
@@ -107,6 +108,12 @@ export const stories = pgTable(
     // Who to credit for the cover (e.g. an Unsplash photographer). Null for the writer's own uploads.
     coverCredit: jsonb("cover_credit").$type<ImageCredit>(),
     canonicalUrl: text("canonical_url"),
+    seoTitle: text("seo_title").notNull().default(""),
+    seoDescription: text("seo_description").notNull().default(""),
+    // Edits to a published story wait here until the writer publishes them.
+    pendingChanges: jsonb("pending_changes").$type<PendingChanges>(),
+    // Bumped on every save; saves must name the revision they started from.
+    revision: integer("revision").notNull().default(0),
     ...timestamps,
     deletedAt: timestamp("deleted_at", { withTimezone: true }),
   },
@@ -116,7 +123,12 @@ export const stories = pgTable(
       .on(t.publishedAt.desc())
       .where(sql`${t.status} = 'published' and ${t.deletedAt} is null`),
     index("stories_author_idx").on(t.authorId),
-    check("stories_title_length", sql`char_length(${t.title}) between 1 and 200`),
+    // Drafts may be untitled; anything live needs a title.
+    check(
+      "stories_title_length",
+      sql`char_length(${t.title}) <= 200 and (${t.status} = 'draft' or char_length(btrim(${t.title})) >= 1)`,
+    ),
+    check("stories_seo_lengths", sql`char_length(${t.seoTitle}) <= 70 and char_length(${t.seoDescription}) <= 160`),
     check("stories_subtitle_length", sql`char_length(${t.subtitle}) <= 280`),
     check("stories_slug_format", sql`${t.slug} ~ '^[a-z0-9]+(-[a-z0-9]+)*$'`),
     check("stories_reading_time_positive", sql`${t.readingTime} >= 1`),

@@ -1,10 +1,11 @@
 "use client";
 
-import { LogOut, UserRound } from "lucide-react";
+import { BookOpenText, LogOut, Settings, UserRound } from "lucide-react";
 import NextLink from "next/link";
 import { useTranslations } from "next-intl";
 import { signOut } from "@/app/actions/auth";
 import { Button } from "@/components/ui/button";
+import { Link } from "@/i18n/navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -58,6 +59,19 @@ export function AccountDropdown({
             {t("Nav.profile")}
           </NextLink>
         </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/me/stories">
+            <BookOpenText />
+            {t("Nav.myStories")}
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/settings/profile">
+            <Settings />
+            {t("Nav.settings")}
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <form action={signOut} className="w-full">
             <input type="hidden" name="locale" value={locale} />

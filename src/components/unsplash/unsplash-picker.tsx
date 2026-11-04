@@ -34,12 +34,22 @@ const DEBOUNCE_MS = 350;
 export function UnsplashPicker({
   onSelect,
   trigger,
+  open: controlledOpen,
+  onOpenChange,
 }: {
   onSelect: (photo: UnsplashPhoto) => void;
-  trigger?: ReactNode;
+  /** Custom trigger; pass null when opening it from elsewhere (controlled `open`). */
+  trigger?: ReactNode | null;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }) {
   const t = useTranslations("Unsplash");
-  const [open, setOpen] = useState(false);
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
+  const open = controlledOpen ?? uncontrolledOpen;
+  const setOpen = (value: boolean) => {
+    setUncontrolledOpen(value);
+    onOpenChange?.(value);
+  };
 
   const pick = (photo: UnsplashPhoto) => {
     void trackUnsplashSelection(photo.id);
@@ -49,14 +59,16 @@ export function UnsplashPicker({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {trigger ?? (
-          <Button variant="outline" data-testid="unsplash-trigger">
-            <ImagePlus />
-            {t("trigger")}
-          </Button>
-        )}
-      </DialogTrigger>
+      {trigger === null ? null : (
+        <DialogTrigger asChild>
+          {trigger ?? (
+            <Button variant="outline" data-testid="unsplash-trigger">
+              <ImagePlus />
+              {t("trigger")}
+            </Button>
+          )}
+        </DialogTrigger>
+      )}
       <DialogContent
         closeLabel={t("close")}
         className="flex max-h-[85dvh] flex-col gap-4 sm:max-w-3xl"
