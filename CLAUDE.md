@@ -94,6 +94,17 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   `getViewer()` (`src/lib/auth.ts`) is the only way to get the signed-in user. Magic links use the
   token-hash flow (`/auth/confirm`) so they work across browsers; Google uses PKCE (`/auth/callback`).
   Post-login redirects go through `safeNextPath()`.
+- **Profile photos** (`src/lib/domain/avatars.ts`, `src/components/profile/upload-avatar.ts`,
+  `src/components/avatar.tsx`). The browser center-crops to a square, scales to ≤512px and re-encodes
+  WebP (strips EXIF/GPS), uploads to the public `avatars` bucket under `<user id>/<uuid>.webp` (storage
+  policies: own folder only, WebP only, 1 MB), then `updateAvatar` saves the URL. Only URLs in the
+  user's own folder are accepted, and a DB check (`profiles_avatar_url_own_folder`) enforces it even
+  through the Data API. Replacing or removing a photo deletes the old file. Render avatars only with
+  `<Avatar>`, which shows initials unless the URL is in our bucket; author queries carry `avatarUrl`.
+- **Touch targets.** Buttons and inputs are 44px on phones and compact from `sm:` up (sizes in
+  `components/ui/button.tsx` / `input.tsx`). Custom controls follow the same rule (`min-h-11` /
+  `min-h-10 … sm:min-h-8`), or get an invisible `after:` hit area when they must stay small visually.
+  Buttons are pill-shaped. On phones the header hides the wordmark once the account menu is present.
 - **Public site vs. everything else.** `isPublicSite` (`src/lib/deployment.ts`) is true only on Vercel
   production (`VERCEL_ENV`, read at build time). Internal pages like the style guide (`/design`) 404
   there and drop out of the footer; local, CI and preview builds keep them because e2e tests use them.

@@ -1,5 +1,20 @@
 # Changelog
 
+## Profile photos and a touch-friendly refresh (2026-11-05)
+
+**Demo** (signed in): **Settings → Profile** → **Upload photo**. Any photo is cropped to a square
+and shows next to your name in the header, on your profile, in bylines, story lists, search and
+responses. **Change photo** replaces it (the old file is deleted); **Remove** brings your initials back.
+On a phone, every button and field is now a comfortable 44px, with pill-shaped buttons, a new byline
+with the writer's photo, larger topic tags and a writer card.
+
+- `avatars` storage bucket (own folder, WebP, 1 MB) and a database check that a profile photo URL
+  points into its owner's folder.
+- Buttons, inputs, header controls, story actions, response actions, topic chips, footer links and
+  settings tabs meet 44px (or 40px with spacing) on phones; desktop stays compact.
+- Tests: 131 unit, 53 RLS/storage/job, 67 Playwright (upload, crop, replace with cleanup, remove,
+  non-photo files, axe on settings).
+
 ## Phase 2, part 3 — Email summaries (2026-11-05)
 
 **Demo** (signed in): avatar menu → **Settings** → **Email** shows **Weekly summary** (on by default,
