@@ -39,6 +39,15 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   triggers (`public.notify`), grouped per recipient/type/target while unread, and pushed to the bell
   through Supabase Realtime. Per-reader data on story pages loads in its own `<Suspense>` so the cached
   story text never waits for it. Pinning goes through `public.set_response_pinned()`.
+- **Circles** (`src/lib/data/circles.ts`, `src/app/actions/circles.ts`, `src/components/circles/`).
+  `circles` (accent color, optional header), `circle_members` (one owner created by trigger, editors,
+  writers) and `circle_submissions` (pending → accepted/declined; one active circle per story; members'
+  submissions are auto-accepted by an AFTER INSERT trigger because RLS checks run after BEFORE
+  triggers). Editors decide; `decided_by/at` are stamped by trigger. Text on an accent always uses
+  `readableTextOn()` (white or pure black, ≥ 4.58:1). Circle pages live at `/{locale}/circles/{slug}`.
+- **Raw SQL inside Drizzle selects:** on single-table queries Drizzle renders `${table.column}` unqualified,
+  which breaks correlated subqueries (`"id"` resolves to the subquery's table). Write the qualified name
+  (`"circles"."id"`) in those subqueries.
 - **Grants vs. Drizzle inserts:** Drizzle names every column in INSERT (DEFAULT for unset ones), and
   Postgres checks column privileges even for DEFAULT, so don't rely on column-level INSERT grants;
   put "can't set X on insert" in the insert policy instead. Column-level UPDATE grants are fine.
@@ -148,9 +157,9 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
 - Turnstile on sign-up, rate limits and new-account limits are not in yet (spec: Trust & safety).
   That includes a per-writer limit on photo searches; today only caching protects the Unsplash quota.
 - Changing a username breaks old `/@old/...` links; add redirects from previous usernames.
-- Phase 2 still to do: circles (community publications with editors and a submission queue) and email
-  notifications/digests (needs an email provider; Resend in the spec). Reading lists beyond one
-  "Saved" list, undoing sparks, editing responses, blocking/muting and rate limits are also open.
+- Phase 2 still to do: email notifications/digests (needs an email provider; Resend in the spec).
+  Also open: reading lists beyond one "Saved" list, undoing sparks, editing responses, blocking and
+  muting, rate limits, deleting or transferring circles, a decline note for writers, and circle RSS.
 - Unsplash thumbnails in lists show without a credit line (the credit is on the story page). Check
   this is acceptable when applying for Unsplash production access.
 - A long-running `next dev` can lose track of routes after many new route folders are added (all

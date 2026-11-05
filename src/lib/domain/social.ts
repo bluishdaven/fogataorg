@@ -7,7 +7,7 @@ export const RESPONSE_MAX = 4000;
 const BLOCK_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 
 export const followSchema = z.object({
-  target: z.enum(["user", "topic"]),
+  target: z.enum(["user", "topic", "circle"]),
   id: z.uuid(),
   follow: z.boolean(),
 });

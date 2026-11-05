@@ -29,6 +29,7 @@ type StoryRow = {
 
 type PersonRow = { username: string; display_name: string; bio: string };
 type TopicRow = { slug: string; name_en: string; name_es: string };
+type CircleRow = { slug: string; name: string; description: string; accent_color: string };
 
 export async function search(query: string, lang: "all" | Locale) {
   "use cache";
@@ -36,7 +37,7 @@ export async function search(query: string, lang: "all" | Locale) {
   cacheTag("stories", "search");
 
   const q = query.trim();
-  if (!q) return { stories: [], people: [], topics: [] };
+  if (!q) return { stories: [], people: [], topics: [], circles: [] };
   const language = lang === "all" ? null : lang;
 
   return asAnon(async (tx) => {
@@ -97,7 +98,20 @@ export async function search(query: string, lang: "all" | Locale) {
       limit 6
     `);
 
+    const circleRows = await tx.execute<CircleRow>(sql`
+      with query as (select public.f_unaccent(lower(${q})) as plain)
+      select c.slug, c.name, c.description, c.accent_color
+      from public.circles c
+      cross join query
+      where strpos(public.f_unaccent(lower(c.name)), query.plain) > 0
+         or strpos(public.f_unaccent(lower(c.description)), query.plain) > 0
+         or extensions.word_similarity(query.plain, public.f_unaccent(lower(c.name))) > 0.5
+      order by extensions.word_similarity(query.plain, public.f_unaccent(lower(c.name))) desc, c.name
+      limit 6
+    `);
+
     return {
+      circles: circleRows.map((row) => ({ slug: row.slug, name: row.name, description: row.description, accentColor: row.accent_color })),
       stories: storyRows.map((row) => ({
         title: row.title,
         subtitle: row.subtitle,

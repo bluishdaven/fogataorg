@@ -47,9 +47,13 @@ async function List() {
               ? t("notice.follow", { actor, others: item.others })
               : item.type === "spark" && item.responseExcerpt
                 ? t("notice.sparkResponse", { actor, others: item.others, title })
-                : t(`notice.${item.type}`, { actor, others: item.others, title });
+                : item.type === "submission" || item.type === "accepted" || item.type === "declined"
+                  ? t(`notice.${item.type}`, { actor, others: item.others, title, circle: item.circle?.name ?? "" })
+                  : t(`notice.${item.type}`, { actor, others: item.others, title });
           const href =
-            item.type === "follow" && item.actor
+            item.type === "submission" && item.circle
+              ? `/${locale}/circles/${item.circle.slug}/manage`
+              : item.type === "follow" && item.actor
               ? profilePath(item.actor.username)
               : item.story
                 ? `${storyPath(item.story.author, item.story.slug)}${item.type === "spark" && !item.responseExcerpt ? "" : "#responses"}`

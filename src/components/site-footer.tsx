@@ -19,6 +19,9 @@ export function SiteFooter() {
           <Link href="/topics" className="underline-offset-4 hover:text-foreground hover:underline">
             {t("Nav.topics")}
           </Link>
+          <Link href="/circles" className="underline-offset-4 hover:text-foreground hover:underline">
+            {t("Nav.circles")}
+          </Link>
           <Link href="/design" className="underline-offset-4 hover:text-foreground hover:underline">
             {t("Nav.design")}
           </Link>

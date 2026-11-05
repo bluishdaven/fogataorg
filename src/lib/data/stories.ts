@@ -122,7 +122,20 @@ export async function getStory(handle: string, slug: string) {
       .where(eq(storyTopics.storyId, row.id))
       .orderBy(topics.slug);
 
-    return { ...row, excerpt: excerpt(row.contentText, 160), topics: storyTopicRows };
+    const [circle] = await tx.execute<{ slug: string; name: string; accent_color: string }>(sql`
+      select c.slug, c.name, c.accent_color
+      from public.circle_submissions cs
+      join public.circles c on c.id = cs.circle_id
+      where cs.story_id = ${row.id} and cs.status = 'accepted'
+      limit 1
+    `);
+
+    return {
+      ...row,
+      excerpt: excerpt(row.contentText, 160),
+      topics: storyTopicRows,
+      circle: circle ? { slug: circle.slug, name: circle.name, accentColor: circle.accent_color } : null,
+    };
   });
 
   // A miss may be a scheduled story that goes live soon, so don't remember it for long.

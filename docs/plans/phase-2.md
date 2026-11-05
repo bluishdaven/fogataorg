@@ -7,7 +7,8 @@ whole story or to one paragraph) and get grouped notifications that never spam.
 
 Done: follows, sparks, saved, responses (threads, paragraph anchors, mentions, pinning, sparks),
 in-app notifications with Realtime. Also shipped alongside: list thumbnails and search.
-Remaining: circles; email notifications (provider decision pending).
+Circles shipped the same day (members, submission queue, follows, notifications, search).
+Remaining: email notifications (provider decision pending).
 
 ## Order
 

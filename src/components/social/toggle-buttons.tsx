@@ -72,7 +72,7 @@ export function FollowButton({
   loginHref,
   size = "sm",
 }: {
-  target: "user" | "topic";
+  target: "user" | "topic" | "circle";
   id: string;
   initialFollowing: boolean;
   signedIn: boolean;

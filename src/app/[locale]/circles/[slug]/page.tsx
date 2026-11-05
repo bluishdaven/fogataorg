@@ -1,0 +1,111 @@
+import type { Metadata } from "next";
+import NextLink from "next/link";
+import { getLocale, getTranslations } from "next-intl/server";
+import { notFound } from "next/navigation";
+import { Suspense } from "react";
+import { CircleHeader } from "@/components/circles/circle-header";
+import { SubmitStoryDialog } from "@/components/circles/submit-story-dialog";
+import { FollowButton } from "@/components/social/toggle-buttons";
+import { StoryCard } from "@/components/story-card";
+import { buttonVariants } from "@/components/ui/button";
+import { Toaster } from "@/components/ui/sonner";
+import { Link } from "@/i18n/navigation";
+import { getViewer } from "@/lib/auth";
+import { getCircle, getCircleViewerState, listSubmittableStories } from "@/lib/data/circles";
+import { profilePath } from "@/lib/domain/handle-routes";
+
+type Props = PageProps<"/[locale]/circles/[slug]">;
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const circle = await getCircle(slug);
+  if (!circle) return {};
+  return { title: circle.name, description: circle.description || undefined };
+}
+
+export default function CirclePage({ params }: Props) {
+  return (
+    <div className="mx-auto max-w-4xl px-4 py-10 sm:py-14">
+      <Toaster position="bottom-center" />
+      <Suspense fallback={<div className="h-48 animate-pulse rounded-2xl bg-muted" aria-hidden />}>
+        <Circle params={params} />
+      </Suspense>
+    </div>
+  );
+}
+
+async function Circle({ params }: Pick<Props, "params">) {
+  const { slug } = await params;
+  const circle = await getCircle(slug);
+  if (!circle) notFound();
+  const t = await getTranslations("Circles");
+  const editors = circle.members.filter((m) => m.role === "owner" || m.role === "editor");
+
+  return (
+    <>
+      <CircleHeader name={circle.name} description={circle.description} accentColor={circle.accentColor} header={circle.header}>
+        <Suspense fallback={<div className="h-8 w-40 animate-pulse rounded bg-black/10" aria-hidden />}>
+          <CircleActions circleId={circle.id} slug={circle.slug} name={circle.name} />
+        </Suspense>
+      </CircleHeader>
+      <div className="mt-10 grid gap-10 md:grid-cols-[minmax(0,1fr)_14rem]">
+        <section aria-labelledby="circle-stories">
+          <h2 id="circle-stories" className="border-b border-border pb-3 font-serif text-2xl font-semibold">
+            {t("stories")}
+          </h2>
+          {circle.stories.length === 0 ? (
+            <p className="py-8 text-muted-foreground">{t("noStories")}</p>
+          ) : (
+            <div data-testid="circle-stories">
+              {circle.stories.map((story) => (
+                <StoryCard key={`${story.author.username}/${story.slug}`} story={story} />
+              ))}
+            </div>
+          )}
+        </section>
+        <aside aria-labelledby="circle-editors" className="text-sm">
+          <h2 id="circle-editors" className="mb-2 font-semibold text-muted-foreground">
+            {t("editors")}
+          </h2>
+          <ul className="flex flex-col gap-1.5">
+            {editors.map((member) => (
+              <li key={member.userId}>
+                <NextLink href={profilePath(member.username)} className="hover:text-ember-text">
+                  {member.displayName}
+                </NextLink>{" "}
+                <span className="text-xs text-muted-foreground">{t(`roles.${member.role}`)}</span>
+              </li>
+            ))}
+          </ul>
+        </aside>
+      </div>
+    </>
+  );
+}
+
+async function CircleActions({ circleId, slug, name }: { circleId: string; slug: string; name: string }) {
+  const viewer = await getViewer();
+  const [state, t, locale] = await Promise.all([getCircleViewerState(viewer, circleId), getTranslations("Circles"), getLocale()]);
+  const submittable = viewer ? await listSubmittableStories(viewer) : [];
+  const canManage = state.role === "owner" || state.role === "editor";
+  return (
+    <div className="flex flex-wrap items-center gap-3 text-sm">
+      <span className="opacity-90" data-testid="circle-followers">
+        {t("followerCount", { count: state.followers })}
+      </span>
+      <FollowButton
+        target="circle"
+        id={circleId}
+        initialFollowing={state.following}
+        signedIn={state.signedIn}
+        loginHref={`/${locale}/login?next=${encodeURIComponent(`/${locale}/circles/${slug}`)}`}
+      />
+      {viewer ? <SubmitStoryDialog circleId={circleId} circleName={name} stories={submittable} /> : null}
+      {canManage ? (
+        <Link href={`/circles/${slug}/manage`} className={buttonVariants({ variant: "secondary", size: "sm" })} data-testid="manage-circle">
+          {t("manage")}
+        </Link>
+      ) : null}
+    </div>
+  );
+}

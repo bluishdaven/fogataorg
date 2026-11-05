@@ -44,15 +44,16 @@ export async function setFollow(input: unknown): Promise<Ok<{ following: boolean
   const { target, id, follow } = parsed.data;
   return asViewer(async (viewer) => {
     await withRls(viewer.claims, async (tx) => {
-      const condition =
-        target === "user"
-          ? and(eq(follows.followerId, viewer.id), eq(follows.followedUserId, id))
-          : and(eq(follows.followerId, viewer.id), eq(follows.followedTopicId, id));
+      const column = { user: follows.followedUserId, topic: follows.followedTopicId, circle: follows.followedCircleId }[target];
+      const condition = and(eq(follows.followerId, viewer.id), eq(column, id));
       if (follow) {
-        await tx
-          .insert(follows)
-          .values(target === "user" ? { followerId: viewer.id, followedUserId: id } : { followerId: viewer.id, followedTopicId: id })
-          .onConflictDoNothing();
+        const values =
+          target === "user"
+            ? { followerId: viewer.id, followedUserId: id }
+            : target === "topic"
+              ? { followerId: viewer.id, followedTopicId: id }
+              : { followerId: viewer.id, followedCircleId: id };
+        await tx.insert(follows).values(values).onConflictDoNothing();
       } else {
         await tx.delete(follows).where(condition);
       }

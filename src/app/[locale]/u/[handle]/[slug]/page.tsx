@@ -70,6 +70,17 @@ async function Story({ params }: Pick<Props, "params">) {
     <article id="story" className="px-4 py-12 sm:py-16" lang={story.language}>
       <ReadingProgress targetId="story" />
       <header className="mx-auto mb-10 flex max-w-[var(--measure)] flex-col gap-4">
+        {story.circle ? (
+          <Link
+            href={`/circles/${story.circle.slug}`}
+            className="flex w-fit items-center gap-2 text-sm font-medium hover:underline"
+            lang={locale}
+            data-testid="story-circle"
+          >
+            <span aria-hidden className="size-2.5 rounded-full" style={{ backgroundColor: story.circle.accentColor }} />
+            {t("Circles.publishedInChip", { circle: story.circle.name })}
+          </Link>
+        ) : null}
         {story.topics.length > 0 ? (
           <ul className="flex flex-wrap gap-2 text-xs font-medium" lang={locale}>
             {story.topics.map((topic) => (

@@ -96,7 +96,7 @@ async function Results({ searchParams }: Pick<Props, "searchParams">) {
   if (!q) return <p className="mt-8 text-muted-foreground">{t("hint")}</p>;
 
   const results = await search(q, lang);
-  const total = results.stories.length + results.people.length + results.topics.length;
+  const total = results.stories.length + results.people.length + results.topics.length + results.circles.length;
   if (total === 0) {
     return (
       <p className="mt-8 text-muted-foreground" role="status">
@@ -110,6 +110,27 @@ async function Results({ searchParams }: Pick<Props, "searchParams">) {
       <p className="sr-only" role="status">
         {t("summary", { stories: results.stories.length, people: results.people.length, topics: results.topics.length })}
       </p>
+
+      {results.circles.length ? (
+        <section aria-labelledby="circles-heading">
+          <h2 id="circles-heading" className="mb-3 text-sm font-semibold tracking-wide text-muted-foreground uppercase">
+            {t("circles")}
+          </h2>
+          <ul className="grid gap-2 sm:grid-cols-2" data-testid="search-circles">
+            {results.circles.map((circle) => (
+              <li key={circle.slug}>
+                <Link href={`/circles/${circle.slug}`} className="flex items-start gap-3 rounded-lg border border-border p-3 hover:bg-accent">
+                  <span aria-hidden className="mt-1 size-3 shrink-0 rounded-full" style={{ backgroundColor: circle.accentColor }} />
+                  <span className="min-w-0">
+                    <span className="block font-medium">{circle.name}</span>
+                    {circle.description ? <span className="line-clamp-2 text-sm text-muted-foreground">{circle.description}</span> : null}
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       {results.topics.length ? (
         <section aria-labelledby="topics-heading">

@@ -1,5 +1,19 @@
 # Changelog
 
+## Phase 2, part 2 — Circles (2026-11-05)
+
+**Demo** (signed in): footer → **Circles** → **Start a circle**. Pick a name, an accent color (text
+on it is always readable) and an optional header photo. On the circle page, **Submit a story** offers
+one of your published stories; editors get a notification and accept or decline it under **Manage**,
+where the owner can also add editors (who review) and writers (who skip review) by username. Accepted
+stories appear on the circle page and show "Published in …" on the story. Readers can follow circles,
+and search finds them.
+
+- Tables: `circles`, `circle_members`, `circle_submissions`; follows and notifications extended.
+- Notifications for new submissions (to editors) and decisions (to the writer), with the circle's name.
+- Tests: 114 unit (including accent contrast across all grays), 40 RLS/trigger, 59 Playwright (two-user
+  submission and review flow, manage-page access, axe on circle pages).
+
 ## Phase 2, part 1 — Social, search and thumbnails (2026-11-05)
 
 **Demo** (restart `npm run dev` first; signed in):

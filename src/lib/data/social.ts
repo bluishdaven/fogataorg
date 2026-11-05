@@ -223,6 +223,8 @@ export async function listNotifications(viewer: Viewer) {
         storySlug: stories.slug,
         storyAuthor: sql<string | null>`(select p.username from public.profiles p where p.id = ${stories.authorId})`,
         responseBody: responses.body,
+        circleName: sql<string | null>`(select c.name from public.circles c where c.id = ${notifications.circleId})`,
+        circleSlug: sql<string | null>`(select c.slug from public.circles c where c.id = ${notifications.circleId})`,
       })
       .from(notifications)
       .leftJoin(stories, eq(stories.id, notifications.storyId))
@@ -251,6 +253,7 @@ export async function listNotifications(viewer: Viewer) {
         others: Math.max(0, row.actorCount - 1),
         story: row.storySlug && row.storyAuthor ? { title: row.storyTitle ?? "", slug: row.storySlug, author: row.storyAuthor } : null,
         responseExcerpt: row.responseBody ? excerpt(row.responseBody, 90) : null,
+        circle: row.circleSlug && row.circleName ? { slug: row.circleSlug, name: row.circleName } : null,
       };
     });
   });
