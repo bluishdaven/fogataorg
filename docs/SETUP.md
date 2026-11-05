@@ -15,7 +15,8 @@ npm run dev       # http://localhost:3000
 - Supabase Studio: http://127.0.0.1:54323.
 - Activity summary emails also land in Mailpit (no Resend key needed locally). Send them now with
   `curl -H "Authorization: Bearer $CRON_SECRET" localhost:3000/api/cron/notification-emails`
-  (the secret is in `.env.local`). Notifications younger than 10 minutes wait for the next run.
+  (the secret is in `.env.local`). A run only emails readers whose `profiles.email_weekday` is
+  today (UTC), and notifications younger than 10 minutes wait for the next run.
 - Stop the stack with `npm run db:stop`. `npm run setup` is safe to re-run.
 - After re-seeding, restart `npm run dev` (cached listings don't know about seed runs).
 
@@ -97,19 +98,21 @@ Never run `npm run db:seed` against production; it refuses unless you pass `--al
    | `EMAIL_FROM` | `Fogata <hola@fogata.org>` (a verified Resend domain) |
    | `EMAIL_SIGNING_SECRET` | `openssl rand -base64 32`; signs unsubscribe links, keep it stable |
    | `CRON_SECRET` | `openssl rand -base64 32`; Vercel Cron sends it to the summary route |
+   | `EMAIL_SUMMARY_DAILY_LIMIT` | optional, default `80`; raise it with a paid Resend plan |
 
    The secret key is **not** needed by the app; keep it out of Vercel until a feature needs it.
 3. `next build` reads published stories to prerender listings, so the build needs `DATABASE_URL`.
 4. Add the `fogata.org` domain.
 5. `vercel.json` schedules `/api/cron/notification-emails` daily at 16:00 UTC (10:00 in Mexico City,
-   17:00/18:00 in Madrid). Hobby allows daily crons only and may run them any time within that
-   hour, which the job tolerates. Vercel adds the `CRON_SECRET` bearer header itself.
+   17:00/18:00 in Madrid). Each run emails the readers whose summary weekday it is, so every reader
+   gets at most one email a week. Hobby allows daily crons only and may run them any time within
+   that hour, which the job tolerates. Vercel adds the `CRON_SECRET` bearer header itself.
 
 ### 4. Email (Resend)
 
-Fogata sends one kind of email itself: a batched activity summary (at most one a day by default,
-or weekly, or off, chosen in **Settings → Email**). Magic links come from Supabase Auth, which can
-use Resend's SMTP (step 2.5 above).
+Readers get two kinds of email only: sign-in links (from Supabase Auth, which can use Resend's SMTP,
+step 2.5 above) and a weekly activity summary that they can turn off in **Settings → Email**. The
+summary goes out on a weekday assigned at random to each reader, only in weeks with new activity.
 
 1. Create a Resend account and add the `fogata.org` domain. Add the DNS records it shows (SPF and
    DKIM) and a DMARC record, e.g. `v=DMARC1; p=none; rua=mailto:<you>`. Wait until it's verified.
@@ -117,7 +120,8 @@ use Resend's SMTP (step 2.5 above).
    `RESEND_API_KEY`, and set `EMAIL_FROM`, `EMAIL_SIGNING_SECRET` and `CRON_SECRET` (table above).
 3. Trigger a run by hand to check it:
    `curl -H "Authorization: Bearer <CRON_SECRET>" https://fogata.org/api/cron/notification-emails`
-   returns `{"sent":…,"failed":…,"skipped":…}`; failures are logged in Vercel with the user id.
+   returns `{"sent":…,"failed":…,"skipped":…,"limited":…}` for today's readers; failures are logged
+   in Vercel with the user id. `limited: true` means the daily cap cut the run short.
 4. Every summary carries `List-Unsubscribe` and `List-Unsubscribe-Post` (one-click, RFC 8058),
    which Gmail and Yahoo require of bulk senders. The footer link opens a confirm page instead,
    because mail scanners prefetch links.
@@ -131,8 +135,9 @@ so preview deploys never email real readers (their cron doesn't run anyway).
   expect Supabase Pro for launch.
 - Supabase's built-in email is rate-limited to a few messages per hour; production needs SMTP
   (Resend, step 4).
-- Resend's free tier allows 3,000 emails a month and 100 a day, shared by magic links and summaries.
-  Summaries go out in one daily run, so once more than ~80 readers have something new on the same
-  day, that run hits the daily cap (the rest are retried the next day). Plan on Resend Pro then;
-  it's a paid service, so decide before launch.
+- Resend's free tier allows 3,000 emails a month and 100 a day, shared by sign-in links and summaries.
+  Summaries are spread over the week and capped at 80 a day, so the free tier covers about 560
+  readers with new activity per week; the monthly 3,000 (about 690 a week, sign-ins included) runs
+  out at roughly the same point. Past that, some summaries slip a week. Resend Pro is a paid service, so decide
+  before launch, then raise `EMAIL_SUMMARY_DAILY_LIMIT`.
 - Vercel Hobby is for non-commercial use; confirm a donation-funded .org qualifies before launch.

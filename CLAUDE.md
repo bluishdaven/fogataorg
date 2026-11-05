@@ -45,9 +45,12 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   submissions are auto-accepted by an AFTER INSERT trigger because RLS checks run after BEFORE
   triggers). Editors decide; `decided_by/at` are stamped by trigger. Text on an accent always uses
   `readableTextOn()` (white or pure black, ≥ 4.58:1). Circle pages live at `/{locale}/circles/{slug}`.
-- **Email** (`src/lib/email/`, `src/emails/`, `src/app/api/cron/notification-emails`). Batched activity
-  summaries only, never one email per event: `profiles.email_frequency` (daily default, weekly, off),
-  sent by a daily Vercel Cron (`vercel.json`, Bearer `CRON_SECRET`). The job claims a reader by
+- **Email** (`src/lib/email/`, `src/emails/`, `src/app/api/cron/notification-emails`). Fogata sends
+  only sign-in links (Supabase Auth) and a weekly activity summary, never one email per event.
+  `profiles.email_frequency` is `weekly` (default) or `off`; `profiles.email_weekday` (random 0–6 at
+  sign-up, UTC, not user-editable yet) phases sends: a daily Vercel Cron (`vercel.json`, Bearer
+  `CRON_SECRET`) emails only that weekday's readers, at most `EMAIL_SUMMARY_DAILY_LIMIT` (80) per run,
+  longest-waiting first; the rest wait a week. The job claims a reader by
   stamping `email_last_sent_at` before sending (gives it back on failure) and marks covered
   notifications `emailed_at`; `notify()` clears `emailed_at` when a new actor joins a group. Resend
   when `RESEND_API_KEY` is set, else Mailpit (`MAILPIT_URL`). Wording and links come from
@@ -141,8 +144,10 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
 - **English fallback, browser detection first**: spec says English-first with Spanish as an equal.
 - **Campfire vocabulary per locale**: ES UI says Chispas / Lo que arde; EN UI says Sparks /
   Burning now.
-- **Summaries, not alerts**: email is one batched summary a day (or week, or off). A daily cron fits
-  Vercel Hobby and keeps Fogata quiet; real-time email can come later if readers ask.
+- **Two kinds of email only**: sign-in links and a weekly summary (or none). Quiet by design.
+  Weekly sends are phased by a per-reader weekday so each day carries a seventh of them, which keeps
+  Resend's free tier (100/day, shared with sign-in links) usable for longer; the daily cron fits
+  Vercel Hobby.
 - **No "Pro" tier anywhere**: everyone gets everything. Donations will be an external link once the
   platform is picked (Open Collective, GitHub Sponsors or Ko-fi).
 - **Dates render in UTC** until readers can choose a time zone (Phase 3 onboarding).
@@ -177,9 +182,10 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   this is acceptable when applying for Unsplash production access.
 - A long-running `next dev` can lose track of routes after many new route folders are added (all
   `/@…` pages 404 with no error). Restart the dev server if that happens.
-- Resend's free tier caps sends at 100/day (magic links included). The summary job sends up to 300
-  readers per run, so past ~80 active readers a day the free tier fails the rest until the next run
-  (logged, retried). Resend Pro is a paid service: ask before switching.
+- Resend's free tier caps sends at 100/day (sign-in links included), so the summary job stops at 80 a
+  run: about 560 readers with new activity a week. Past that, some summaries slip a week (logged as
+  "daily summary cap reached"). Resend Pro is a paid service: ask before switching, then raise
+  `EMAIL_SUMMARY_DAILY_LIMIT`. Readers can't pick their summary day yet.
 - Summary emails list stories by title only; no story images in email (would need hosted copies of
   Unsplash images or hotlinks that some clients block).
 - E2E runs against `npm run dev` locally (magic links only redirect to port 3000) and against the
