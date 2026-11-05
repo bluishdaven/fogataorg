@@ -27,6 +27,7 @@ Ranked by impact, in small commits.
 | 3 | **Focus lost when dialogs close.** Radix only returns focus to a `<DialogTrigger>`. Dialogs opened from code had none, so focus fell to `<body>` and Tab restarted at the top of the page. | Badge guide, publish dialog, Unsplash picker from the editor's photo menu | Keyboard and screen-reader users lose their place every time (WCAG 2.4.3). | `DialogContent` remembers the opener, or for a menu item the menu's button, and restores focus. | `dialog.test.tsx` (unit), `keyboard.spec.ts`, `writing.spec.ts` |
 | 4 | **Story page layout shift on phones: CLS 0.24** (Lighthouse mobile, the "poor" threshold is 0.25). The Suspense skeleton was shorter than the screen, so the footer showed and then jumped. | `/@handle/slug` | CLS is a Core Web Vital. Readers lose their place when the page jumps. | The skeleton is at least one screen tall. CLS is now **0.001**, and the story page's Lighthouse performance score went from 68 to 83. | Lighthouse (no stable e2e signal) |
 | 5 | **Supabase client in every page's JS.** The bell imported it at module level, so about 66 KB (gzipped) loaded on every page, even for signed-out readers. | Header (`NotificationBell`) | That's a fifth of the JS, parsed before the page is interactive on slow phones. | The bell imports the client inside its effect, after hydration. Home 317 → 251 KB, story 361 → 281 KB; unused JS 115 → 50 KB. | `social.spec.ts` (live bell) |
+| 5b | **The bell never updated live.** It subscribed to Realtime before supabase-js passed the session token along, so it joined as `anon`. Realtime refused the subscription ("invalid column for filter user_id"), and the count changed only on focus or navigation. Found by the new live-bell test. | Header bell | CLAUDE.md promises live notifications; readers saw stale counts. | The bell awaits `realtime.setAuth()` before subscribing. | `social.spec.ts` (live bell) |
 | 6 | **Focus hidden under the sticky header.** Shift+Tab scrolls the focused card to the top edge, under the 56–64px header (5 cards on home, 12 on circles). | All long pages | WCAG 2.4.11 (focus not obscured). | `scroll-padding-top: 5rem` on `<html>`. It also fixes anchor jumps. | `keyboard.spec.ts` |
 | 7 | **Hovered primary buttons failed contrast.** `hover:bg-primary/80` faded toward the page: white text fell to 3.81:1 (light) and 4.26:1 (sepia). | Every default `Button` | Text must stay at 4.5:1 in every state, and axe only checks resting states. | Hover mixes 15% foreground into the primary color, which *raises* contrast in all themes: 6.3, 8.0 and 6.8:1. | `theme-a11y.spec.ts` (3 themes) |
 | 8 | **Form errors not tied to fields.** Fields had `aria-invalid` and the messages sat in a summary list, but nothing linked the two. | Settings → Profile, circle form | A screen reader on the field heard "invalid" with no reason (WCAG 3.3.1). | Each message has an id, and the field's `aria-describedby` points at it, next to the existing hint. | `profile-topics-reader.spec.ts` |
@@ -158,6 +159,21 @@ Ranked by impact, in small commits.
   this is a nit.
 - **"Merch, coming soon"** is a disabled button: skipped by Tab and 2.5:1. That's exempt as
   inactive, but plain text with a "soon" chip would read better.
+
+### 2.9 Test suite notes (not UI, found while running it)
+
+- **`email.spec.ts` "writers get a summary email…" is timing-dependent.** It expects "1 new
+  notification", the follow. Whether the writer's first-story Kindling notification is already in
+  the summary depends on whether `check_writing_badge()` sees the new story at publish time:
+  `published_at` comes from the app clock, the trigger compares it with the transaction's `now()`,
+  and they're milliseconds apart. If the trigger misses it, the daily job announces the badge later.
+  On this machine it passed twice and failed three times with "2 new notifications". The test
+  should accept the badge, or publish before following and assert on the follow line only.
+- **`reading.spec.ts` needs a fresh seed.** It looks for seed stories on the home page, which lists
+  the 20 newest. After a day of e2e runs the shared local DB had 164 newer test stories, so a build
+  made then doesn't list them. `npm run db:reset && npm run db:seed` fixes it locally. A longer-term
+  option is giving e2e-created stories an old `published_at`, or filtering them out of the home
+  assertion.
 
 ## 3. Checked and fine
 

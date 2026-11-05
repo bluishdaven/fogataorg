@@ -15,6 +15,8 @@ Open a story on a phone-sized window: the footer no longer jumps.
 - **Contrast**: hovered primary buttons and the editor's hints pass AA in all three themes.
 - **Performance**: the story page's mobile layout shift went from 0.24 to 0.001. The Supabase
   client loads after hydration, about 66 KB less JS on every page.
+- **Live bell**: the unread count now really updates without a reload. The Realtime subscription
+  had been refused because it joined before the session token was set.
 - Open items, ranked, in `docs/plans/ui-audit.md`: paragraph responses need a keyboard path; input
   borders and font loading need the owner's call.
 - Tests: unit (dialog focus return, badge chip names, reduced-motion scroll) and Playwright
