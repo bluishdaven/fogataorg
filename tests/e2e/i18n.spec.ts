@@ -1,4 +1,6 @@
 import { expect, test } from "@playwright/test";
+import en from "../../messages/en.json";
+import es from "../../messages/es.json";
 
 test.describe("Spanish browser", () => {
   test.use({ locale: "es-MX" });
@@ -7,14 +9,28 @@ test.describe("Spanish browser", () => {
     await page.goto("/");
     await expect(page).toHaveURL(/\/es$/);
     await expect(page.locator("html")).toHaveAttribute("lang", "es");
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Acércate. Alguien está contando una historia.");
+    expect(es.Home.headlines).toContain(await page.getByRole("heading", { level: 1 }).innerText());
   });
 });
 
 test("English browsers land on the English home page", async ({ page }) => {
   await page.goto("/");
   await expect(page).toHaveURL(/\/en$/);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Pull up a seat. Someone is telling a story.");
+  expect(en.Home.headlines).toContain(await page.getByRole("heading", { level: 1 }).innerText());
+});
+
+test("the home headline changes on every visit", async ({ page }) => {
+  const heading = page.getByTestId("home-headline");
+  const seen: string[] = [];
+  for (let visit = 0; visit < 4; visit += 1) {
+    await page.goto("/en");
+    const text = await heading.innerText();
+    expect(en.Home.headlines).toContain(text);
+    // Only the shown headline is announced.
+    await expect(heading).toHaveAccessibleName(text);
+    if (visit > 0) expect(text).not.toBe(seen.at(-1));
+    seen.push(text);
+  }
 });
 
 test("the language menu swaps the UI prefix and keeps the page", async ({ page }) => {

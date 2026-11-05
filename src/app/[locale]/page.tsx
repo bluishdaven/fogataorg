@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
-import { FlameLogo } from "@/components/flame-logo";
+import { HomeHeadline } from "@/components/home-headline";
 import { StoryCard } from "@/components/story-card";
 import { StoryListSkeleton } from "@/components/story-list-skeleton";
 import { getLatestStories } from "@/lib/data/stories";
@@ -10,14 +10,12 @@ export default async function HomePage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4">
-      <section className="flex flex-col gap-5 py-14 sm:py-20" aria-labelledby="home-title">
-        <p className="flex items-center gap-2 text-sm font-semibold tracking-wide text-ember-text uppercase">
-          <FlameLogo className="h-5" animated={false} />
-          {t("eyebrow")}
-        </p>
-        <h1 id="home-title" className="max-w-3xl font-serif text-4xl leading-[1.1] font-semibold text-balance sm:text-display">
-          {t("title")}
-        </h1>
+      <section className="flex flex-col gap-5 pt-8 pb-12 sm:pt-12 sm:pb-16" aria-labelledby="home-title">
+        <HomeHeadline
+          id="home-title"
+          headlines={t.raw("headlines") as string[]}
+          className="max-w-3xl font-serif text-4xl leading-[1.1] font-semibold text-balance sm:text-display"
+        />
         <p className="max-w-2xl text-lg text-muted-foreground text-pretty">{t("lede")}</p>
       </section>
 

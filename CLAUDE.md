@@ -70,6 +70,10 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
 - **Reader preferences** (size, typeface, width) live in localStorage and are applied to `<html>` by
   `READER_PREFS_SCRIPT` before paint; CSS reads the data attributes. The reading column width is
   `--measure` in rem, so headers and bodies always line up.
+- **Home headline** (`src/lib/domain/headlines.ts`, `src/components/home-headline.tsx`). Every
+  `Home.headlines` entry is rendered so the page stays static; `HEADLINE_SCRIPT` (root layout, before
+  paint) sets `<html data-headline>` to one that differs from the last visit's (localStorage) and CSS
+  shows only that one. Adding or removing headlines: change both message files and `HEADLINE_COUNT`.
 - **Partial prefetching** also prerenders with the reader's cookies, where clock reads
   (`Date.now()`) are errors. Anything that checks a session or the current time must call
   `await connection()` first, as `getViewer()` does.

@@ -54,8 +54,20 @@
     "es": "Español"
   },
   "Home": {
-    "eyebrow": "Historias alrededor del fuego",
-    "title": "Acércate. Alguien está contando una historia.",
+    "headlines": [
+      "Acércate. Alguien está contando una historia.",
+      "Toda gran historia empieza con una chispa.",
+      "Quédate un rato. El fuego sigue encendido.",
+      "Lecturas largas para noches largas.",
+      "Siempre hay lugar para uno más junto al fuego.",
+      "Hay historias que toman tiempo. Tómate el tuyo.",
+      "Cuéntala despacio. Te estamos escuchando.",
+      "Palabras por las que vale la pena desvelarse.",
+      "Trae una historia. Quédate a escuchar otras.",
+      "La noche es joven y la fogata está encendida.",
+      "Arrímate al fuego. Esta vale la pena.",
+      "Donde las historias duran más que las brasas."
+    ],
     "lede": "Fogata es un hogar cálido para la escritura larga. Sin anuncios, sin feeds hechos para que no dejes de deslizar: solo historias y la gente que las cuenta.",
     "latest": "Recién salidas del fuego",
     "empty": "Todavía no hay historias. La fogata acaba de encenderse y la tuya puede ser la primera."

@@ -54,8 +54,20 @@
     "es": "Español"
   },
   "Home": {
-    "eyebrow": "Stories around the fire",
-    "title": "Pull up a seat. Someone is telling a story.",
+    "headlines": [
+      "Pull up a seat. Someone is telling a story.",
+      "Every great story starts with a spark.",
+      "Stay a while. The fire is still warm.",
+      "Long reads for long nights.",
+      "There's always room for one more by the fire.",
+      "Some stories take time. Take yours.",
+      "Tell it slowly. We're listening.",
+      "Words worth staying up for.",
+      "Bring a story. Stay for a few more.",
+      "The night is young and the fire is lit.",
+      "Gather round. This one is worth hearing.",
+      "Where stories outlast the embers."
+    ],
     "lede": "Fogata is a warm home for long-form writing. No ads, no feeds built to keep you scrolling, just stories and the people who tell them.",
     "latest": "Fresh from the fire",
     "empty": "No stories yet. The fire has just been lit, and yours could be the first."

@@ -9,6 +9,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { ThemeProvider } from "@/components/theme-provider";
 import { routing } from "@/i18n/routing";
+import { HEADLINE_SCRIPT } from "@/lib/domain/headlines";
 import { READER_PREFS_SCRIPT } from "@/lib/domain/reader-prefs";
 import { publicEnv } from "@/lib/env";
 import "../globals.css";
@@ -56,6 +57,10 @@ export default async function LocaleLayout({ children }: LayoutProps<"/[locale]"
         {/* Applies saved reader preferences before paint (no layout jump). */}
         <Script id="reader-prefs" strategy="beforeInteractive">
           {READER_PREFS_SCRIPT}
+        </Script>
+        {/* Picks this visit's home headline before paint (see HomeHeadline). */}
+        <Script id="headline" strategy="beforeInteractive">
+          {HEADLINE_SCRIPT}
         </Script>
         <ThemeProvider>
           <NextIntlClientProvider>
