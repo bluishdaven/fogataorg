@@ -19,6 +19,7 @@ import {
   Pilcrow,
   Quote,
   TextQuote,
+  Upload,
 } from "lucide-react";
 import NextLink from "next/link";
 import { useLocale, useTranslations } from "next-intl";
@@ -27,6 +28,13 @@ import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent }
 import { toast } from "sonner";
 import { discardPendingChanges } from "@/app/actions/stories";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Toaster } from "@/components/ui/sonner";
 import { UnsplashPicker } from "@/components/unsplash/unsplash-picker";
 import { Link } from "@/i18n/navigation";
@@ -283,8 +291,27 @@ export function StoryEditor({
           <p className="flex-1 truncate text-center text-muted-foreground" role="status" aria-live="polite" data-testid="save-status" data-status={autosave.status}>
             {uploads > 0 ? t("uploading") : <SaveLabel status={autosave.status} savedAt={autosave.savedAt} />}
           </p>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <span className="hidden text-muted-foreground sm:inline">{t("words", { count: words })}</span>
+            {/* Typing "/" is awkward on a phone keyboard, so photos also have a button. */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon-sm" aria-label={t("addPhoto")} title={t("addPhoto")} disabled={!editor} data-testid="add-photo">
+                  <ImagePlus className="size-5 sm:size-4" aria-hidden />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-64">
+                <DropdownMenuLabel>{t("addPhoto")}</DropdownMenuLabel>
+                <DropdownMenuItem onSelect={() => fileInput.current?.click()} data-testid="add-photo-upload">
+                  <Upload aria-hidden />
+                  {t("addPhotoUpload")}
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setUnsplashOpen(true)} data-testid="add-photo-unsplash">
+                  <Camera aria-hidden />
+                  {t("addPhotoUnsplash")}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             {live ? (
               <NextLink href={storyPath(username, story.slug)} className="hidden text-muted-foreground hover:text-foreground sm:inline">
                 {t("viewLive")}
@@ -326,7 +353,7 @@ export function StoryEditor({
           aria-label={t("titleLabel")}
           rows={1}
           maxLength={200}
-          className="field-sizing-content resize-none bg-transparent font-serif text-4xl leading-tight font-semibold outline-none placeholder:text-muted-foreground/70 sm:text-title"
+          className="field-sizing-content resize-none overflow-hidden bg-transparent font-serif text-4xl leading-tight font-semibold outline-none placeholder:text-muted-foreground/70 sm:text-title"
           data-testid="editor-title"
         />
         <textarea
@@ -338,7 +365,7 @@ export function StoryEditor({
           aria-label={t("subtitleLabel")}
           rows={1}
           maxLength={280}
-          className="field-sizing-content resize-none bg-transparent font-serif text-xl text-muted-foreground outline-none placeholder:text-muted-foreground/60"
+          className="field-sizing-content resize-none overflow-hidden bg-transparent font-serif text-xl text-muted-foreground outline-none placeholder:text-muted-foreground/60"
           data-testid="editor-subtitle"
         />
       </div>
