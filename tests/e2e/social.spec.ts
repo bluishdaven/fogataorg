@@ -92,14 +92,18 @@ test("readers can respond to a single paragraph", async ({ page }) => {
   await page.goto("/@danawrites/notes-from-a-river-that-changed-course");
   const paragraph = page.locator("#story-body p[data-block]").nth(1);
   await paragraph.scrollIntoViewIfNeeded();
-  await paragraph.evaluate((el) => {
-    const range = document.createRange();
-    range.selectNodeContents(el.firstChild!);
-    range.setEnd(el.firstChild!, Math.min(20, el.firstChild!.textContent!.length));
-    const selection = window.getSelection()!;
-    selection.removeAllRanges();
-    selection.addRange(range);
-  });
+  // The selection listener attaches on hydration; under load the first selection can land before it.
+  await expect(async () => {
+    await paragraph.evaluate((el) => {
+      const range = document.createRange();
+      range.selectNodeContents(el.firstChild!);
+      range.setEnd(el.firstChild!, Math.min(20, el.firstChild!.textContent!.length));
+      const selection = window.getSelection()!;
+      selection.removeAllRanges();
+      selection.addRange(range);
+    });
+    await expect(page.getByTestId("respond-to-selection")).toBeVisible({ timeout: 1_000 });
+  }).toPass({ timeout: 15_000 });
   await page.getByTestId("respond-to-selection").click();
   await expect(page.getByText("Responding to this paragraph")).toBeVisible();
   const note = `Paragraph note ${Date.now()}`;
