@@ -24,7 +24,12 @@ export async function AccountMenu() {
     <div className="flex items-center gap-1">
       <WriteButton />
       <NotificationBell userId={viewer.id} initialCount={unread} />
-      <AccountDropdown displayName={viewer.displayName} username={viewer.username} locale={locale} />
+      <AccountDropdown
+        displayName={viewer.displayName}
+        username={viewer.username}
+        avatarUrl={viewer.avatarUrl}
+        locale={locale}
+      />
     </div>
   );
 }

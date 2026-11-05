@@ -1,5 +1,6 @@
 import NextLink from "next/link";
 import { useFormatter, useTranslations } from "next-intl";
+import { Avatar } from "@/components/avatar";
 import { UnsplashImage } from "@/components/unsplash/unsplash-image";
 import { storyPath } from "@/lib/domain/handle-routes";
 import type { Locale } from "@/lib/domain/locale";
@@ -15,7 +16,7 @@ export type StoryCardData = {
   excerpt: string;
   /** Cover, else first image in the story; only URLs from allowed hosts reach here. */
   thumbnail: { url: string; alt: string } | null;
-  author: { username: string; displayName: string };
+  author: { username: string; displayName: string; avatarUrl?: string | null };
 };
 
 export function StoryCard({ story }: { story: StoryCardData }) {
@@ -25,9 +26,10 @@ export function StoryCard({ story }: { story: StoryCardData }) {
   const authorName = story.author.displayName || story.author.username;
 
   return (
-    <article className="group relative flex items-start gap-4 border-b border-border py-6 last:border-b-0 sm:gap-6">
+    <article className="group relative -mx-3 flex items-start gap-4 rounded-2xl border-b border-border/70 px-3 py-6 transition-colors last:border-b-0 hover:bg-card motion-safe:duration-200 sm:-mx-4 sm:gap-6 sm:px-4">
       <div className="flex min-w-0 flex-1 flex-col gap-2">
-        <p className="text-sm text-muted-foreground">
+        <p className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Avatar name={authorName} url={story.author.avatarUrl} className="size-6 text-[0.625rem]" />
           <span className="font-medium text-foreground">{authorName}</span>
         </p>
         <h3 className="font-serif text-xl leading-snug font-semibold text-balance sm:text-2xl" lang={story.language}>
@@ -46,7 +48,7 @@ export function StoryCard({ story }: { story: StoryCardData }) {
         ) : null}
         <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
           <span
-            className="rounded-sm border border-border px-1.5 py-px text-xs font-semibold tracking-wide"
+            className="rounded-full border border-border px-2 py-px text-xs font-semibold tracking-wide"
             title={t("Story.writtenIn", { language: t(`Common.languageName.${story.language}`) })}
           >
             {t(`Common.languageBadge.${story.language}`)}
@@ -68,7 +70,7 @@ export function StoryCard({ story }: { story: StoryCardData }) {
 /** Decorative: the title link already names the story, so alt is empty. */
 function Thumbnail({ url }: { url: string }) {
   return (
-    <div className="relative mt-1 size-20 shrink-0 overflow-hidden rounded-lg bg-muted sm:h-28 sm:w-40" data-testid="story-thumbnail">
+    <div className="relative mt-1 size-20 shrink-0 overflow-hidden rounded-xl bg-muted sm:h-28 sm:w-40" data-testid="story-thumbnail">
       {isUnsplashImageUrl(url) ? (
         <UnsplashImage rawUrl={url} alt="" fill sizes="(min-width: 640px) 160px, 80px" className="object-cover" />
       ) : (

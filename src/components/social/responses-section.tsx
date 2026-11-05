@@ -12,7 +12,8 @@ import {
   setResponseSpark,
   type PostedResponse,
 } from "@/app/actions/social";
-import { Button } from "@/components/ui/button";
+import { Avatar } from "@/components/avatar";
+import { Button, buttonVariants } from "@/components/ui/button";
 import type { ResponseView } from "@/lib/data/social";
 import { profilePath } from "@/lib/domain/handle-routes";
 import { RESPONSE_MAX, splitMentions } from "@/lib/domain/social";
@@ -133,11 +134,11 @@ export function ResponsesSection({
           }}
         />
       ) : (
-        <p className="mt-4 rounded-lg bg-secondary px-4 py-3 text-sm">
-          <NextLink href={loginHref} className="font-medium text-ember-text underline underline-offset-2">
+        <div className="mt-4 rounded-2xl bg-secondary p-4">
+          <NextLink href={loginHref} className={cn(buttonVariants(), "w-full sm:w-auto")}>
             {t("signInToRespond")}
           </NextLink>
-        </p>
+        </div>
       )}
 
       {filter ? (
@@ -247,7 +248,8 @@ function ResponseItem({
   return (
     <article aria-label={t("responseBy", { name: item.author.displayName })} data-testid="response">
       <header className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
-        <NextLink href={profilePath(item.author.username)} className="font-medium hover:text-ember-text">
+        <NextLink href={profilePath(item.author.username)} className="flex min-h-8 items-center gap-2 font-medium hover:text-ember-text">
+          <Avatar name={item.author.displayName} url={item.author.avatarUrl} className="size-8 text-[0.7rem]" />
           {item.author.displayName}
         </NextLink>
         {isWriter ? (
@@ -269,20 +271,27 @@ function ResponseItem({
         </blockquote>
       ) : null}
       <Body text={item.body} />
-      <div className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
+      <div className="mt-2 -ml-2 flex items-center gap-1 text-sm text-muted-foreground sm:text-xs">
         <button
           type="button"
           onClick={() => void toggleSpark()}
           disabled={own}
           aria-pressed={sparked}
           aria-label={t("sparkResponse", { count })}
-          className={cn("flex items-center gap-1 rounded-full px-2 py-1 hover:bg-accent disabled:opacity-50", sparked && "text-ember-text")}
+          className={cn(
+            "flex min-h-10 min-w-10 items-center justify-center gap-1 rounded-full px-3 transition-colors hover:bg-accent disabled:opacity-50 sm:min-h-8 sm:min-w-8 sm:px-2",
+            sparked && "text-ember-text",
+          )}
         >
           <Sparkles className={cn("size-3.5", sparked && "fill-current")} aria-hidden />
           <span aria-hidden>{count}</span>
         </button>
         {onTogglePin && viewer?.id === storyAuthorId ? (
-          <button type="button" onClick={() => onTogglePin(item)} className="rounded-full px-2 py-1 hover:bg-accent">
+          <button
+            type="button"
+            onClick={() => onTogglePin(item)}
+            className="flex min-h-10 items-center rounded-full px-3 transition-colors hover:bg-accent sm:min-h-8 sm:px-2"
+          >
             {item.pinned ? t("unpin") : t("pin")}
           </button>
         ) : null}
@@ -290,7 +299,7 @@ function ResponseItem({
           <button
             type="button"
             onClick={() => onDelete(item.id)}
-            className="flex items-center gap-1 rounded-full px-2 py-1 hover:bg-accent hover:text-destructive"
+            className="flex min-h-10 items-center gap-1 rounded-full px-3 transition-colors hover:bg-accent hover:text-destructive sm:min-h-8 sm:px-2"
           >
             <Trash2 className="size-3.5" aria-hidden />
             {t("delete")}

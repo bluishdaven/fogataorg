@@ -11,6 +11,7 @@ export type Viewer = {
   claims: NonNullable<RlsClaims>;
   username: string;
   displayName: string;
+  avatarUrl: string | null;
 };
 
 /**
@@ -29,7 +30,7 @@ export const getViewer = cache(async (): Promise<Viewer | null> => {
   const claims = { ...data.claims, sub: data.claims.sub } as NonNullable<RlsClaims>;
   const profile = await withRls(claims, (tx) =>
     tx
-      .select({ username: profiles.username, displayName: profiles.displayName })
+      .select({ username: profiles.username, displayName: profiles.displayName, avatarUrl: profiles.avatarUrl })
       .from(profiles)
       .where(eq(profiles.id, claims.sub))
       .limit(1),
@@ -42,5 +43,6 @@ export const getViewer = cache(async (): Promise<Viewer | null> => {
     claims,
     username: row.username,
     displayName: row.displayName || row.username,
+    avatarUrl: row.avatarUrl,
   };
 });

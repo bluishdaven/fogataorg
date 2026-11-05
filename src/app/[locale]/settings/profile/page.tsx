@@ -7,6 +7,7 @@ import { SettingsNav } from "@/components/settings-nav";
 import { getViewer } from "@/lib/auth";
 import { withRls } from "@/lib/db/rls";
 import { profiles } from "@/lib/db/schema";
+import { AvatarEditor } from "./avatar-editor";
 import { ProfileForm } from "./profile-form";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -34,11 +35,22 @@ async function Form() {
   if (!viewer) redirect(`/${locale}/login?next=${encodeURIComponent(`/${locale}/settings/profile`)}`);
   const [profile] = await withRls(viewer.claims, (tx) =>
     tx
-      .select({ username: profiles.username, displayName: profiles.displayName, bio: profiles.bio, links: profiles.links })
+      .select({
+        username: profiles.username,
+        displayName: profiles.displayName,
+        bio: profiles.bio,
+        links: profiles.links,
+        avatarUrl: profiles.avatarUrl,
+      })
       .from(profiles)
       .where(eq(profiles.id, viewer.id))
       .limit(1),
   );
   if (!profile) redirect(`/${locale}`);
-  return <ProfileForm initial={profile} />;
+  return (
+    <>
+      <AvatarEditor userId={viewer.id} name={profile.displayName || profile.username} initialUrl={profile.avatarUrl} />
+      <ProfileForm initial={profile} />
+    </>
+  );
 }

@@ -14,21 +14,19 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Avatar } from "@/components/avatar";
+import { initials } from "@/lib/domain/avatars";
 import { profilePath } from "@/lib/domain/handle-routes";
-
-function initials(name: string): string {
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  const letters = parts.length > 1 ? `${parts[0]?.[0] ?? ""}${parts.at(-1)?.[0] ?? ""}` : name.slice(0, 2);
-  return letters.toUpperCase();
-}
 
 export function AccountDropdown({
   displayName,
   username,
+  avatarUrl,
   locale,
 }: {
   displayName: string;
   username: string;
+  avatarUrl: string | null;
   locale: string;
 }) {
   const t = useTranslations();
@@ -39,14 +37,12 @@ export function AccountDropdown({
         <Button
           variant="ghost"
           size="icon"
-          className="ml-1 rounded-full bg-ember-soft font-semibold text-ember-text"
+          className="ml-1 p-0"
           // Visible initials must be part of the accessible name (WCAG 2.5.3).
           aria-label={`${t("Nav.account")}: ${letters}`}
           data-testid="account-menu"
         >
-          <span aria-hidden className="text-xs">
-            {letters}
-          </span>
+          <Avatar name={displayName} url={avatarUrl} className="size-9 text-xs sm:size-8" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="min-w-52">

@@ -104,7 +104,7 @@ export type PostedResponse = {
   blockId: string | null;
   body: string;
   createdAt: string;
-  author: { id: string; username: string; displayName: string };
+  author: { id: string; username: string; displayName: string; avatarUrl: string | null };
 };
 
 export async function postResponse(input: ResponseInput): Promise<Ok<{ response: PostedResponse }> | Fail> {
@@ -136,7 +136,7 @@ export async function postResponse(input: ResponseInput): Promise<Ok<{ response:
         blockId: created.blockId,
         body,
         createdAt: created.createdAt.toISOString(),
-        author: { id: viewer.id, username: viewer.username, displayName: viewer.displayName },
+        author: { id: viewer.id, username: viewer.username, displayName: viewer.displayName, avatarUrl: viewer.avatarUrl },
       },
     };
   });

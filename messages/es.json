@@ -395,6 +395,20 @@
       "linkUrl": "Los enlaces deben ser direcciones web completas, como https://ejemplo.com.",
       "tooManyLinks": "Puedes agregar hasta 5 enlaces.",
       "invalid": "Algo no está bien. Revisa el formulario y vuelve a intentarlo."
+    },
+    "photo": "Foto de perfil",
+    "photoHint": "Aparece junto a tu nombre. La recortamos en un cuadrado; JPG, PNG o WebP.",
+    "uploadPhoto": "Subir foto",
+    "changePhoto": "Cambiar foto",
+    "removePhoto": "Quitar",
+    "photoWorking": "Guardando…",
+    "photoSaved": "Foto guardada.",
+    "photoRemoved": "Foto quitada.",
+    "photoErrors": {
+      "type": "Ese archivo no es una foto que podamos usar. Prueba con JPG, PNG o WebP.",
+      "size": "Esa foto pesa más de 15 MB. Prueba con una más pequeña.",
+      "failed": "No se pudo guardar la foto. Inténtalo de nuevo.",
+      "unauthorized": "Tu sesión terminó. Vuelve a entrar."
     }
   },
   "Topics": {

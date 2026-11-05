@@ -71,6 +71,7 @@ export async function getCircle(slug: string) {
         thumbnailAlt: stories.thumbnailAlt,
         username: profiles.username,
         displayName: profiles.displayName,
+        avatarUrl: profiles.avatarUrl,
       })
       .from(circleSubmissions)
       .innerJoin(stories, eq(stories.id, circleSubmissions.storyId))
@@ -97,7 +98,7 @@ export async function getCircle(slug: string) {
         publishedAt: row.publishedAt,
         excerpt: excerpt(row.contentText),
         thumbnail: row.thumbnailUrl && isAllowedStoryImage(row.thumbnailUrl) ? { url: row.thumbnailUrl, alt: row.thumbnailAlt } : null,
-        author: { username: row.username, displayName: row.displayName },
+        author: { username: row.username, displayName: row.displayName, avatarUrl: row.avatarUrl },
       })),
     };
   });

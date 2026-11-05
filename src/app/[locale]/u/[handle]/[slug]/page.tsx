@@ -3,6 +3,7 @@ import NextLink from "next/link";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { Avatar } from "@/components/avatar";
 import { ReaderControls } from "@/components/reader-controls";
 import { ReadingProgress } from "@/components/reading-progress";
 import { StoryBody } from "@/components/story-body";
@@ -82,12 +83,12 @@ async function Story({ params }: Pick<Props, "params">) {
           </Link>
         ) : null}
         {story.topics.length > 0 ? (
-          <ul className="flex flex-wrap gap-2 text-xs font-medium" lang={locale}>
+          <ul className="flex flex-wrap gap-2 text-sm font-medium sm:text-xs" lang={locale}>
             {story.topics.map((topic) => (
               <li key={topic.slug}>
                 <Link
                   href={`/topics/${topic.slug}`}
-                  className="block rounded-full bg-secondary px-2.5 py-1 text-secondary-foreground hover:bg-accent"
+                  className="flex min-h-10 items-center rounded-full bg-secondary px-4 text-secondary-foreground transition-colors hover:bg-accent sm:min-h-8 sm:px-3"
                 >
                   {locale === "es" ? topic.nameEs : topic.nameEn}
                 </Link>
@@ -99,27 +100,35 @@ async function Story({ params }: Pick<Props, "params">) {
         {story.subtitle ? (
           <p className="font-serif text-xl text-muted-foreground text-pretty">{story.subtitle}</p>
         ) : null}
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground" lang={locale}>
-          <NextLink href={profilePath(story.authorUsername)} className="font-medium text-foreground hover:text-ember-text">
-            {authorName}
+        <div className="mt-2 flex items-center gap-3 border-y border-border/70 py-4" lang={locale}>
+          {/* Same destination as the name link, so it's kept out of the tab order and accessibility tree. */}
+          <NextLink href={profilePath(story.authorUsername)} tabIndex={-1} aria-hidden className="shrink-0">
+            <Avatar name={authorName} url={story.authorAvatarUrl} className="size-11 text-sm" />
           </NextLink>
-          {story.publishedAt ? (
-            <>
+          <div className="min-w-0 flex-1">
+            <NextLink
+              href={profilePath(story.authorUsername)}
+              className="block w-fit font-medium text-foreground hover:text-ember-text"
+            >
+              {authorName}
+            </NextLink>
+            <p className="flex flex-wrap items-center gap-x-1.5 text-sm text-muted-foreground">
+              {story.publishedAt ? (
+                <>
+                  <time dateTime={story.publishedAt.toISOString()}>
+                    {format.dateTime(story.publishedAt, { dateStyle: "medium" })}
+                  </time>
+                  <span aria-hidden>·</span>
+                </>
+              ) : null}
+              <span>{t("Common.minRead", { minutes: story.readingTime })}</span>
               <span aria-hidden>·</span>
-              <time dateTime={story.publishedAt.toISOString()}>
-                {format.dateTime(story.publishedAt, { dateStyle: "long" })}
-              </time>
-            </>
-          ) : null}
-          <span aria-hidden>·</span>
-          <span>{t("Common.minRead", { minutes: story.readingTime })}</span>
-          <span aria-hidden>·</span>
-          <span title={t("Story.writtenIn", { language: t(`Common.languageName.${story.language}`) })}>
-            {t(`Common.languageBadge.${story.language}`)}
-          </span>
-          <span className="ml-auto">
-            <ReaderControls />
-          </span>
+              <span title={t("Story.writtenIn", { language: t(`Common.languageName.${story.language}`) })}>
+                {t(`Common.languageBadge.${story.language}`)}
+              </span>
+            </p>
+          </div>
+          <ReaderControls />
         </div>
       </header>
       {story.coverUrl && isAllowedStoryImage(story.coverUrl) ? (
@@ -137,6 +146,7 @@ async function Story({ params }: Pick<Props, "params">) {
             id: story.authorId,
             username: story.authorUsername,
             displayName: story.authorDisplayName,
+            avatarUrl: story.authorAvatarUrl,
             bio: story.authorBio,
           }}
         />

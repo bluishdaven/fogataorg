@@ -26,6 +26,7 @@ const cardColumns = {
   thumbnailAlt: stories.thumbnailAlt,
   authorUsername: profiles.username,
   authorDisplayName: profiles.displayName,
+  authorAvatarUrl: profiles.avatarUrl,
 };
 
 type CardRow = {
@@ -40,6 +41,7 @@ type CardRow = {
   thumbnailAlt: string;
   authorUsername: string;
   authorDisplayName: string;
+  authorAvatarUrl: string | null;
 };
 
 function toCard(row: CardRow) {
@@ -53,7 +55,7 @@ function toCard(row: CardRow) {
     excerpt: excerpt(row.contentText),
     thumbnail:
       row.thumbnailUrl && isAllowedStoryImage(row.thumbnailUrl) ? { url: row.thumbnailUrl, alt: row.thumbnailAlt } : null,
-    author: { username: row.authorUsername, displayName: row.authorDisplayName },
+    author: { username: row.authorUsername, displayName: row.authorDisplayName, avatarUrl: row.authorAvatarUrl },
   };
 }
 
@@ -106,6 +108,7 @@ export async function getStory(handle: string, slug: string) {
         authorId: profiles.id,
         authorUsername: profiles.username,
         authorDisplayName: profiles.displayName,
+        authorAvatarUrl: profiles.avatarUrl,
         authorBio: profiles.bio,
       })
       .from(stories)
@@ -155,6 +158,7 @@ export async function getProfileWithStories(handle: string) {
         id: profiles.id,
         username: profiles.username,
         displayName: profiles.displayName,
+        avatarUrl: profiles.avatarUrl,
         bio: profiles.bio,
         links: profiles.links,
         createdAt: profiles.createdAt,

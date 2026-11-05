@@ -3,6 +3,7 @@ import Form from "next/form";
 import NextLink from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Suspense } from "react";
+import { Avatar } from "@/components/avatar";
 import { StoryCard } from "@/components/story-card";
 import { StoryListSkeleton } from "@/components/story-list-skeleton";
 import { Link } from "@/i18n/navigation";
@@ -140,7 +141,10 @@ async function Results({ searchParams }: Pick<Props, "searchParams">) {
           <ul className="flex flex-wrap gap-2">
             {results.topics.map((topic) => (
               <li key={topic.slug}>
-                <Link href={`/topics/${topic.slug}`} className="block rounded-full bg-secondary px-3 py-1 text-sm hover:bg-accent">
+                <Link
+                  href={`/topics/${topic.slug}`}
+                  className="flex min-h-10 items-center rounded-full bg-secondary px-4 text-sm transition-colors hover:bg-accent sm:min-h-8 sm:px-3"
+                >
                   {locale === "es" ? topic.nameEs : topic.nameEn}
                 </Link>
               </li>
@@ -157,10 +161,13 @@ async function Results({ searchParams }: Pick<Props, "searchParams">) {
           <ul className="divide-y divide-border" data-testid="search-people">
             {results.people.map((person) => (
               <li key={person.username} className="py-3">
-                <NextLink href={profilePath(person.username)} className="group flex flex-col">
-                  <span className="font-medium group-hover:text-ember-text">{person.displayName || person.username}</span>
-                  <span className="text-sm text-muted-foreground">@{person.username}</span>
-                  {person.bio ? <span className="mt-1 line-clamp-2 text-sm text-muted-foreground">{person.bio}</span> : null}
+                <NextLink href={profilePath(person.username)} className="group flex items-start gap-3">
+                  <Avatar name={person.displayName || person.username} url={person.avatarUrl} className="size-11 text-sm" />
+                  <span className="flex min-w-0 flex-col">
+                    <span className="font-medium group-hover:text-ember-text">{person.displayName || person.username}</span>
+                    <span className="text-sm text-muted-foreground">@{person.username}</span>
+                    {person.bio ? <span className="mt-1 line-clamp-2 text-sm text-muted-foreground">{person.bio}</span> : null}
+                  </span>
                 </NextLink>
               </li>
             ))}

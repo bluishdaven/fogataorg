@@ -395,6 +395,20 @@
       "linkUrl": "Links must be full web addresses, like https://example.com.",
       "tooManyLinks": "You can add up to 5 links.",
       "invalid": "Something's not right. Check the form and try again."
+    },
+    "photo": "Profile photo",
+    "photoHint": "Shown next to your name. We crop it to a square; JPG, PNG or WebP.",
+    "uploadPhoto": "Upload photo",
+    "changePhoto": "Change photo",
+    "removePhoto": "Remove",
+    "photoWorking": "Saving…",
+    "photoSaved": "Photo saved.",
+    "photoRemoved": "Photo removed.",
+    "photoErrors": {
+      "type": "That file isn't a photo we can use. Try a JPG, PNG or WebP.",
+      "size": "That photo is over 15 MB. Try a smaller one.",
+      "failed": "The photo couldn't be saved. Try again.",
+      "unauthorized": "Your session ended. Sign in again."
     }
   },
   "Topics": {

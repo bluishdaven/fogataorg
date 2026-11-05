@@ -78,7 +78,7 @@ export type ResponseView = {
   body: string;
   createdAt: Date;
   pinned: boolean;
-  author: { id: string; username: string; displayName: string };
+  author: { id: string; username: string; displayName: string; avatarUrl: string | null };
   sparks: number;
   sparkedByViewer: boolean;
   replies: ResponseView[];
@@ -97,6 +97,7 @@ export async function listResponses(viewer: Viewer | null, storyId: string): Pro
         authorId: profiles.id,
         username: profiles.username,
         displayName: profiles.displayName,
+        avatarUrl: profiles.avatarUrl,
       })
       .from(responses)
       .innerJoin(profiles, eq(profiles.id, responses.authorId))
@@ -132,7 +133,12 @@ export async function listResponses(viewer: Viewer | null, storyId: string): Pro
         body: row.body,
         createdAt: row.createdAt,
         pinned: Boolean(row.pinnedAt),
-        author: { id: row.authorId, username: row.username, displayName: row.displayName || row.username },
+        author: {
+          id: row.authorId,
+          username: row.username,
+          displayName: row.displayName || row.username,
+          avatarUrl: row.avatarUrl,
+        },
         sparks: countById.get(row.id) ?? 0,
         sparkedByViewer: mine.has(row.id),
         replies: [],
@@ -179,6 +185,7 @@ export async function listSaved(viewer: Viewer) {
         thumbnailAlt: stories.thumbnailAlt,
         username: profiles.username,
         displayName: profiles.displayName,
+        avatarUrl: profiles.avatarUrl,
       })
       .from(bookmarks)
       .innerJoin(stories, eq(stories.id, bookmarks.storyId))
@@ -195,7 +202,7 @@ export async function listSaved(viewer: Viewer) {
       publishedAt: row.publishedAt,
       excerpt: excerpt(row.contentText),
       thumbnail: row.thumbnailUrl && isAllowedStoryImage(row.thumbnailUrl) ? { url: row.thumbnailUrl, alt: row.thumbnailAlt } : null,
-      author: { username: row.username, displayName: row.displayName },
+      author: { username: row.username, displayName: row.displayName, avatarUrl: row.avatarUrl },
     }));
   });
 }
