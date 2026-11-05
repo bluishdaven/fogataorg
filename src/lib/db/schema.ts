@@ -59,6 +59,8 @@ export const profiles = pgTable(
     emailLastSentAt: timestamp("email_last_sent_at", { withTimezone: true }),
     // Weekday (0 = Sunday, UTC) the summary goes out, random per reader so sends spread over the week.
     emailWeekday: smallint("email_weekday").notNull().default(sql`floor(random() * 7)::smallint`),
+    // Set by the owner (grant_donor_badge) when someone shares a donation receipt; permanent until removed.
+    donorSince: timestamp("donor_since", { withTimezone: true }),
     ...timestamps,
   },
   (t) => [
@@ -573,3 +575,31 @@ export type Profile = typeof profiles.$inferSelect;
 export type Topic = typeof topics.$inferSelect;
 export type Story = typeof stories.$inferSelect;
 export type NewStory = typeof stories.$inferInsert;
+
+/**
+ * Private log of donor badges the owner granted or removed. Only admins can read it; writes go
+ * through grant_donor_badge / remove_donor_badge, which also set profiles.donor_since.
+ */
+export const donorGrants = pgTable(
+  "donor_grants",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => profiles.id, { onDelete: "cascade" }),
+    grantedBy: uuid("granted_by").references(() => profiles.id, { onDelete: "set null" }),
+    note: text("note").notNull().default(""),
+    grantedAt: timestamp("granted_at", { withTimezone: true }).notNull().defaultNow(),
+    removedAt: timestamp("removed_at", { withTimezone: true }),
+  },
+  (t) => [
+    index("donor_grants_user_idx").on(t.userId, t.grantedAt.desc()),
+    check("donor_grants_note_length", sql`char_length(${t.note}) <= 500`),
+    pgPolicy("donor_grants_select_admin", {
+      for: "select",
+      to: authenticatedRole,
+      using: sql`coalesce((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin', false)`,
+    }),
+  ],
+);
+

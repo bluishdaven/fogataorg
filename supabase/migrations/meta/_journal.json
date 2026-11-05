@@ -155,6 +155,20 @@
       "when": 1793883031488,
       "tag": "20261105125031_topics_catalog",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1793886471487,
+      "tag": "20261105134751_donor_badges",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1793886473002,
+      "tag": "20261105134753_donor_badge_functions",
+      "breakpoints": true
     }
   ]
 }
