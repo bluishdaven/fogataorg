@@ -169,6 +169,20 @@
       "when": 1793886473002,
       "tag": "20261105134753_donor_badge_functions",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1793887632545,
+      "tag": "20261105140712_moderation_and_donor_terms",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1793887644487,
+      "tag": "20261105140724_moderation_functions",
+      "breakpoints": true
     }
   ]
 }

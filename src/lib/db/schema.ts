@@ -59,8 +59,9 @@ export const profiles = pgTable(
     emailLastSentAt: timestamp("email_last_sent_at", { withTimezone: true }),
     // Weekday (0 = Sunday, UTC) the summary goes out, random per reader so sends spread over the week.
     emailWeekday: smallint("email_weekday").notNull().default(sql`floor(random() * 7)::smallint`),
-    // Set by the owner (grant_donor_badge) when someone shares a donation receipt; permanent until removed.
+    // Donor badge (grant_donor_badge, owner only): first grant, and when the current two months end.
     donorSince: timestamp("donor_since", { withTimezone: true }),
+    donorUntil: timestamp("donor_until", { withTimezone: true }),
     ...timestamps,
   },
   (t) => [
@@ -590,12 +591,62 @@ export const donorGrants = pgTable(
     grantedBy: uuid("granted_by").references(() => profiles.id, { onDelete: "set null" }),
     note: text("note").notNull().default(""),
     grantedAt: timestamp("granted_at", { withTimezone: true }).notNull().defaultNow(),
+    // When the badge runs out after this grant (two months, stacked on time left).
+    endsAt: timestamp("ends_at", { withTimezone: true }),
     removedAt: timestamp("removed_at", { withTimezone: true }),
   },
   (t) => [
     index("donor_grants_user_idx").on(t.userId, t.grantedAt.desc()),
     check("donor_grants_note_length", sql`char_length(${t.note}) <= 500`),
     pgPolicy("donor_grants_select_admin", {
+      for: "select",
+      to: authenticatedRole,
+      using: sql`coalesce((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin', false)`,
+    }),
+  ],
+);
+
+export const moderationStatus = pgEnum("moderation_status", ["nsfw", "removed"]);
+
+/**
+ * Current moderation of a story (one row while moderated). Public to read: the reason is shown on
+ * the story. Written only by moderate_story(), which checks the admin role, so authors can't undo it.
+ */
+export const storyModeration = pgTable(
+  "story_moderation",
+  {
+    storyId: uuid("story_id")
+      .primaryKey()
+      .references(() => stories.id, { onDelete: "cascade" }),
+    status: moderationStatus("status").notNull(),
+    reason: text("reason").notNull(),
+    moderatedBy: uuid("moderated_by").references(() => profiles.id, { onDelete: "set null" }),
+    moderatedAt: timestamp("moderated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index("story_moderation_status_idx").on(t.status),
+    check("story_moderation_reason_length", sql`char_length(btrim(${t.reason})) between 1 and 300`),
+    pgPolicy("story_moderation_select_public", { for: "select", to: everyone, using: sql`true` }),
+  ],
+);
+
+/** Every moderation action, including restores. Private to admins. */
+export const moderationLog = pgTable(
+  "moderation_log",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    storyId: uuid("story_id")
+      .notNull()
+      .references(() => stories.id, { onDelete: "cascade" }),
+    // null means the moderation was lifted.
+    status: moderationStatus("status"),
+    reason: text("reason").notNull().default(""),
+    moderatorId: uuid("moderator_id").references(() => profiles.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index("moderation_log_story_idx").on(t.storyId, t.createdAt.desc()),
+    pgPolicy("moderation_log_select_admin", {
       for: "select",
       to: authenticatedRole,
       using: sql`coalesce((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin', false)`,

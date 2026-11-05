@@ -1,6 +1,6 @@
 import { eq, sql } from "drizzle-orm";
 import { afterAll, describe, expect, it } from "vitest";
-import { publishedCountSql } from "@/lib/data/badge-sql";
+import { donorActiveSql, publishedCountSql } from "@/lib/data/badge-sql";
 import { donorGrants, profiles, stories } from "@/lib/db/schema";
 import { closeDb, expectPgError, PG, scenario, type Harness } from "./harness";
 
@@ -23,24 +23,52 @@ async function donorSince(h: Harness, id: string) {
 }
 
 describe("donor badge", () => {
-  it("is granted by admins, permanent, and keeps its first date", async () => {
+  const DAY = 24 * HOUR;
+  const until = async (h: Harness, id: string) => {
+    const [row] = await h.tx
+      .select({ until: profiles.donorUntil, active: donorActiveSql() })
+      .from(profiles)
+      .where(eq(profiles.id, id));
+    return row!;
+  };
+
+  it("lasts two months, and a new grant adds two more to the time left", async () => {
     await scenario(async (h) => {
       const owner = await h.createUser();
       const donor = await h.createUser();
 
       const first = await grant(h, adminClaims(h, owner), donor, "BMC 5 Nov");
-      expect(first).not.toBeNull();
-      expect((await donorSince(h, donor))?.getTime()).toBe(first?.getTime());
+      const months = (first!.getTime() - Date.now()) / DAY;
+      expect(months).toBeGreaterThan(58);
+      expect(months).toBeLessThan(63);
+      expect((await until(h, donor)).active).toBe(true);
+      expect(await donorSince(h, donor)).not.toBeNull();
 
-      // A later donation is logged but the badge keeps its original date.
-      await h.tx.update(profiles).set({ donorSince: new Date(Date.now() - 30 * 24 * HOUR) }).where(eq(profiles.id, donor));
-      const kept = await donorSince(h, donor);
-      await grant(h, adminClaims(h, owner), donor, "BMC again");
-      expect((await donorSince(h, donor))?.getTime()).toBe(kept?.getTime());
+      // Donating again while active stacks onto the current end date.
+      const second = await grant(h, adminClaims(h, owner), donor, "BMC again");
+      const stacked = (second!.getTime() - first!.getTime()) / DAY;
+      expect(stacked).toBeGreaterThan(58);
+      expect(stacked).toBeLessThan(63);
 
       const log = await h.tx.select().from(donorGrants).where(eq(donorGrants.userId, donor));
       expect(log.map((row) => row.note).sort()).toEqual(["BMC 5 Nov", "BMC again"]);
-      expect(log.every((row) => row.grantedBy === owner)).toBe(true);
+      expect(log.every((row) => row.grantedBy === owner && row.endsAt !== null)).toBe(true);
+    });
+  });
+
+  it("runs out on its own, and a later grant starts from today", async () => {
+    await scenario(async (h) => {
+      const owner = await h.createUser();
+      const donor = await h.createUser();
+      await grant(h, adminClaims(h, owner), donor);
+      await h.tx.update(profiles).set({ donorUntil: new Date(Date.now() - DAY) }).where(eq(profiles.id, donor));
+      expect((await until(h, donor)).active).toBe(false);
+
+      const renewed = await grant(h, adminClaims(h, owner), donor);
+      const fromToday = (renewed!.getTime() - Date.now()) / DAY;
+      expect(fromToday).toBeGreaterThan(58);
+      expect(fromToday).toBeLessThan(63);
+      expect((await until(h, donor)).active).toBe(true);
     });
   });
 
@@ -51,6 +79,7 @@ describe("donor badge", () => {
       await grant(h, adminClaims(h, owner), donor);
       await h.as(adminClaims(h, owner), (tx) => tx.execute(sql`select public.remove_donor_badge(${donor}::uuid)`));
       expect(await donorSince(h, donor)).toBeNull();
+      expect((await until(h, donor)).active).toBe(false);
       const [log] = await h.tx.select().from(donorGrants).where(eq(donorGrants.userId, donor));
       expect(log?.removedAt).not.toBeNull();
     });
@@ -73,7 +102,7 @@ describe("donor badge", () => {
       // Nor set directly: donor_since isn't an updatable column for users.
       await expectPgError(
         h.as(h.claimsFor(someone), (tx) =>
-          tx.update(profiles).set({ donorSince: new Date() }).where(eq(profiles.id, someone)),
+          tx.update(profiles).set({ donorUntil: new Date(Date.now() + 1e10) }).where(eq(profiles.id, someone)),
         ),
         PG.insufficientPrivilege,
       );
