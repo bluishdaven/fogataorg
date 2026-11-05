@@ -15,7 +15,8 @@ import {
 } from "@/lib/db/schema";
 import { badgeData, type BadgeData } from "@/lib/domain/badges";
 import { excerpt } from "@/lib/domain/content";
-import { publishedCountSql } from "./badge-sql";
+import { donorActiveSql, publishedCountSql } from "./badge-sql";
+import { moderationStatusSql, notRemoved } from "./moderation-sql";
 import { selectNotificationItems } from "./notification-items";
 import { isAllowedStoryImage } from "@/lib/story-images";
 
@@ -101,7 +102,7 @@ export async function listResponses(viewer: Viewer | null, storyId: string): Pro
         displayName: profiles.displayName,
         avatarUrl: profiles.avatarUrl,
         publishedCount: publishedCountSql(),
-        donorSince: profiles.donorSince,
+        donorActive: donorActiveSql(),
       })
       .from(responses)
       .innerJoin(profiles, eq(profiles.id, responses.authorId))
@@ -192,12 +193,13 @@ export async function listSaved(viewer: Viewer) {
         displayName: profiles.displayName,
         avatarUrl: profiles.avatarUrl,
         publishedCount: publishedCountSql(),
-        donorSince: profiles.donorSince,
+        donorActive: donorActiveSql(),
+        moderation: moderationStatusSql,
       })
       .from(bookmarks)
       .innerJoin(stories, eq(stories.id, bookmarks.storyId))
       .innerJoin(profiles, eq(profiles.id, stories.authorId))
-      .where(and(eq(bookmarks.userId, viewer.id), isNull(stories.deletedAt)))
+      .where(and(eq(bookmarks.userId, viewer.id), isNull(stories.deletedAt), notRemoved))
       .orderBy(desc(bookmarks.createdAt))
       .limit(200);
     return rows.map((row) => ({
@@ -208,7 +210,11 @@ export async function listSaved(viewer: Viewer) {
       readingTime: row.readingTime,
       publishedAt: row.publishedAt,
       excerpt: excerpt(row.contentText),
-      thumbnail: row.thumbnailUrl && isAllowedStoryImage(row.thumbnailUrl) ? { url: row.thumbnailUrl, alt: row.thumbnailAlt } : null,
+      nsfw: row.moderation === "nsfw",
+      thumbnail:
+        row.moderation !== "nsfw" && row.thumbnailUrl && isAllowedStoryImage(row.thumbnailUrl)
+          ? { url: row.thumbnailUrl, alt: row.thumbnailAlt }
+          : null,
       author: { username: row.username, displayName: row.displayName, avatarUrl: row.avatarUrl, badges: badgeData(row) },
     }));
   });

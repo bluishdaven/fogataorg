@@ -31,8 +31,8 @@ export function writingTier(publishedStories: number): WritingTier | null {
 /** What badge components need about a person. */
 export type BadgeData = { stories: number; donor: boolean };
 
-export function badgeData(row: { publishedCount: number | null | undefined; donorSince: Date | string | null | undefined }): BadgeData {
-  return { stories: Number(row.publishedCount ?? 0), donor: row.donorSince != null };
+export function badgeData(row: { publishedCount: number | null | undefined; donorActive: boolean | null | undefined }): BadgeData {
+  return { stories: Number(row.publishedCount ?? 0), donor: row.donorActive === true };
 }
 
 export const donorGrantSchema = z.object({
@@ -44,7 +44,7 @@ export const donorGrantSchema = z.object({
 export const donorRemoveSchema = z.object({ userId: z.uuid() });
 
 export type DonorActionResult =
-  | { ok: true; name: string }
+  | { ok: true; name: string; /** ISO date the badge now runs until (grants only). */ until?: string }
   | { ok: false; error: "unauthorized" | "invalid" | "notFound" };
 
 /** Admins are marked in Supabase app_metadata (settable only from the dashboard or service key). */

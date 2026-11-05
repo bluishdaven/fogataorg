@@ -1,21 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
-import postgres from "postgres";
+import { becomeAdmin, setAdmin } from "./admin";
 import { signInWithMagicLink } from "./sign-in";
-
-/** Local test database only: marks an account as the owner (what the Supabase dashboard does in production). */
-async function setAdmin(email: string, admin: boolean) {
-  const sql = postgres(process.env.DATABASE_URL!, { max: 1, onnotice: () => {} });
-  try {
-    await sql`
-      update auth.users
-      set raw_app_meta_data = case when ${admin} then raw_app_meta_data || '{"role":"admin"}'::jsonb
-                                   else raw_app_meta_data - 'role' end
-      where email = ${email}`;
-  } finally {
-    await sql.end();
-  }
-}
 
 async function usernameOf(page: Page) {
   await page.goto("/en/settings/profile");
@@ -53,11 +39,7 @@ test("the owner grants and removes the donor badge", async ({ browser }) => {
   await expect(owner.getByRole("heading", { level: 1 })).toHaveText("This trail goes cold");
 
   try {
-    await setAdmin(ownerEmail, true);
-    // The role travels in the session token, so sign in again to pick it up.
-    await owner.getByTestId("account-menu").click();
-    await owner.getByTestId("sign-out").click();
-    await signInWithMagicLink(owner, "en", ownerEmail);
+    await becomeAdmin(owner, ownerEmail);
 
     await owner.getByTestId("account-menu").click();
     await owner.getByTestId("admin-donors-link").click();
@@ -73,9 +55,10 @@ test("the owner grants and removes the donor badge", async ({ browser }) => {
     await owner.getByLabel("Username or email").fill(`@${donorUsername}`);
     await owner.getByLabel("Private note").fill("BMC test receipt");
     await owner.getByTestId("grant-donor").click();
-    await expect(owner.getByTestId("donor-message")).toContainText("is now a Firekeeper.");
+    await expect(owner.getByTestId("donor-message")).toContainText(/is a Firekeeper until /);
     const grant = owner.getByTestId("donor-grant").filter({ hasText: `@${donorUsername}` });
     await expect(grant).toContainText("BMC test receipt");
+    await expect(grant).toContainText("active until");
 
     // Everyone sees it on the donor's profile.
     await donor.goto(`/@${donorUsername}`);

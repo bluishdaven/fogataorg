@@ -40,7 +40,12 @@ async function MyStories() {
   const viewer = await getViewer();
   const locale = await getLocale();
   if (!viewer) redirect(`/${locale}/login?next=${encodeURIComponent(`/${locale}/me/stories`)}`);
-  const [rows, t, format] = await Promise.all([listMyStories(viewer), getTranslations("MyStories"), getFormatter()]);
+  const [rows, t, format, m] = await Promise.all([
+    listMyStories(viewer),
+    getTranslations("MyStories"),
+    getFormatter(),
+    getTranslations("Moderation"),
+  ]);
   const now = new Date();
   const stories = rows.map((row) => ({ ...row, state: storyState(row, now) }));
 
@@ -81,6 +86,13 @@ async function MyStories() {
                             : t("editedOn", { date: format.dateTime(story.updatedAt, { dateStyle: "medium", timeStyle: "short" }) })}
                         {story.pendingChanges ? ` · ${t("unpublishedChanges")}` : ""}
                       </p>
+                      {story.moderation && story.moderationReason ? (
+                        <p className="text-sm font-medium text-destructive" data-testid="my-story-moderation">
+                          {story.moderation === "removed"
+                            ? m("myRemoved", { reason: story.moderationReason })
+                            : m("myNsfw", { reason: story.moderationReason })}
+                        </p>
+                      ) : null}
                     </div>
                     <div className="flex shrink-0 items-center gap-1">
                       <Link href={`/write/${story.id}`} className={buttonVariants({ variant: "outline", size: "sm" })}>

@@ -21,6 +21,7 @@ import { FollowButton, SaveButton } from "./toggle-buttons";
 export async function StorySocial({
   storyId,
   title,
+  nsfw = false,
   language,
   readingTime,
   preview,
@@ -29,6 +30,8 @@ export async function StorySocial({
 }: {
   storyId: string;
   title: string;
+  /** NSFW stories can still be shared as links, but not as a Stories image with a preview. */
+  nsfw?: boolean;
   language: "en" | "es";
   readingTime: number;
   /** A few sentences from the start of the story, for the Stories image. */
@@ -85,6 +88,7 @@ export async function StorySocial({
           title={title}
           text={t("shareText", { title, author: name })}
           fileName={storyImageFileName(slug)}
+          allowImage={!nsfw}
           image={{
             title,
             author: name,

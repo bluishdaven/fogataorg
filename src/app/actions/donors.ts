@@ -29,13 +29,15 @@ export async function grantDonorBadge(input: unknown): Promise<DonorActionResult
       sql`select id, username, display_name from public.admin_find_profile(${parsed.data.target})`,
     );
     if (!found) return null;
-    await tx.execute(sql`select public.grant_donor_badge(${found.id}::uuid, ${parsed.data.note})`);
-    return found;
+    const [granted] = await tx.execute<{ until: string }>(
+      sql`select public.grant_donor_badge(${found.id}::uuid, ${parsed.data.note}) as until`,
+    );
+    return { ...found, until: granted?.until ? new Date(granted.until).toISOString() : undefined };
   });
   if (!person) return { ok: false, error: "notFound" };
 
   refresh(person.username);
-  return { ok: true, name: person.display_name || person.username };
+  return { ok: true, name: person.display_name || person.username, until: person.until };
 }
 
 export async function removeDonorBadge(input: unknown): Promise<DonorActionResult> {

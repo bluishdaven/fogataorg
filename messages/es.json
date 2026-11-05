@@ -37,7 +37,8 @@
     "circles": "Fogatas",
     "merch": "Merch",
     "comingSoon": "Próximamente",
-    "donors": "Mecenas"
+    "donors": "Mecenas",
+    "moderation": "Moderación"
   },
   "Theme": {
     "label": "Tema",
@@ -410,7 +411,8 @@
       "size": "Esa foto pesa más de 15 MB. Prueba con una más pequeña.",
       "failed": "No se pudo guardar la foto. Inténtalo de nuevo.",
       "unauthorized": "Tu sesión terminó. Vuelve a entrar."
-    }
+    },
+    "donorUntil": "Eres Mecenas hasta el {date}. Gracias por mantener viva la fogata."
   },
   "Topics": {
     "title": "Temas",
@@ -679,7 +681,7 @@
   },
   "Admin": {
     "donorsTitle": "Mecenas",
-    "donorsLede": "Otorga la insignia de mecenas a quienes te envíen el comprobante de su donación desde el correo de su cuenta de Fogata. Se queda hasta que la quites.",
+    "donorsLede": "Otorga la insignia de mecenas a quienes te envíen el comprobante de su donación desde el correo de su cuenta de Fogata. Cada insignia dura dos meses; si la otorgas de nuevo, suma dos más.",
     "target": "Nombre de usuario o correo",
     "targetPlaceholder": "@usuario o nombre@ejemplo.com",
     "targetHint": "Su @usuario, o el correo con el que entra a Fogata.",
@@ -687,7 +689,7 @@
     "notePlaceholder": "Buy Me a Coffee, 5 nov, comprobante en Gmail",
     "grant": "Otorgar insignia",
     "granting": "Otorgando…",
-    "granted": "{name} ahora es Mecenas.",
+    "granted": "{name} es Mecenas hasta el {date}.",
     "grants": "Insignias otorgadas",
     "empty": "Todavía no has otorgado insignias.",
     "grantedOn": "Otorgada el {date}",
@@ -699,6 +701,44 @@
       "invalid": "Revisa el usuario o el correo.",
       "notFound": "Ninguna cuenta tiene ese usuario o correo.",
       "failed": "No funcionó. Inténtalo de nuevo."
-    }
+    },
+    "activeUntil": "activa hasta el {date}",
+    "endedOn": "terminó el {date}"
+  },
+  "Moderation": {
+    "nsfwLabel": "NSFW",
+    "removedTitle": "Esta historia fue moderada",
+    "removedReason": "Motivo de la moderación: {reason}",
+    "removedHint": "Ya no está disponible en Fogata.",
+    "removedAuthorHint": "Puedes seguir abriéndola desde Tus historias.",
+    "nsfwTitle": "Aviso de contenido",
+    "nsfwReason": "Marcada como NSFW. Motivo: {reason}",
+    "nsfwShow": "Mostrar la historia",
+    "panelTitle": "Moderación",
+    "markNsfw": "Marcar como NSFW",
+    "remove": "Retirar historia",
+    "lift": "Quitar la moderación",
+    "reason": "Motivo (se muestra en la historia)",
+    "reasonPlaceholder": "Violencia gráfica",
+    "apply": "Aplicar",
+    "cancel": "Cancelar",
+    "currentNsfw": "Marcada como NSFW: {reason}",
+    "currentRemoved": "Retirada: {reason}",
+    "saved": "Moderación guardada.",
+    "errors": {
+      "reasonRequired": "Escribe un motivo. Quienes lean lo verán.",
+      "failed": "No funcionó. Inténtalo de nuevo.",
+      "unauthorized": "Solo las cuentas administradoras pueden moderar historias."
+    },
+    "pageTitle": "Moderación",
+    "pageLede": "Historias marcadas como NSFW o retiradas, de la más reciente a la más antigua. Cada historia muestra su motivo a quienes la visitan.",
+    "empty": "No hay nada moderado por ahora.",
+    "logTitle": "Acciones recientes",
+    "statusNsfw": "NSFW",
+    "statusRemoved": "Retirada",
+    "statusLifted": "Moderación quitada",
+    "byOn": "por {name}, {date}",
+    "myRemoved": "Retirada por moderación: {reason}",
+    "myNsfw": "Marcada como NSFW: {reason}"
   }
 }

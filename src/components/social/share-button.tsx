@@ -52,6 +52,7 @@ export function ShareButton({
   text,
   image,
   fileName,
+  allowImage = true,
 }: {
   url: string;
   title: string;
@@ -59,6 +60,7 @@ export function ShareButton({
   /** Everything the Stories image shows, with copy in the story's language. */
   image: StoryImageInput;
   fileName: string;
+  allowImage?: boolean;
 }) {
   const t = useTranslations("Social");
   const shareSheet = useSyncExternalStore(subscribe, hasShareSheet, () => false);
@@ -109,7 +111,7 @@ export function ShareButton({
   return (
     <DropdownMenu
       onOpenChange={(open) => {
-        if (open) void prepareImage().catch(() => undefined);
+        if (open && allowImage) void prepareImage().catch(() => undefined);
       }}
     >
       <DropdownMenuTrigger asChild>
@@ -139,10 +141,12 @@ export function ShareButton({
             {t("shareVia")}
           </DropdownMenuItem>
         ) : null}
-        <DropdownMenuItem onSelect={() => void shareImage()} disabled={busy} data-testid="share-stories">
-          <ImageIcon aria-hidden />
-          {t("shareStories")}
-        </DropdownMenuItem>
+        {allowImage ? (
+          <DropdownMenuItem onSelect={() => void shareImage()} disabled={busy} data-testid="share-stories">
+            <ImageIcon aria-hidden />
+            {t("shareStories")}
+          </DropdownMenuItem>
+        ) : null}
         <DropdownMenuItem onSelect={() => void copy()} data-testid="share-copy">
           <Link2 aria-hidden />
           {t("shareCopy")}

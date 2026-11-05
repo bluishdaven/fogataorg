@@ -6,6 +6,7 @@ import { asAnon, withRls } from "@/lib/db/rls";
 import { stories, storyTopics, topics } from "@/lib/db/schema";
 import type { TiptapDoc } from "@/lib/domain/content";
 import { pendingChangesSchema } from "@/lib/domain/stories";
+import { moderationReasonSql, moderationStatusSql } from "./moderation-sql";
 
 /**
  * A writer's own stories. Runs as the signed-in writer, so RLS returns only
@@ -68,6 +69,8 @@ export async function listMyStories(viewer: Viewer) {
         updatedAt: stories.updatedAt,
         readingTime: stories.readingTime,
         pendingChanges: stories.pendingChanges,
+        moderation: moderationStatusSql,
+        moderationReason: moderationReasonSql,
       })
       .from(stories)
       .where(and(eq(stories.authorId, viewer.id), isNull(stories.deletedAt)))

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useFormatter, useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 import { grantDonorBadge, removeDonorBadge } from "@/app/actions/donors";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 
 export function GrantDonorForm() {
   const t = useTranslations("Admin");
+  const format = useFormatter();
   const router = useRouter();
   const [target, setTarget] = useState("");
   const [note, setNote] = useState("");
@@ -23,7 +24,8 @@ export function GrantDonorForm() {
     try {
       const result = await grantDonorBadge({ target, note });
       if (result.ok) {
-        setMessage({ ok: true, text: t("granted", { name: result.name }) });
+        const date = result.until ? format.dateTime(new Date(result.until), { dateStyle: "medium" }) : "";
+        setMessage({ ok: true, text: t("granted", { name: result.name, date }) });
         setTarget("");
         setNote("");
         router.refresh();

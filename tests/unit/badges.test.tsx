@@ -40,8 +40,9 @@ describe("writing tiers", () => {
   });
 
   it("are read from query rows", () => {
-    expect(badgeData({ publishedCount: 7, donorSince: null })).toEqual({ stories: 7, donor: false });
-    expect(badgeData({ publishedCount: null, donorSince: "2026-11-05T00:00:00Z" })).toEqual({ stories: 0, donor: true });
+    expect(badgeData({ publishedCount: 7, donorActive: false })).toEqual({ stories: 7, donor: false });
+    expect(badgeData({ publishedCount: null, donorActive: true })).toEqual({ stories: 0, donor: true });
+    expect(badgeData({ publishedCount: 3, donorActive: null })).toEqual({ stories: 3, donor: false });
   });
 });
 

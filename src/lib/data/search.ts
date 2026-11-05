@@ -6,7 +6,7 @@ import { badgeData } from "@/lib/domain/badges";
 import { excerpt } from "@/lib/domain/content";
 import type { Locale } from "@/lib/domain/locale";
 import { isAllowedStoryImage } from "@/lib/story-images";
-import { publishedCountRaw } from "./badge-sql";
+import { donorActiveRaw, publishedCountRaw } from "./badge-sql";
 
 /**
  * Public search across stories, people and topics. Runs as `anon`, so only
@@ -29,7 +29,7 @@ type StoryRow = {
   display_name: string;
   avatar_url: string | null;
   published_count: number;
-  donor_since: string | null;
+  donor_active: boolean;
 };
 
 type PersonRow = {
@@ -38,7 +38,7 @@ type PersonRow = {
   bio: string;
   avatar_url: string | null;
   published_count: number;
-  donor_since: string | null;
+  donor_active: boolean;
 };
 type TopicRow = { slug: string; name_en: string; name_es: string };
 type CircleRow = { slug: string; name: string; description: string; accent_color: string };
@@ -62,7 +62,7 @@ export async function search(query: string, lang: "all" | Locale) {
       )
       select s.title, s.subtitle, s.slug, s.language, s.reading_time, s.published_at,
              left(s.content_text, 400) as content_text, s.thumbnail_url, s.thumbnail_alt,
-             p.username, p.display_name, p.avatar_url, p.donor_since,
+             p.username, p.display_name, p.avatar_url, ${donorActiveRaw("p")} as donor_active,
              ${publishedCountRaw("p")} as published_count
       from public.stories s
       join public.profiles p on p.id = s.author_id
@@ -70,6 +70,7 @@ export async function search(query: string, lang: "all" | Locale) {
       where s.status = 'published'
         and s.deleted_at is null
         and s.published_at <= now()
+        and not exists (select 1 from public.story_moderation sm where sm.story_id = s.id)
         and (${language}::text is null or s.language::text = ${language}::text)
         and (
           s.search_vector @@ query.ts
@@ -84,7 +85,7 @@ export async function search(query: string, lang: "all" | Locale) {
 
     const people = await tx.execute<PersonRow>(sql`
       with query as (select public.f_unaccent(lower(${q})) as plain)
-      select pr.username, pr.display_name, pr.bio, pr.avatar_url, pr.donor_since,
+      select pr.username, pr.display_name, pr.bio, pr.avatar_url, ${donorActiveRaw("pr")} as donor_active,
              ${publishedCountRaw("pr")} as published_count
       from public.profiles pr
       cross join query
@@ -142,7 +143,7 @@ export async function search(query: string, lang: "all" | Locale) {
           username: row.username,
           displayName: row.display_name,
           avatarUrl: row.avatar_url,
-          badges: badgeData({ publishedCount: row.published_count, donorSince: row.donor_since }),
+          badges: badgeData({ publishedCount: row.published_count, donorActive: row.donor_active }),
         },
       })),
       people: people.map((row) => ({
@@ -150,7 +151,7 @@ export async function search(query: string, lang: "all" | Locale) {
         displayName: row.display_name,
         bio: row.bio,
         avatarUrl: row.avatar_url,
-        badges: badgeData({ publishedCount: row.published_count, donorSince: row.donor_since }),
+        badges: badgeData({ publishedCount: row.published_count, donorActive: row.donor_active }),
       })),
       topics: topicRows.map((row) => ({ slug: row.slug, nameEn: row.name_en, nameEs: row.name_es })),
     };

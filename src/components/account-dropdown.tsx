@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, Bookmark, BookOpenText, HandHeart, LogOut, Settings, UserRound } from "lucide-react";
+import { Bell, Bookmark, BookOpenText, HandHeart, LogOut, Settings, ShieldAlert, UserRound } from "lucide-react";
 import NextLink from "next/link";
 import { useTranslations } from "next-intl";
 import { signOut } from "@/app/actions/auth";
@@ -95,6 +95,14 @@ export function AccountDropdown({
             <Link href="/admin/donors" data-testid="admin-donors-link">
               <HandHeart />
               {t("Nav.donors")}
+            </Link>
+          </DropdownMenuItem>
+        ) : null}
+        {isAdmin ? (
+          <DropdownMenuItem asChild>
+            <Link href="/admin/moderation" data-testid="admin-moderation-link">
+              <ShieldAlert />
+              {t("Nav.moderation")}
             </Link>
           </DropdownMenuItem>
         ) : null}

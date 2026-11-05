@@ -7,6 +7,7 @@ import { Suspense } from "react";
 import { DonorIcon } from "@/components/badges/badge-icons";
 import { getViewer } from "@/lib/auth";
 import { withRls } from "@/lib/db/rls";
+import { donorActiveSql } from "@/lib/data/badge-sql";
 import { donorGrants, profiles } from "@/lib/db/schema";
 import { profilePath } from "@/lib/domain/handle-routes";
 import { GrantDonorForm, RemoveDonorButton } from "./donor-forms";
@@ -47,10 +48,12 @@ async function Donors() {
           userId: donorGrants.userId,
           note: donorGrants.note,
           grantedAt: donorGrants.grantedAt,
+          endsAt: donorGrants.endsAt,
           removedAt: donorGrants.removedAt,
           username: profiles.username,
           displayName: profiles.displayName,
-          donorSince: profiles.donorSince,
+          donorUntil: profiles.donorUntil,
+          donorActive: donorActiveSql(),
         })
         .from(donorGrants)
         .innerJoin(profiles, eq(profiles.id, donorGrants.userId))
@@ -74,7 +77,7 @@ async function Donors() {
           <ul className="divide-y divide-border rounded-2xl border border-border" data-testid="donor-grants">
             {rows.map((row) => {
               const name = row.displayName || row.username;
-              const active = !row.removedAt && row.donorSince !== null;
+              const active = !row.removedAt && row.donorActive;
               return (
                 <li key={row.id} className="flex flex-wrap items-start justify-between gap-3 p-4" data-testid="donor-grant">
                   <div className="min-w-0">
@@ -86,7 +89,11 @@ async function Donors() {
                       {t("grantedOn", { date: format.dateTime(row.grantedAt, { dateStyle: "medium" }) })}
                       {row.removedAt
                         ? ` · ${t("removedOn", { date: format.dateTime(row.removedAt, { dateStyle: "medium" }) })}`
-                        : null}
+                        : active && row.donorUntil
+                          ? ` · ${t("activeUntil", { date: format.dateTime(row.donorUntil, { dateStyle: "medium" }) })}`
+                          : row.endsAt
+                            ? ` · ${t("endedOn", { date: format.dateTime(row.endsAt, { dateStyle: "medium" }) })}`
+                            : null}
                     </p>
                     {row.note ? <p className="mt-1 text-sm text-pretty">{row.note}</p> : null}
                   </div>

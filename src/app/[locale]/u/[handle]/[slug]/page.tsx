@@ -4,6 +4,9 @@ import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { Avatar } from "@/components/avatar";
+import { AdminModeration } from "@/components/moderation/admin-moderation";
+import { NsfwGate } from "@/components/moderation/nsfw-gate";
+import { RemovedNotice } from "@/components/moderation/removed-notice";
 import { UserBadges } from "@/components/badges/user-badges";
 import { ReaderControls } from "@/components/reader-controls";
 import { ReadingProgress } from "@/components/reading-progress";
@@ -13,6 +16,7 @@ import { StorySocial } from "@/components/social/story-social";
 import { UnsplashCredit } from "@/components/unsplash/unsplash-credit";
 import { UnsplashImage } from "@/components/unsplash/unsplash-image";
 import { Link } from "@/i18n/navigation";
+import { getViewer } from "@/lib/auth";
 import { getStory } from "@/lib/data/stories";
 import { badgeData } from "@/lib/domain/badges";
 import { excerpt } from "@/lib/domain/content";
@@ -30,18 +34,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { handle, slug } = await params;
   const story = await getStory(handle, slug);
   if (!story) return {};
+  if (story.moderation === "removed") {
+    const m = await getTranslations("Moderation");
+    return { title: m("removedTitle"), robots: { index: false } };
+  }
   const t = await getTranslations("Story");
   const url = storyPath(story.authorUsername, story.slug);
   const description = story.seoDescription || story.subtitle || story.excerpt;
   // Share previews (WhatsApp, X, iMessage…) use the cover, else the story's first picture.
   const cover =
-    [story.coverUrl, story.thumbnailUrl].find((url): url is string => !!url && isAllowedStoryImage(url)) ?? null;
+    story.moderation === "nsfw"
+      ? null
+      : ([story.coverUrl, story.thumbnailUrl].find((url): url is string => !!url && isAllowedStoryImage(url)) ?? null);
   return {
     title: story.seoTitle || story.title,
     description,
     authors: [{ name: story.authorDisplayName || story.authorUsername, url: profilePath(story.authorUsername) }],
     alternates: { canonical: story.canonicalUrl ?? url },
-    robots: story.status === "unlisted" ? { index: false } : undefined,
+    robots: story.status === "unlisted" || story.moderation === "nsfw" ? { index: false } : undefined,
     openGraph: {
       type: "article",
       title: story.title,
@@ -71,6 +81,22 @@ async function Story({ params }: Pick<Props, "params">) {
 
   const [t, format, locale] = await Promise.all([getTranslations(), getFormatter(), getLocale()]);
   const authorName = story.authorDisplayName || story.authorUsername;
+
+  if (story.moderation === "removed") {
+    return (
+      <div className="px-4 py-12 sm:py-16">
+        <RemovedNotice reason={story.moderationReason ?? ""}>
+          <Suspense fallback={null}>
+            <RemovedAuthorHint authorId={story.authorId} />
+          </Suspense>
+        </RemovedNotice>
+        <Suspense fallback={null}>
+          <AdminModeration storyId={story.id} status={story.moderation} reason={story.moderationReason} />
+        </Suspense>
+      </div>
+    );
+  }
+  const nsfw = story.moderation === "nsfw";
 
   return (
     <article id="story" className="px-4 py-12 sm:py-16" lang={story.language}>
@@ -115,7 +141,7 @@ async function Story({ params }: Pick<Props, "params">) {
               <NextLink href={profilePath(story.authorUsername)} className="font-medium text-foreground hover:text-ember-text">
                 {authorName}
               </NextLink>
-              <UserBadges badges={badgeData({ publishedCount: story.authorPublishedCount, donorSince: story.authorDonorSince })} />
+              <UserBadges badges={badgeData({ publishedCount: story.authorPublishedCount, donorActive: story.authorDonorActive })} />
             </span>
             <p className="flex flex-wrap items-center gap-x-1.5 text-sm text-muted-foreground">
               {story.publishedAt ? (
@@ -136,17 +162,28 @@ async function Story({ params }: Pick<Props, "params">) {
           <ReaderControls />
         </div>
       </header>
-      {story.coverUrl && isAllowedStoryImage(story.coverUrl) ? (
-        <StoryCover url={story.coverUrl} alt={story.coverAlt} credit={story.coverCredit} />
-      ) : null}
-      {/* Positioned so paragraph-response markers can sit beside their paragraph. */}
-      <div id="story-body" className="relative mx-auto max-w-[var(--measure)]">
-        <StoryBody doc={story.content} lang={story.language} imagePrefixes={allowedImagePrefixes()} />
-      </div>
+      <Suspense fallback={null}>
+        <AdminModeration storyId={story.id} status={story.moderation} reason={story.moderationReason} />
+      </Suspense>
+      {(() => {
+        const content = (
+          <>
+            {story.coverUrl && isAllowedStoryImage(story.coverUrl) ? (
+              <StoryCover url={story.coverUrl} alt={story.coverAlt} credit={story.coverCredit} />
+            ) : null}
+            {/* Positioned so paragraph-response markers can sit beside their paragraph. */}
+            <div id="story-body" className="relative mx-auto max-w-[var(--measure)]">
+              <StoryBody doc={story.content} lang={story.language} imagePrefixes={allowedImagePrefixes()} />
+            </div>
+          </>
+        );
+        return nsfw ? <NsfwGate reason={story.moderationReason ?? ""}>{content}</NsfwGate> : content;
+      })()}
       <Suspense fallback={<div className="mx-auto mt-12 h-12 w-56 animate-pulse rounded-full bg-muted" aria-hidden />}>
         <StorySocial
           storyId={story.id}
           title={story.title}
+          nsfw={nsfw}
           language={story.language}
           readingTime={story.readingTime}
           preview={excerpt(story.contentText, 300)}
@@ -156,7 +193,7 @@ async function Story({ params }: Pick<Props, "params">) {
             username: story.authorUsername,
             displayName: story.authorDisplayName,
             avatarUrl: story.authorAvatarUrl,
-            badges: badgeData({ publishedCount: story.authorPublishedCount, donorSince: story.authorDonorSince }),
+            badges: badgeData({ publishedCount: story.authorPublishedCount, donorActive: story.authorDonorActive }),
             bio: story.authorBio,
           }}
         />
@@ -171,6 +208,17 @@ async function Story({ params }: Pick<Props, "params">) {
         />
       </Suspense>
     </article>
+  );
+}
+
+async function RemovedAuthorHint({ authorId }: { authorId: string }) {
+  const viewer = await getViewer();
+  if (viewer?.id !== authorId) return null;
+  const t = await getTranslations("Moderation");
+  return (
+    <Link href="/me/stories" className="w-fit font-medium text-ember-text underline underline-offset-2">
+      {t("removedAuthorHint")}
+    </Link>
   );
 }
 

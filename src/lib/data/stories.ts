@@ -6,7 +6,8 @@ import { profiles, stories, storyTopics, topics } from "@/lib/db/schema";
 import { badgeData } from "@/lib/domain/badges";
 import { excerpt } from "@/lib/domain/content";
 import { isAllowedStoryImage } from "@/lib/story-images";
-import { publishedCountSql } from "./badge-sql";
+import { donorActiveSql, publishedCountSql } from "./badge-sql";
+import { moderationReasonSql, moderationStatusSql, notModerated, notRemoved } from "./moderation-sql";
 
 /**
  * Public story reads. They run as `anon`, so RLS guarantees drafts never leak
@@ -30,7 +31,8 @@ const cardColumns = {
   authorDisplayName: profiles.displayName,
   authorAvatarUrl: profiles.avatarUrl,
   authorPublishedCount: publishedCountSql(),
-  authorDonorSince: profiles.donorSince,
+  authorDonorActive: donorActiveSql(),
+  moderation: moderationStatusSql,
 };
 
 type CardRow = {
@@ -47,7 +49,8 @@ type CardRow = {
   authorDisplayName: string;
   authorAvatarUrl: string | null;
   authorPublishedCount: number;
-  authorDonorSince: Date | null;
+  authorDonorActive: boolean;
+  moderation: "nsfw" | "removed" | null;
 };
 
 function toCard(row: CardRow) {
@@ -59,13 +62,17 @@ function toCard(row: CardRow) {
     readingTime: row.readingTime,
     publishedAt: row.publishedAt,
     excerpt: excerpt(row.contentText),
+    nsfw: row.moderation === "nsfw",
+    // NSFW stories never show a picture in lists.
     thumbnail:
-      row.thumbnailUrl && isAllowedStoryImage(row.thumbnailUrl) ? { url: row.thumbnailUrl, alt: row.thumbnailAlt } : null,
+      row.moderation !== "nsfw" && row.thumbnailUrl && isAllowedStoryImage(row.thumbnailUrl)
+        ? { url: row.thumbnailUrl, alt: row.thumbnailAlt }
+        : null,
     author: {
       username: row.authorUsername,
       displayName: row.authorDisplayName,
       avatarUrl: row.authorAvatarUrl,
-      badges: badgeData({ publishedCount: row.authorPublishedCount, donorSince: row.authorDonorSince }),
+      badges: badgeData({ publishedCount: row.authorPublishedCount, donorActive: row.authorDonorActive }),
     },
   };
 }
@@ -74,7 +81,10 @@ const listed = and(
   eq(stories.status, "published"),
   isNull(stories.deletedAt),
   lte(stories.publishedAt, sql`now()`),
+  notRemoved,
 );
+/** Feeds (home, topics) also leave out NSFW stories. */
+const inFeeds = and(listed, notModerated);
 
 export async function getLatestStories(limit = 20) {
   "use cache";
@@ -86,7 +96,7 @@ export async function getLatestStories(limit = 20) {
       .select(cardColumns)
       .from(stories)
       .innerJoin(profiles, eq(profiles.id, stories.authorId))
-      .where(listed)
+      .where(inFeeds)
       .orderBy(desc(stories.publishedAt))
       .limit(limit),
   );
@@ -122,8 +132,10 @@ export async function getStory(handle: string, slug: string) {
         authorDisplayName: profiles.displayName,
         authorAvatarUrl: profiles.avatarUrl,
         authorPublishedCount: publishedCountSql(),
-        authorDonorSince: profiles.donorSince,
+        authorDonorActive: donorActiveSql(),
         authorBio: profiles.bio,
+        moderation: moderationStatusSql,
+        moderationReason: moderationReasonSql,
       })
       .from(stories)
       .innerJoin(profiles, eq(profiles.id, stories.authorId))
@@ -174,7 +186,7 @@ export async function getProfileWithStories(handle: string) {
         displayName: profiles.displayName,
         avatarUrl: profiles.avatarUrl,
         publishedCount: publishedCountSql(),
-        donorSince: profiles.donorSince,
+        donorActive: donorActiveSql(),
         bio: profiles.bio,
         links: profiles.links,
         createdAt: profiles.createdAt,
@@ -213,7 +225,7 @@ export async function getTopicWithStories(slug: string) {
       .from(storyTopics)
       .innerJoin(stories, eq(stories.id, storyTopics.storyId))
       .innerJoin(profiles, eq(profiles.id, stories.authorId))
-      .where(and(listed, eq(storyTopics.topicId, topic.id)))
+      .where(and(inFeeds, eq(storyTopics.topicId, topic.id)))
       .orderBy(desc(stories.publishedAt))
       .limit(50);
 
@@ -240,7 +252,7 @@ export async function listTopicsWithCounts() {
       })
       .from(topics)
       .leftJoin(storyTopics, eq(storyTopics.topicId, topics.id))
-      .leftJoin(stories, and(eq(stories.id, storyTopics.storyId), listed))
+      .leftJoin(stories, and(eq(stories.id, storyTopics.storyId), inFeeds))
       .groupBy(topics.id)
       .orderBy(topics.slug),
   );

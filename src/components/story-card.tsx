@@ -18,6 +18,8 @@ export type StoryCardData = {
   excerpt: string;
   /** Cover, else first image in the story; only URLs from allowed hosts reach here. */
   thumbnail: { url: string; alt: string } | null;
+  /** Marked NSFW by moderation: labelled, and never shown with a picture. */
+  nsfw?: boolean;
   author: { username: string; displayName: string; avatarUrl?: string | null; badges?: BadgeData };
 };
 
@@ -56,6 +58,11 @@ export function StoryCard({ story }: { story: StoryCardData }) {
           >
             {t(`Common.languageBadge.${story.language}`)}
           </span>
+          {story.nsfw ? (
+            <span className="rounded-full bg-destructive/10 px-2 py-px text-xs font-semibold text-destructive" data-testid="nsfw-label">
+              {t("Moderation.nsfwLabel")}
+            </span>
+          ) : null}
           {story.publishedAt ? (
             <time dateTime={story.publishedAt.toISOString()}>
               {format.dateTime(story.publishedAt, { dateStyle: "medium" })}
