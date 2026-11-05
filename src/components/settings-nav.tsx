@@ -18,7 +18,7 @@ export async function SettingsNav({ active }: { active: (typeof TABS)[number]["k
           href={tab.href}
           aria-current={tab.key === active ? "page" : undefined}
           className={cn(
-            "-mb-px border-b-2 px-3 py-2 text-sm font-medium",
+            "-mb-px flex min-h-11 items-center border-b-2 px-3 text-sm font-medium sm:min-h-9",
             tab.key === active
               ? "border-primary text-foreground"
               : "border-transparent text-muted-foreground hover:text-foreground",

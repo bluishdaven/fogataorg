@@ -117,7 +117,7 @@ export function CircleForm({
                 setSlugTouched(true);
                 setSlug(e.target.value.toLowerCase());
               }}
-              className="h-8 min-w-0 flex-1 bg-transparent pr-2.5 text-sm outline-none"
+              className="h-11 min-w-0 flex-1 bg-transparent pr-3 text-base outline-none sm:h-9 sm:text-sm"
               spellCheck={false}
               aria-describedby="circle-slug-hint"
             />

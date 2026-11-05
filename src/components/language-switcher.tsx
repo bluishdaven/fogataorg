@@ -46,12 +46,13 @@ export function LanguageSwitcher() {
         <Button
           variant="ghost"
           size="sm"
+          className="min-w-11 sm:min-w-0"
           // Visible text ("EN") must be part of the accessible name (WCAG 2.5.3).
           aria-label={t("current", { language: locale.toUpperCase() })}
           disabled={pending}
           data-testid="language-switcher"
         >
-          <Languages />
+          <Languages className="max-sm:hidden" />
           <span className="font-semibold uppercase">{locale}</span>
         </Button>
       </DropdownMenuTrigger>

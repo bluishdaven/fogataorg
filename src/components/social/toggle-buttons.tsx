@@ -53,7 +53,7 @@ export function SaveButton({
       aria-label={saved ? t("saved") : t("save")}
       title={saved ? t("saved") : t("save")}
       className={cn(
-        "flex size-10 items-center justify-center rounded-full transition-colors hover:bg-accent",
+        "flex size-11 items-center justify-center rounded-full transition-colors hover:bg-accent",
         saved ? "text-ember-text" : "text-muted-foreground",
       )}
       data-testid="save-button"

@@ -82,7 +82,7 @@ export function ParagraphAnchors({ counts }: { counts: Record<string, number> })
                   key={marker.blockId}
                   type="button"
                   // Wide screens: in the right margin beside the paragraph. Narrower: in the gap below it.
-                  className="absolute top-(--marker-below) right-0 flex items-center gap-1 rounded-full border border-border bg-background px-2 py-0.5 font-sans text-xs text-muted-foreground shadow-sm hover:text-foreground lg:top-(--marker-top) lg:translate-x-[calc(100%+0.75rem)]"
+                  className="absolute top-(--marker-below) right-0 flex items-center gap-1 rounded-full border border-border bg-background px-2.5 py-1 font-sans text-xs after:absolute after:-inset-2 after:content-[''] text-muted-foreground shadow-sm hover:text-foreground lg:top-(--marker-top) lg:translate-x-[calc(100%+0.75rem)]"
                   style={{ "--marker-top": `${marker.top}px`, "--marker-below": `${marker.bottom + 2}px` } as React.CSSProperties}
                   aria-label={t("paragraphResponses", { count: marker.count })}
                   onClick={() => window.dispatchEvent(new CustomEvent(SHOW_BLOCK_EVENT, { detail: marker.blockId }))}

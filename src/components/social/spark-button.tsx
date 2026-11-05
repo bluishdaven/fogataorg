@@ -99,7 +99,7 @@ export function SparkButton({
         aria-disabled={isAuthor || undefined}
         title={label}
         className={cn(
-          "relative flex size-10 items-center justify-center rounded-full transition-colors hover:bg-ember-soft",
+          "relative flex size-11 items-center justify-center rounded-full transition-colors hover:bg-ember-soft",
           mine > 0 ? "text-ember-text" : "text-muted-foreground",
           isAuthor && "cursor-default opacity-60 hover:bg-transparent",
         )}

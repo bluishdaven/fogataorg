@@ -30,15 +30,15 @@ export function SiteFooter() {
             </p>
           </div>
         </div>
-        <nav className="flex flex-wrap items-center gap-x-4 gap-y-2" aria-label={t("Nav.footer")}>
-          <Link href="/topics" className="underline-offset-4 hover:text-foreground hover:underline">
+        <nav className="flex flex-wrap items-center gap-x-5 gap-y-0 sm:gap-y-2" aria-label={t("Nav.footer")}>
+          <Link href="/topics" className="inline-flex min-h-11 items-center underline-offset-4 hover:text-foreground hover:underline sm:min-h-0">
             {t("Nav.topics")}
           </Link>
           {/* Placeholder until the shop opens: disabled, so it can't be activated and reads as unavailable. */}
           <button
             type="button"
             disabled
-            className="inline-flex cursor-not-allowed items-center gap-1.5 text-muted-foreground/60"
+            className="inline-flex min-h-11 cursor-not-allowed items-center gap-1.5 text-muted-foreground/60 sm:min-h-0"
             data-testid="merch-soon"
           >
             {t("Nav.merch")}
@@ -46,11 +46,11 @@ export function SiteFooter() {
               {t("Nav.comingSoon")}
             </span>
           </button>
-          <Link href="/circles" className="underline-offset-4 hover:text-foreground hover:underline">
+          <Link href="/circles" className="inline-flex min-h-11 items-center underline-offset-4 hover:text-foreground hover:underline sm:min-h-0">
             {t("Nav.circles")}
           </Link>
           {isPublicSite ? null : (
-            <Link href="/design" className="underline-offset-4 hover:text-foreground hover:underline">
+            <Link href="/design" className="inline-flex min-h-11 items-center underline-offset-4 hover:text-foreground hover:underline sm:min-h-0">
               {t("Nav.design")}
             </Link>
           )}

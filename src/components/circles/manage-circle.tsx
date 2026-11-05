@@ -168,7 +168,7 @@ export function MembersManager({ circleId, members, isOwner }: { circleId: strin
               id="member-role"
               value={role}
               onChange={(e) => setRole(e.target.value as "editor" | "writer")}
-              className="h-8 rounded-lg border border-input bg-transparent px-2 text-sm"
+              className="h-11 rounded-xl border border-input bg-transparent px-3 text-base sm:h-9 sm:text-sm"
             >
               <option value="editor">{t("roles.editor")}</option>
               <option value="writer">{t("roles.writer")}</option>
