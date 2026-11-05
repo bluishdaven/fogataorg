@@ -240,6 +240,9 @@ export const notificationType = pgEnum("notification_type", [
   // A new writing tier (notifications.badge holds its key) or the donor badge being granted.
   "badge",
   "donor",
+  // Someone asked to join a private circle (to its owner and editors), or was let in.
+  "join_request",
+  "join_accepted",
 ]);
 
 /** A reader following a writer or a topic (circles later). Exactly one target is set. */
@@ -438,6 +441,8 @@ export const notifications = pgTable(
         t.type,
         sql`coalesce(${t.storyId}, '00000000-0000-0000-0000-000000000000'::uuid)`,
         sql`coalesce(${t.responseId}, '00000000-0000-0000-0000-000000000000'::uuid)`,
+        // Join requests have no story: keep each circle's requests in their own group.
+        sql`coalesce(${t.circleId}, '00000000-0000-0000-0000-000000000000'::uuid)`,
       )
       .where(sql`${t.readAt} is null`),
     pgPolicy("notifications_select_own", { for: "select", to: authenticatedRole, using: sql`${t.userId} = ${authUid}` }),
@@ -473,6 +478,8 @@ export const circles = pgTable(
     headerUrl: text("header_url"),
     headerAlt: text("header_alt").notNull().default(""),
     headerCredit: jsonb("header_credit").$type<ImageCredit>(),
+    // Private circles stay listed and readable; only members publish, others ask to join.
+    isPrivate: boolean("is_private").notNull().default(false),
     ownerId: uuid("owner_id")
       .notNull()
       .references(() => profiles.id, { onDelete: "cascade" }),
@@ -562,7 +569,7 @@ export const circleSubmissions = pgTable(
     pgPolicy("circle_submissions_insert_author", {
       for: "insert",
       to: authenticatedRole,
-      withCheck: sql`${t.submittedBy} = ${authUid} and ${t.status} = 'pending' and ${t.decidedBy} is null and exists (select 1 from public.stories s where s.id = ${t.storyId} and s.author_id = ${authUid} and s.deleted_at is null and s.status in ('published', 'unlisted') and s.published_at <= now())`,
+      withCheck: sql`${t.submittedBy} = ${authUid} and ${t.status} = 'pending' and ${t.decidedBy} is null and exists (select 1 from public.stories s where s.id = ${t.storyId} and s.author_id = ${authUid} and s.deleted_at is null and s.status in ('published', 'unlisted') and s.published_at <= now()) and (not exists (select 1 from public.circles c where c.id = ${t.circleId} and c.is_private) or exists (select 1 from public.circle_members m where m.circle_id = ${t.circleId} and m.user_id = ${authUid}))`,
     }),
     pgPolicy("circle_submissions_update_editors", {
       for: "update",
@@ -575,6 +582,52 @@ export const circleSubmissions = pgTable(
       for: "delete",
       to: authenticatedRole,
       using: sql`${t.submittedBy} = ${authUid} or ${CIRCLE_EDITOR(t.circleId)}`,
+    }),
+  ],
+);
+
+export const joinRequestStatus = pgEnum("join_request_status", ["pending", "declined"]);
+
+/**
+ * Asking to join a private circle. Owners and editors decide through decide_join_request(); an
+ * accepted request becomes a writer membership and the row goes away. Declined rows stay, so the
+ * same person can't ask again and again.
+ */
+export const circleJoinRequests = pgTable(
+  "circle_join_requests",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    circleId: uuid("circle_id")
+      .notNull()
+      .references(() => circles.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => profiles.id, { onDelete: "cascade" }),
+    status: joinRequestStatus("status").notNull().default("pending"),
+    decidedBy: uuid("decided_by").references(() => profiles.id, { onDelete: "set null" }),
+    decidedAt: timestamp("decided_at", { withTimezone: true }),
+    ...timestamps,
+  },
+  (t) => [
+    uniqueIndex("circle_join_requests_circle_user_key").on(t.circleId, t.userId),
+    index("circle_join_requests_circle_idx").on(t.circleId, t.status, t.createdAt),
+    index("circle_join_requests_user_idx").on(t.userId),
+    pgPolicy("circle_join_requests_select", {
+      for: "select",
+      to: authenticatedRole,
+      using: sql`${t.userId} = ${authUid} or ${CIRCLE_EDITOR(t.circleId)}`,
+    }),
+    // Only for private circles the person isn't in yet, and only as a fresh request.
+    pgPolicy("circle_join_requests_insert_own", {
+      for: "insert",
+      to: authenticatedRole,
+      withCheck: sql`${t.userId} = ${authUid} and ${t.status} = 'pending' and ${t.decidedBy} is null and exists (select 1 from public.circles c where c.id = ${t.circleId} and c.is_private) and not exists (select 1 from public.circle_members m where m.circle_id = ${t.circleId} and m.user_id = ${authUid})`,
+    }),
+    // People can take back a request that's still waiting.
+    pgPolicy("circle_join_requests_delete_own", {
+      for: "delete",
+      to: authenticatedRole,
+      using: sql`${t.userId} = ${authUid} and ${t.status} = 'pending'`,
     }),
   ],
 );

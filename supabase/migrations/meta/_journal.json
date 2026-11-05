@@ -197,6 +197,20 @@
       "when": 1793900812536,
       "tag": "20261105174652_badge_notification_functions",
       "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1793909194416,
+      "tag": "20261105200634_private_circles",
+      "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1793909212692,
+      "tag": "20261105200652_private_circle_functions",
+      "breakpoints": true
     }
   ]
 }
