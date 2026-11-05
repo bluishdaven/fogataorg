@@ -123,3 +123,48 @@ test("edits to a live story stay private until published", async ({ page }) => {
 
   await deleteFromMyStories(page, `${title} (revised)`);
 });
+
+test.describe("on a phone", () => {
+  test.use({ viewport: { width: 375, height: 812 } });
+
+  test("photos have their own button, and formatting waits for a selection", async ({ page }) => {
+    test.setTimeout(90_000);
+    await signInWithMagicLink(page, "en");
+    await startDraft(page);
+    const addPhoto = page.getByTestId("add-photo");
+    await expect(addPhoto).toBeEnabled();
+    // A new draft starts with nothing selected by the writer: no formatting bar over it.
+    await expect(page.getByTestId("selection-toolbar")).toBeHidden();
+
+    const upload = async (name: string, color: [number, number, number]) => {
+      await addPhoto.click();
+      const chooser = page.waitForEvent("filechooser");
+      await page.getByTestId("add-photo-upload").click();
+      await (await chooser).setFiles({ name, mimeType: "image/png", buffer: solidPng(64, 48, color) });
+      // Let the menu finish closing (no person taps again within its 100 ms fade).
+      await expect(page.getByRole("menu")).toHaveCount(0);
+    };
+    const figures = page.getByTestId("editor-body").locator("figure");
+
+    // Before the writer taps the story, a photo fills the blank draft.
+    await upload("first.png", [232, 89, 12]);
+    await expect(figures).toHaveCount(1, { timeout: 15_000 });
+
+    // With a photo selected, the next one goes after it instead of replacing it.
+    await figures.first().locator("img").click();
+    await upload("second.png", [40, 90, 160]);
+    await expect(figures).toHaveCount(2, { timeout: 15_000 });
+
+    // Unsplash is one tap away too.
+    await addPhoto.click();
+    await page.getByTestId("add-photo-unsplash").click();
+    await expect(page.getByRole("dialog", { name: "Free photos from Unsplash" })).toBeVisible();
+    await page.keyboard.press("Escape");
+
+    // Selecting words brings the formatting bar.
+    await page.getByTestId("editor-body").locator("p").last().click();
+    await page.keyboard.type("Embers in the dark");
+    await page.keyboard.press("Shift+Home");
+    await expect(page.getByTestId("selection-toolbar")).toBeVisible();
+  });
+});

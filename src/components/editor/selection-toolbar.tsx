@@ -40,55 +40,65 @@ export function SelectionToolbar({ editor }: { editor: Editor }) {
   return (
     <BubbleMenu
       editor={editor}
-      shouldShow={({ editor: e, state: s }) => !s.selection.empty && !e.isActive("figure") && !e.isActive("codeBlock")}
-      className="flex items-center gap-0.5 rounded-xl border border-border bg-popover p-1 text-popover-foreground shadow-lg"
-      data-testid="selection-toolbar"
+      // Only for text the writer selected: a new editor can start with everything selected
+      // (and unfocused), which must not open the toolbar over an empty draft.
+      shouldShow={({ editor: e, view, element, state: s, from, to }) =>
+        (view.hasFocus() || element.contains(document.activeElement)) &&
+        !s.selection.empty &&
+        s.doc.textBetween(from, to).trim().length > 0 &&
+        !e.isActive("figure") &&
+        !e.isActive("codeBlock")
+      }
+      className="rounded-xl border border-border bg-popover p-1 text-popover-foreground shadow-lg"
     >
-      {linking ? (
-        <form onSubmit={applyLink} className="flex items-center gap-1">
-          <input
-            autoFocus
-            value={href}
-            onChange={(event) => setHref(event.target.value)}
-            onKeyDown={(event) => event.key === "Escape" && setLinking(false)}
-            placeholder={t("linkPlaceholder")}
-            aria-label={t("link")}
-            className="h-8 w-56 rounded-md bg-transparent px-2 text-sm outline-none"
-          />
-        </form>
-      ) : (
-        <>
-          <ToolButton label={t("bold")} active={state.bold} onClick={() => editor.chain().focus().toggleBold().run()}>
-            <Bold />
-          </ToolButton>
-          <ToolButton label={t("italic")} active={state.italic} onClick={() => editor.chain().focus().toggleItalic().run()}>
-            <Italic />
-          </ToolButton>
-          <ToolButton label={t("strike")} active={state.strike} onClick={() => editor.chain().focus().toggleStrike().run()}>
-            <Strikethrough />
-          </ToolButton>
-          <ToolButton
-            label={t("link")}
-            active={state.link}
-            onClick={() => {
-              setHref((editor.getAttributes("link").href as string | undefined) ?? "");
-              setLinking(true);
-            }}
-          >
-            <Link2 />
-          </ToolButton>
-          <span className="mx-0.5 h-5 w-px bg-border" aria-hidden />
-          <ToolButton label={t("heading")} active={state.h2} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}>
-            <Heading2 />
-          </ToolButton>
-          <ToolButton label={t("subheading")} active={state.h3} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}>
-            <Heading3 />
-          </ToolButton>
-          <ToolButton label={t("quote")} active={state.quote} onClick={() => editor.chain().focus().toggleBlockquote().run()}>
-            <Quote />
-          </ToolButton>
-        </>
-      )}
+      {/* Tiptap doesn't pass data attributes to the floating element, so they live in here. */}
+      <div role="toolbar" aria-label={t("formatting")} className="flex items-center gap-0.5" data-testid="selection-toolbar">
+        {linking ? (
+          <form onSubmit={applyLink} className="flex items-center gap-1">
+            <input
+              autoFocus
+              value={href}
+              onChange={(event) => setHref(event.target.value)}
+              onKeyDown={(event) => event.key === "Escape" && setLinking(false)}
+              placeholder={t("linkPlaceholder")}
+              aria-label={t("link")}
+              className="h-8 w-56 rounded-md bg-transparent px-2 text-sm outline-none"
+            />
+          </form>
+        ) : (
+          <>
+            <ToolButton label={t("bold")} active={state.bold} onClick={() => editor.chain().focus().toggleBold().run()}>
+              <Bold />
+            </ToolButton>
+            <ToolButton label={t("italic")} active={state.italic} onClick={() => editor.chain().focus().toggleItalic().run()}>
+              <Italic />
+            </ToolButton>
+            <ToolButton label={t("strike")} active={state.strike} onClick={() => editor.chain().focus().toggleStrike().run()}>
+              <Strikethrough />
+            </ToolButton>
+            <ToolButton
+              label={t("link")}
+              active={state.link}
+              onClick={() => {
+                setHref((editor.getAttributes("link").href as string | undefined) ?? "");
+                setLinking(true);
+              }}
+            >
+              <Link2 />
+            </ToolButton>
+            <span className="mx-0.5 h-5 w-px bg-border" aria-hidden />
+            <ToolButton label={t("heading")} active={state.h2} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}>
+              <Heading2 />
+            </ToolButton>
+            <ToolButton label={t("subheading")} active={state.h3} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}>
+              <Heading3 />
+            </ToolButton>
+            <ToolButton label={t("quote")} active={state.quote} onClick={() => editor.chain().focus().toggleBlockquote().run()}>
+              <Quote />
+            </ToolButton>
+          </>
+        )}
+      </div>
     </BubbleMenu>
   );
 }
