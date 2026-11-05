@@ -1,5 +1,18 @@
 # Changelog
 
+## Badges (2026-11-05)
+
+**Demo**: badges sit right after names in story lists, bylines, the writer card, responses, search,
+circle members and the account menu; profiles show labeled chips.
+
+- **Writing tiers**, by published public stories: Kindling/Yesca (1), Candle/Vela (5), Flame/Llama
+  (12), Torch/Antorcha (25), Hearth/Hogar (50), Bonfire/Hoguera (100), Beacon/Faro (200),
+  Star/Estrella (350), Sun/Sol (600), Phoenix/Fénix (1,000).
+- **Firekeeper / Mecenas** donor badge, permanent until removed, granted by the owner at
+  `/admin/donors` (by @username or sign-in email, with a private note and a log).
+- Tests: 150 unit, 60 RLS (admin-only grants, private log, count rules), 72 Playwright (grant and
+  remove as owner, badges in both languages).
+
 ## Stories image (2026-11-05)
 
 **Demo**: open any story → share → **Image for Stories**. A 1080×1920 image with the Fogata flame,

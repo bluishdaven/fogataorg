@@ -1,10 +1,10 @@
-# Badges (draft, not built)
+# Badges
 
 Goal: quiet recognition next to writers' names, without a paid tier. Two kinds: a writing tier that
 grows with published stories (1 to 1,000), and a permanent donor badge the owner grants.
 
-Status: proposal, revised 2026-11-05 (ten tiers up to 1,000 stories; the donor badge no longer
-expires). Awaiting the owner's go-ahead.
+Status: built 2026-11-05 as described below (ten tiers up to 1,000 stories; permanent donor badge).
+Still open: the donations inbox (decision 3).
 
 ## Writing tiers
 

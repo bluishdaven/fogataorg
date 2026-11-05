@@ -141,6 +141,21 @@ summary goes out on a weekday assigned at random to each reader, only in weeks w
    which Gmail and Yahoo require of bulk senders. The footer link opens a confirm page instead,
    because mail scanners prefetch links.
 
+### 5. Donor badges (owner)
+
+The Firekeeper / Mecenas badge is granted from `/admin/donors`, which only admin accounts can open.
+Make your own account the admin once, in Supabase → **SQL Editor** (replace the username):
+
+```sql
+update auth.users
+set raw_app_meta_data = raw_app_meta_data || '{"role":"admin"}'::jsonb
+where id = (select id from public.profiles where username = 'your_username');
+```
+
+Then sign out of Fogata and sign in again (the role travels in the session). **Donors** appears in
+your account menu. Donors need somewhere to send receipts: set up forwarding such as
+`donaciones@fogata.org` → your inbox in Spaceship (Email → Email forwarding).
+
 ### Cost notes
 
 - Supabase Free pauses projects after 7 days without activity and has no image transformations;
