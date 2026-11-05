@@ -9,6 +9,7 @@ import {
   pgEnum,
   pgPolicy,
   pgTable,
+  smallint,
   primaryKey,
   text,
   timestamp,
@@ -35,7 +36,7 @@ const timestamps = {
 const everyone = [anonRole, authenticatedRole];
 
 export const localeCode = pgEnum("locale_code", ["en", "es"]);
-export const emailFrequency = pgEnum("email_frequency", ["off", "daily", "weekly"]);
+export const emailFrequency = pgEnum("email_frequency", ["off", "weekly"]);
 export const storyStatus = pgEnum("story_status", ["draft", "scheduled", "published", "unlisted"]);
 
 export type ProfileLink = { label: string; url: string };
@@ -53,9 +54,11 @@ export const profiles = pgTable(
     links: jsonb("links").$type<ProfileLink[]>().notNull().default(sql`'[]'::jsonb`),
     locale: localeCode("locale").notNull().default("en"),
     isVerified: boolean("is_verified").notNull().default(false),
-    // Activity summary emails: batched, never one per event. Default daily; one click turns them off.
-    emailFrequency: emailFrequency("email_frequency").notNull().default("daily"),
+    // Activity summary emails: one a week at most, on a weekday fixed per reader; one click turns them off.
+    emailFrequency: emailFrequency("email_frequency").notNull().default("weekly"),
     emailLastSentAt: timestamp("email_last_sent_at", { withTimezone: true }),
+    // Weekday (0 = Sunday, UTC) the summary goes out, random per reader so sends spread over the week.
+    emailWeekday: smallint("email_weekday").notNull().default(sql`floor(random() * 7)::smallint`),
     ...timestamps,
   },
   (t) => [
@@ -63,6 +66,7 @@ export const profiles = pgTable(
     check("profiles_username_format", sql`${t.username} ~ '^[A-Za-z0-9_]{3,30}$'`),
     check("profiles_display_name_length", sql`char_length(${t.displayName}) <= 80`),
     check("profiles_bio_length", sql`char_length(${t.bio}) <= 280`),
+    check("profiles_email_weekday_range", sql`${t.emailWeekday} between 0 and 6`),
     pgPolicy("profiles_select_public", { for: "select", to: everyone, using: sql`true` }),
     pgPolicy("profiles_update_own", {
       for: "update",

@@ -120,6 +120,20 @@
       "when": 1793852088808,
       "tag": "20261105041448_email_frequency_grant",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1793853178425,
+      "tag": "20261105043258_weekly_email_summaries",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1793853309332,
+      "tag": "20261105043509_email_weekday",
+      "breakpoints": true
     }
   ]
 }
