@@ -45,3 +45,18 @@ for (const theme of ["light", "dark", "sepia"] as const) {
     await expect.poll(() => outline(email)).toEqual({ style: "solid", width: 2, color: ring });
   });
 }
+
+test("focused elements never hide under the sticky header when tabbing backwards", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 700 });
+  await page.goto("/en");
+  await page.getByRole("contentinfo").getByRole("link").last().focus();
+  const headerBottom = await page.locator("body > header").evaluate((el) => el.getBoundingClientRect().bottom);
+  for (let i = 0; i < 12; i++) {
+    await page.keyboard.press("Shift+Tab");
+    const top = await page.evaluate(() => {
+      const el = document.activeElement;
+      return el && !el.closest("header") ? el.getBoundingClientRect().top : null;
+    });
+    if (top !== null) expect(top).toBeGreaterThanOrEqual(headerBottom);
+  }
+});

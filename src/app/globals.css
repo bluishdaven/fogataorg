@@ -190,6 +190,8 @@ html[data-reader-font="sans"] .prose-fogata {
   html {
     @apply font-sans;
     -webkit-text-size-adjust: 100%;
+    /* Keeps anchors and keyboard-focused elements clear of the sticky header (WCAG 2.4.11). */
+    scroll-padding-top: 5rem;
   }
   body {
     @apply bg-background text-foreground antialiased;

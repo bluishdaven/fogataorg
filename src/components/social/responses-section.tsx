@@ -115,7 +115,7 @@ export function ResponsesSection({
       id="responses"
       ref={section}
       aria-labelledby="responses-heading"
-      className="mx-auto mt-12 max-w-[var(--measure)] scroll-mt-20 font-sans"
+      className="mx-auto mt-12 max-w-[var(--measure)] font-sans"
     >
       <h2 id="responses-heading" className="font-serif text-2xl font-semibold">
         {t("responsesHeading", { count: total })}
