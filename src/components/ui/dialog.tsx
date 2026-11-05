@@ -47,22 +47,50 @@ function DialogOverlay({
   )
 }
 
+/** What should get focus back when a dialog closes: the focused element, or, for a dialog opened
+ * from a menu item (which unmounts with its menu), the button that opened the menu. */
+function focusReturnTarget(): HTMLElement | null {
+  const active = document.activeElement
+  if (!(active instanceof HTMLElement) || active === document.body) return null
+  const menuTriggerId = active.closest("[role=menu]")?.getAttribute("aria-labelledby")
+  const menuTrigger = menuTriggerId ? document.getElementById(menuTriggerId) : null
+  return menuTrigger ?? active
+}
+
 function DialogContent({
   className,
   children,
   showCloseButton = true,
   closeLabel = "Close",
+  onOpenAutoFocus,
+  onCloseAutoFocus,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean
   /** Screen-reader label for the close button; pass a translated string. */
   closeLabel?: string
 }) {
+  // Radix returns focus to a <DialogTrigger>. Dialogs opened from code (a chip, a menu item, a
+  // Publish button) have none, so focus would fall to <body>: remember what had it instead.
+  const opener = React.useRef<HTMLElement | null>(null)
   return (
     <DialogPortal>
       <DialogOverlay />
       <DialogPrimitive.Content
         data-slot="dialog-content"
+        onOpenAutoFocus={(event) => {
+          opener.current = focusReturnTarget()
+          onOpenAutoFocus?.(event)
+        }}
+        onCloseAutoFocus={(event) => {
+          onCloseAutoFocus?.(event)
+          if (event.defaultPrevented) return
+          const target = opener.current
+          if (target?.isConnected && target !== document.body) {
+            event.preventDefault()
+            target.focus()
+          }
+        }}
         className={cn(
           "fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
           className

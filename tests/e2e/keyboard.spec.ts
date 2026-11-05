@@ -60,3 +60,30 @@ test("focused elements never hide under the sticky header when tabbing backwards
     if (top !== null) expect(top).toBeGreaterThanOrEqual(headerBottom);
   }
 });
+
+test("closing the badge guide puts focus back on the badge that opened it", async ({ page }) => {
+  await page.goto("/@danawrites");
+  const chip = page.getByTestId("badge-chip").first();
+  await tabTo(page, chip);
+  await page.keyboard.press("Enter");
+  const guide = page.getByTestId("badge-guide");
+  await expect(guide).toBeVisible();
+  // Focus is trapped in the dialog.
+  for (let i = 0; i < 6; i++) {
+    await page.keyboard.press("Tab");
+    expect(await guide.evaluate((el) => el.contains(document.activeElement))).toBe(true);
+  }
+  await page.keyboard.press("Escape");
+  await expect(guide).toBeHidden();
+  await expect(chip).toBeFocused();
+});
+
+test("the share menu returns focus to its button", async ({ page }) => {
+  await page.goto("/@lucia_ortega/el-mole-de-mi-abuela-no-tiene-receta");
+  const share = page.getByTestId("share-button");
+  await tabTo(page, share, 80);
+  await page.keyboard.press("Enter");
+  await expect(page.getByTestId("share-copy")).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(share).toBeFocused();
+});
