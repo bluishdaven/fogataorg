@@ -1,5 +1,26 @@
 # Changelog
 
+## UI audit: keyboard focus, dialogs, layout shift and JS size (2026-11-05)
+
+**Demo**: on the home page press Tab a few times. Story cards now show an ember outline, as do
+every button and field. Open a badge on a profile and press Escape: focus goes back to the badge.
+Open a story on a phone-sized window: the footer no longer jumps.
+
+- **Keyboard**: visible 2px focus outlines everywhere, which were missing on story cards and at
+  1.8:1 elsewhere. Focus stays clear of the sticky header and returns to the opener when any dialog
+  closes.
+- **Screen readers**: form errors are read with their field, the editor has a heading, and its
+  phone back link has a name. The toast region is named in the reader's language, and badge chips
+  no longer repeat their name.
+- **Contrast**: hovered primary buttons and the editor's hints pass AA in all three themes.
+- **Performance**: the story page's mobile layout shift went from 0.24 to 0.001. The Supabase
+  client loads after hydration, about 66 KB less JS on every page.
+- Open items, ranked, in `docs/plans/ui-audit.md`: paragraph responses need a keyboard path; input
+  borders and font loading need the owner's call.
+- Tests: unit (dialog focus return, badge chip names, reduced-motion scroll) and Playwright
+  (keyboard focus in 3 themes, hover contrast, axe on the editor and account pages at phone width,
+  live bell, Spanish toast region).
+
 ## Private circles, badge explainer and badge notifications (2026-11-05)
 
 **Demo**: start a circle and choose **Private** under "Who can publish" (or switch it in Manage →

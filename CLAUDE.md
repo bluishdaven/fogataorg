@@ -198,7 +198,12 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
 - Styling: Tailwind 4 with tokens in `src/app/globals.css` (light, dark, sepia). Use semantic
   tokens (`bg-background`, `text-muted-foreground`, `text-ember-text`), never raw colors. Every
   text/background pair must pass WCAG AA in all three themes (e2e axe tests check this).
-- Skeletons, never spinners. Respect `prefers-reduced-motion` (`motion-safe:` utilities).
+- Skeletons, never spinners. Respect `prefers-reduced-motion` (`motion-safe:` utilities; use
+  `scrollBehavior()` from `src/lib/utils.ts` for scripted scrolling).
+- Focus: the global `:focus-visible` rule (2px solid `--ring`, 2px offset) is the focus style. Don't
+  add `outline-none` or `ring-*/50` to interactive elements; stretched-link cards draw the outline on
+  the card (`has-[a:focus-visible]:`). `DialogContent` returns focus to whatever opened it, trigger or
+  not. Audit and open items: `docs/plans/ui-audit.md`.
 - Seed content is original and fictional; seed emails use the reserved `.test` TLD.
 - Commit in small steps; never commit `.env*` (only `.env.example`).
 
