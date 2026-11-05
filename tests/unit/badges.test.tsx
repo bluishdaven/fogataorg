@@ -118,6 +118,9 @@ describe("BadgeChips", () => {
     expect(ladder.querySelector('[aria-current="true"]')).toHaveAttribute("data-tier", "candle");
     expect(dialog.querySelector('[data-tier="donor"]')).toHaveAttribute("data-earned", "false");
     expect(within(dialog).getByRole("link", { name: "Support Fogata" })).toHaveAttribute("target", "_blank");
+    // The donor badge comes first, before the writing ladder.
+    const donorRow = dialog.querySelector('[data-tier="donor"]')!;
+    expect(donorRow.compareDocumentPosition(ladder) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it("explain the donor badge, in Spanish", () => {
@@ -127,5 +130,17 @@ describe("BadgeChips", () => {
     expect(within(dialog).getByText(/Cada donación enciende esta insignia durante dos meses/)).toBeInTheDocument();
     expect(within(dialog).getByText("Dana ha publicado 1 historia. Faltan 4 historias para Vela.")).toBeInTheDocument();
     expect(dialog.querySelector('[data-tier="donor"]')).toHaveAttribute("data-earned", "true");
+    // Offered whether or not the person already has the badge.
+    expect(within(dialog).getByRole("link", { name: "Apoyar a Fogata" })).toBeInTheDocument();
+  });
+
+  it("put the donor badge first, next to names and on profiles", () => {
+    const { container } = renderBadges({ stories: 30, donor: true });
+    expect([...container.querySelectorAll("[data-badge]")].map((el) => el.getAttribute("data-badge"))).toEqual(["donor", "torch"]);
+  });
+
+  it("put the donor chip first on profiles", () => {
+    renderBadges({ stories: 30, donor: true }, "en", true);
+    expect(screen.getAllByTestId("badge-chip").map((el) => el.closest("li")?.getAttribute("data-badge"))).toEqual(["donor", "torch"]);
   });
 });

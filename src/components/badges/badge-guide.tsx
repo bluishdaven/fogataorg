@@ -1,8 +1,9 @@
 "use client";
 
-import { Check } from "lucide-react";
+import { Check, Coffee } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { buttonVariants } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { nextWritingTier, WRITING_TIERS, writingTier, type BadgeData, type WritingTierKey } from "@/lib/domain/badges";
 import { SUPPORT_URL } from "@/lib/domain/links";
@@ -27,21 +28,21 @@ export function BadgeChips({ badges, name, className }: { badges: BadgeData; nam
   return (
     <>
       <ul className={cn("flex flex-wrap gap-2", className)} data-testid="user-badges">
-        {tier ? (
-          <li data-badge={tier.key}>
-            <button type="button" className={CHIP} onClick={() => setShown(tier.key)} data-testid="badge-chip">
-              <TierIcon tier={tier.key} className="h-4 w-auto" />
-              <span>{t(`tiers.${tier.key}`)}</span>
-              <span className="sr-only">: {t("tierLabel", { name: t(`tiers.${tier.key}`), count: tier.min })}</span>
-            </button>
-          </li>
-        ) : null}
         {badges.donor ? (
           <li data-badge="donor">
             <button type="button" className={CHIP} onClick={() => setShown("donor")} data-testid="badge-chip">
               <DonorIcon className="h-4 w-auto" />
               <span>{t("donor")}</span>
               <span className="sr-only">: {t("donorLabel", { name: t("donor") })}</span>
+            </button>
+          </li>
+        ) : null}
+        {tier ? (
+          <li data-badge={tier.key}>
+            <button type="button" className={CHIP} onClick={() => setShown(tier.key)} data-testid="badge-chip">
+              <TierIcon tier={tier.key} className="h-4 w-auto" />
+              <span>{t(`tiers.${tier.key}`)}</span>
+              <span className="sr-only">: {t("tierLabel", { name: t(`tiers.${tier.key}`), count: tier.min })}</span>
             </button>
           </li>
         ) : null}
@@ -73,7 +74,43 @@ function BadgeGuide({ shown, badges, name }: { shown: Shown; badges: BadgeData; 
         </DialogDescription>
       </DialogHeader>
 
-      <section aria-labelledby="writing-badges" className="flex flex-col gap-2">
+      <section aria-labelledby="donor-badge" className="flex flex-col gap-3">
+        <h3 id="donor-badge" className="font-semibold">
+          {t("donorHeading")}
+        </h3>
+        <div
+          className={cn("flex items-center gap-3 rounded-lg px-2 py-1.5", badges.donor && "bg-ember-soft")}
+          data-tier="donor"
+          data-earned={badges.donor}
+        >
+          <span className="flex w-8 shrink-0 justify-center">
+            <DonorIcon className={cn("h-6 w-auto", !badges.donor && "opacity-40 grayscale")} />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="font-medium">{t("donor")}</span>
+            <span className="block text-xs text-muted-foreground">{t("donorInfo")}</span>
+          </span>
+          {badges.donor ? (
+            <span className="flex items-center gap-1 text-xs font-medium text-ember-text">
+              <Check className="size-4" aria-hidden />
+              {t("earned")}
+            </span>
+          ) : null}
+        </div>
+        {/* Offered to everyone, whether or not this person has the badge. */}
+        <a
+          href={SUPPORT_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={cn(buttonVariants(), "w-full")}
+          data-testid="support-fogata"
+        >
+          <Coffee />
+          {t("support")}
+        </a>
+      </section>
+
+      <section aria-labelledby="writing-badges" className="flex flex-col gap-2 border-t border-border pt-4">
         <h3 id="writing-badges" className="font-semibold">
           {t("writingHeading")}
         </h3>
@@ -111,39 +148,6 @@ function BadgeGuide({ shown, badges, name }: { shown: Shown; badges: BadgeData; 
             );
           })}
         </ol>
-      </section>
-
-      <section aria-labelledby="donor-badge" className="flex flex-col gap-2 border-t border-border pt-4">
-        <h3 id="donor-badge" className="font-semibold">
-          {t("donorHeading")}
-        </h3>
-        <div
-          className={cn("flex items-center gap-3 rounded-lg px-2 py-1.5", badges.donor && "bg-ember-soft")}
-          data-tier="donor"
-          data-earned={badges.donor}
-        >
-          <span className="flex w-8 shrink-0 justify-center">
-            <DonorIcon className={cn("h-6 w-auto", !badges.donor && "opacity-40 grayscale")} />
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="font-medium">{t("donor")}</span>
-            <span className="block text-xs text-muted-foreground">{t("donorInfo")}</span>
-          </span>
-          {badges.donor ? (
-            <span className="flex items-center gap-1 text-xs font-medium text-ember-text">
-              <Check className="size-4" aria-hidden />
-              {t("earned")}
-            </span>
-          ) : null}
-        </div>
-        <a
-          href={SUPPORT_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="self-start text-sm font-medium text-ember-text underline underline-offset-2"
-        >
-          {t("support")}
-        </a>
       </section>
     </>
   );

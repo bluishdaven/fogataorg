@@ -4,8 +4,8 @@ import { cn } from "@/lib/utils";
 import { DonorIcon, TierIcon } from "./badge-icons";
 
 /**
- * A person's badges, shown right after their name everywhere: the writing tier (highest reached)
- * and the donor badge, as icons labelled for screen readers, with a tooltip. Profiles use
+ * A person's badges, shown right after their name everywhere: the donor badge first, then the
+ * writing tier (highest reached), as icons labelled for screen readers, with a tooltip. Profiles use
  * BadgeChips (badge-guide.tsx) instead, which explain each badge.
  */
 export function UserBadges({
@@ -26,14 +26,14 @@ export function UserBadges({
 
   return (
     <span className={cn("inline-flex shrink-0 items-center gap-1 align-middle", className)} data-testid="user-badges">
-      {tier ? (
-        <span role="img" aria-label={tierLabel} title={tierLabel} data-badge={tier.key} className="inline-flex">
-          <TierIcon tier={tier.key} className="h-[1.05em] w-auto" />
-        </span>
-      ) : null}
       {badges.donor ? (
         <span role="img" aria-label={donorLabel} title={donorLabel} data-badge="donor" className="inline-flex">
           <DonorIcon className="h-[1.1em] w-auto" />
+        </span>
+      ) : null}
+      {tier ? (
+        <span role="img" aria-label={tierLabel} title={tierLabel} data-badge={tier.key} className="inline-flex">
+          <TierIcon tier={tier.key} className="h-[1.05em] w-auto" />
         </span>
       ) : null}
     </span>
