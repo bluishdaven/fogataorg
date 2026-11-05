@@ -281,12 +281,15 @@ export function StoryEditor({
 
   return (
     <div className="pb-24">
+      {/* The title is a text field, so the page needs its own heading for screen-reader navigation. */}
+      <h1 className="sr-only">{t("pageTitle")}</h1>
       <Toaster position="bottom-center" />
       <div className="sticky top-14 z-30 border-b border-border/60 bg-background/90 backdrop-blur">
         <div className="mx-auto flex h-12 max-w-5xl items-center justify-between gap-3 px-4 text-sm">
           <Link href="/me/stories" className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground">
             <ArrowLeft className="size-4" aria-hidden />
-            <span className="hidden sm:inline">{t("backToStories")}</span>
+            {/* Hidden visually on phones only: display:none would leave the link without a name. */}
+            <span className="sr-only sm:not-sr-only">{t("backToStories")}</span>
           </Link>
           <p className="flex-1 truncate text-center text-muted-foreground" role="status" aria-live="polite" data-testid="save-status" data-status={autosave.status}>
             {uploads > 0 ? t("uploading") : <SaveLabel status={autosave.status} savedAt={autosave.savedAt} />}

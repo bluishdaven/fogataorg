@@ -1,5 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+import { startDraft } from "./helpers";
+import { signInWithMagicLink } from "./sign-in";
 
 test("the theme choice applies and survives a reload", async ({ page }) => {
   await page.goto("/en");
@@ -34,6 +36,32 @@ for (const theme of ["light", "dark", "sepia"] as const) {
       expect(serious.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(" ")).join(", ")}`)).toEqual([]);
     });
   }
+}
+
+async function seriousViolations(page: Page) {
+  const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]).analyze();
+  return results.violations
+    .filter((v) => v.impact === "serious" || v.impact === "critical")
+    .map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(" ")).join(", ")}`);
+}
+
+for (const theme of ["light", "dark", "sepia"] as const) {
+  // Phone width: that's where controls collapse to icons and can lose their names.
+  test(`the editor and account pages have no WCAG A/AA violations in ${theme}`, async ({ page }) => {
+    test.setTimeout(60_000);
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.addInitScript((value) => window.localStorage.setItem("theme", value), theme);
+    await signInWithMagicLink(page, "en");
+    await startDraft(page);
+    await expect(page.getByRole("heading", { level: 1, name: "Write" })).toBeAttached();
+    await expect(page.getByRole("link", { name: "Your stories" })).toBeVisible();
+    expect(await seriousViolations(page)).toEqual([]);
+    for (const path of ["/en/settings/profile", "/en/settings/notifications", "/en/me/notifications", "/en/me/stories"]) {
+      await page.goto(path);
+      await expect(page.locator("main .animate-pulse")).toHaveCount(0);
+      expect(await seriousViolations(page), path).toEqual([]);
+    }
+  });
 }
 
 for (const theme of ["light", "dark", "sepia"] as const) {
