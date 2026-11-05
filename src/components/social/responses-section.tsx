@@ -18,7 +18,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import type { ResponseView } from "@/lib/data/social";
 import { profilePath } from "@/lib/domain/handle-routes";
 import { RESPONSE_MAX, splitMentions } from "@/lib/domain/social";
-import { cn } from "@/lib/utils";
+import { cn, scrollBehavior } from "@/lib/utils";
 import { RESPOND_TO_BLOCK_EVENT, SHOW_BLOCK_EVENT } from "./paragraph-anchors";
 
 type Viewer = { id: string; username: string; displayName: string } | null;
@@ -58,12 +58,12 @@ export function ResponsesSection({
       const blockId = (event as CustomEvent<string>).detail;
       setAnchor(blockId);
       setFilter(null);
-      section.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      section.current?.scrollIntoView({ behavior: scrollBehavior(), block: "start" });
       setTimeout(() => composer.current?.focus(), 300);
     };
     const show = (event: Event) => {
       setFilter((event as CustomEvent<string>).detail);
-      section.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      section.current?.scrollIntoView({ behavior: scrollBehavior(), block: "start" });
     };
     window.addEventListener(RESPOND_TO_BLOCK_EVENT, respond);
     window.addEventListener(SHOW_BLOCK_EVENT, show);
