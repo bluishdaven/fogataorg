@@ -17,6 +17,8 @@ npm run dev       # http://localhost:3000
   `curl -H "Authorization: Bearer $CRON_SECRET" localhost:3000/api/cron/notification-emails`
   (the secret is in `.env.local`). A run only emails readers whose `profiles.email_weekday` is
   today (UTC), and notifications younger than 10 minutes wait for the next run.
+- Never put `RESEND_API_KEY` in `.env.local`: summaries would go through Resend to the seed's
+  `@fogata.test` addresses, and those bounces count against the domain's sending reputation.
 - Stop the stack with `npm run db:stop`. `npm run setup` is safe to re-run.
 - After re-seeding, restart `npm run dev` (cached listings don't know about seed runs).
 
@@ -72,7 +74,9 @@ tests and a runtime dependency audit, then RLS and e2e tests against a throwaway
    `supabase/config.toml`). They link to `/auth/confirm` with a token hash.
 5. **Authentication → SMTP**: Supabase's built-in mailer is for testing only (a few emails per
    hour). Point it at Resend (step 4 below): host `smtp.resend.com`, port `465`, user `resend`,
-   password = a Resend API key, sender = the same address as `EMAIL_FROM`.
+   password = a Resend API key, sender = the same address as `EMAIL_FROM`. With custom SMTP, Supabase
+   limits auth emails to 30 an hour by default (**Authentication → Rate Limits**); that's enough
+   at first, and raising it past ~100/day only runs into Resend's free cap.
 6. **Google provider**: enable it with your Google client; add
    `https://<project-ref>.supabase.co/auth/v1/callback` as an authorized redirect URI in Google.
 7. Copy the **publishable key**, **secret key** and the **transaction pooler** connection string
@@ -96,8 +100,8 @@ Never run `npm run db:seed` against production; it refuses unless you pass `--al
    | `UNSPLASH_LANG_BETA` | `true` once Unsplash enables the `lang` beta |
    | `RESEND_API_KEY` | Resend API key with sending access (step 4) |
    | `EMAIL_FROM` | `Fogata <hola@fogata.org>` (a verified Resend domain) |
-   | `EMAIL_SIGNING_SECRET` | `openssl rand -base64 32`; signs unsubscribe links, keep it stable |
-   | `CRON_SECRET` | `openssl rand -base64 32`; Vercel Cron sends it to the summary route |
+   | `EMAIL_SIGNING_SECRET` | `openssl rand -hex 32`; signs unsubscribe links, keep it stable |
+   | `CRON_SECRET` | `openssl rand -hex 32`; Vercel Cron sends it to the summary route |
    | `EMAIL_SUMMARY_DAILY_LIMIT` | optional, default `80`; raise it with a paid Resend plan |
 
    The secret key is **not** needed by the app; keep it out of Vercel until a feature needs it.
@@ -118,16 +122,19 @@ summary goes out on a weekday assigned at random to each reader, only in weeks w
    DKIM) and a DMARC record, e.g. `v=DMARC1; p=none; rua=mailto:<you>`. Wait until it's verified.
 2. Create an API key with **sending access** only, for that domain. Put it in Vercel as
    `RESEND_API_KEY`, and set `EMAIL_FROM`, `EMAIL_SIGNING_SECRET` and `CRON_SECRET` (table above).
-3. Trigger a run by hand to check it:
+   Set `RESEND_API_KEY` for **Production** only, so preview deploys can't email real readers.
+   Push new migrations (`npx supabase db push`) before deploying code that uses them.
+3. Trigger a run by hand to check it (Vercel's **Settings → Cron Jobs** also has a Run button):
    `curl -H "Authorization: Bearer <CRON_SECRET>" https://fogata.org/api/cron/notification-emails`
    returns `{"sent":…,"failed":…,"skipped":…,"limited":…}` for today's readers; failures are logged
    in Vercel with the user id. `limited: true` means the daily cap cut the run short.
-4. Every summary carries `List-Unsubscribe` and `List-Unsubscribe-Post` (one-click, RFC 8058),
+4. To see a real summary, have a second account follow you, then in the Supabase SQL editor make
+   today your summary day:
+   `update public.profiles set email_weekday = extract(dow from now() at time zone 'utc') where username = '<you>';`
+   Wait 10 minutes and trigger a run. In Gmail, **Show original** should say SPF, DKIM and DMARC: PASS.
+5. Every summary carries `List-Unsubscribe` and `List-Unsubscribe-Post` (one-click, RFC 8058),
    which Gmail and Yahoo require of bulk senders. The footer link opens a confirm page instead,
    because mail scanners prefetch links.
-
-Previews share production's Resend key only if you add it to the Preview environment; leave it out
-so preview deploys never email real readers (their cron doesn't run anyway).
 
 ### Cost notes
 
