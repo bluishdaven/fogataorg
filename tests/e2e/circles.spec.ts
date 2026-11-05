@@ -3,6 +3,9 @@ import { expect, test, type Page } from "@playwright/test";
 import { deleteFromMyStories, publishStory } from "./helpers";
 import { signInWithMagicLink } from "./sign-in";
 
+/** Unique even when tests start in the same millisecond (digits only, so it stays a valid slug). */
+const circleName = () => `E2E circle ${Date.now()}${Math.floor(Math.random() * 1000)}`;
+
 async function createCircle(page: Page, name: string): Promise<string> {
   await page.goto("/en/circles");
   await page.getByTestId("start-circle").click();
@@ -34,7 +37,7 @@ test("writers submit to a circle, editors review, and accepted stories show the 
   const writer = await writerContext.newPage();
 
   await signInWithMagicLink(owner, "en");
-  const name = `E2E circle ${Date.now()}`;
+  const name = circleName();
   const circleUrl = await createCircle(owner, name);
   const band = owner.getByTestId("circle-band");
   await expect(band).toHaveCSS("background-color", "rgb(29, 78, 216)");
@@ -94,7 +97,7 @@ test("only owners and editors can open the manage page", async ({ browser }) => 
   const owner = await ownerContext.newPage();
   const other = await otherContext.newPage();
   await signInWithMagicLink(owner, "en");
-  const circleUrl = await createCircle(owner, `E2E circle ${Date.now()}`);
+  const circleUrl = await createCircle(owner, circleName());
 
   await signInWithMagicLink(other, "en");
   await other.goto(`${circleUrl}/manage`);

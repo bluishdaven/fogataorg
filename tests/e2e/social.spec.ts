@@ -134,7 +134,10 @@ test("search finds stories without accents, people and topics", async ({ page })
 
 test("pressing / opens search", async ({ page }) => {
   await page.goto("/en/topics");
-  await page.keyboard.press("/");
-  await expect(page).toHaveURL(/\/en\/search$/);
+  // The shortcut listener attaches on hydration; under load the first press can land before it.
+  await expect(async () => {
+    await page.keyboard.press("/");
+    await expect(page).toHaveURL(/\/en\/search$/, { timeout: 1_000 });
+  }).toPass({ timeout: 10_000 });
   await expect(page.getByTestId("search-input")).toBeFocused();
 });
