@@ -353,7 +353,7 @@ export function StoryEditor({
           aria-label={t("titleLabel")}
           rows={1}
           maxLength={200}
-          className="field-sizing-content resize-none overflow-hidden bg-transparent font-serif text-4xl leading-tight font-semibold outline-none placeholder:text-muted-foreground/70 sm:text-title"
+          className="field-sizing-content resize-none overflow-hidden bg-transparent font-serif text-4xl leading-tight font-semibold outline-none placeholder:text-muted-foreground/80 sm:text-title"
           data-testid="editor-title"
         />
         <textarea

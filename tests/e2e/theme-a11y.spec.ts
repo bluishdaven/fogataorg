@@ -52,3 +52,43 @@ for (const theme of ["light", "dark", "sepia"] as const) {
     expect(serious.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(" ")).join(", ")}`)).toEqual([]);
   });
 }
+
+/** WCAG contrast of an element's text against its background, read through a canvas so any CSS color works. */
+const ownContrast = (el: Element) => {
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = 1;
+  const ctx = canvas.getContext("2d", { willReadFrequently: true })!;
+  // Paints the layers bottom-up, so translucent colors are judged as they appear on the page.
+  const rgb = (...layers: string[]) => {
+    ctx.clearRect(0, 0, 1, 1);
+    for (const color of layers) {
+      ctx.fillStyle = color;
+      ctx.fillRect(0, 0, 1, 1);
+    }
+    return [...ctx.getImageData(0, 0, 1, 1).data].slice(0, 3);
+  };
+  const luminance = (c: number[]) =>
+    c
+      .map((v) => v / 255)
+      .map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4))
+      .reduce((sum, v, i) => sum + v * [0.2126, 0.7152, 0.0722][i]!, 0);
+  const style = getComputedStyle(el);
+  const page = getComputedStyle(document.body).backgroundColor;
+  const [a, b] = [luminance(rgb(page, style.backgroundColor, style.color)), luminance(rgb(page, style.backgroundColor))].sort(
+    (x, y) => y - x,
+  );
+  return (a! + 0.05) / (b! + 0.05);
+};
+
+for (const theme of ["light", "dark", "sepia"] as const) {
+  // axe only sees resting states; a hover that lightens the button can drop its label below AA.
+  test(`a hovered primary button keeps AA text contrast in ${theme}`, async ({ page }) => {
+    await page.addInitScript((value) => window.localStorage.setItem("theme", value), theme);
+    await page.goto("/en");
+    const signIn = page.getByTestId("sign-in-link");
+    const resting = await signIn.evaluate(ownContrast);
+    await signIn.hover();
+    await expect.poll(() => signIn.evaluate(ownContrast)).toBeGreaterThan(resting);
+    expect(await signIn.evaluate(ownContrast)).toBeGreaterThanOrEqual(4.5);
+  });
+}

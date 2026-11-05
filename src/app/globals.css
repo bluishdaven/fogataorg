@@ -417,7 +417,6 @@ html[data-reader-font="sans"] .prose-fogata {
   height: 0;
   pointer-events: none;
   color: var(--muted-foreground);
-  opacity: 0.8;
 }
 .editor-body p.is-empty:not(.is-editor-empty)::before {
   /* Only hint on the empty line the cursor is on, not every blank paragraph. */
