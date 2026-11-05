@@ -134,6 +134,7 @@ export async function getProfileWithStories(handle: string) {
         username: profiles.username,
         displayName: profiles.displayName,
         bio: profiles.bio,
+        links: profiles.links,
         createdAt: profiles.createdAt,
       })
       .from(profiles)
@@ -151,4 +152,54 @@ export async function getProfileWithStories(handle: string) {
 
     return { ...profile, stories: rows.map(toCard) };
   });
+}
+
+export async function getTopicWithStories(slug: string) {
+  "use cache";
+  cacheTag("stories", "topics", `topic:${slug}`);
+
+  const result = await asAnon(async (tx) => {
+    const [topic] = await tx
+      .select({ id: topics.id, slug: topics.slug, nameEn: topics.nameEn, nameEs: topics.nameEs })
+      .from(topics)
+      .where(eq(topics.slug, slug))
+      .limit(1);
+    if (!topic) return null;
+
+    const rows = await tx
+      .select(cardColumns)
+      .from(storyTopics)
+      .innerJoin(stories, eq(stories.id, storyTopics.storyId))
+      .innerJoin(profiles, eq(profiles.id, stories.authorId))
+      .where(and(listed, eq(storyTopics.topicId, topic.id)))
+      .orderBy(desc(stories.publishedAt))
+      .limit(50);
+
+    return { ...topic, stories: rows.map(toCard) };
+  });
+
+  if (result) cacheLife("hours");
+  else cacheLife("minutes");
+  return result;
+}
+
+export async function listTopicsWithCounts() {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("stories", "topics");
+
+  return asAnon((tx) =>
+    tx
+      .select({
+        slug: topics.slug,
+        nameEn: topics.nameEn,
+        nameEs: topics.nameEs,
+        count: sql<number>`count(${stories.id})::int`,
+      })
+      .from(topics)
+      .leftJoin(storyTopics, eq(storyTopics.topicId, topics.id))
+      .leftJoin(stories, and(eq(stories.id, storyTopics.storyId), listed))
+      .groupBy(topics.id)
+      .orderBy(topics.slug),
+  );
 }

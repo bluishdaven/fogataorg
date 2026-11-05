@@ -15,9 +15,14 @@ export function SiteFooter() {
             <p>{t("Footer.support")}</p>
           </div>
         </div>
-        <Link href="/design" className="underline-offset-4 hover:text-foreground hover:underline">
-          {t("Nav.design")}
-        </Link>
+        <nav className="flex gap-4" aria-label={t("Nav.footer")}>
+          <Link href="/topics" className="underline-offset-4 hover:text-foreground hover:underline">
+            {t("Nav.topics")}
+          </Link>
+          <Link href="/design" className="underline-offset-4 hover:text-foreground hover:underline">
+            {t("Nav.design")}
+          </Link>
+        </nav>
       </div>
     </footer>
   );

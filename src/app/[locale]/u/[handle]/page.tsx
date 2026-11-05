@@ -6,6 +6,7 @@ import { StoryCard } from "@/components/story-card";
 import { StoryListSkeleton } from "@/components/story-list-skeleton";
 import { getProfileWithStories } from "@/lib/data/stories";
 import { profilePath } from "@/lib/domain/handle-routes";
+import { safeHref } from "@/lib/domain/story-doc";
 
 type Props = PageProps<"/[locale]/u/[handle]">;
 
@@ -54,6 +55,23 @@ async function Profile({ params }: Pick<Props, "params">) {
         <h1 className="font-serif text-4xl font-semibold">{name}</h1>
         <p className="text-muted-foreground">@{profile.username}</p>
         {profile.bio ? <p className="max-w-prose font-serif text-lg text-pretty">{profile.bio}</p> : null}
+        {profile.links.length ? (
+          <ul className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
+            {profile.links.flatMap((link) => {
+              const href = safeHref(link.url);
+              return href
+                ? [
+                    <li key={href}>
+                      {/* rel="me" lets other sites (e.g. Mastodon) verify the link back to this profile. */}
+                      <a href={href} rel="me noopener noreferrer nofollow" target="_blank" className="text-ember-text underline underline-offset-2">
+                        {link.label}
+                      </a>
+                    </li>,
+                  ]
+                : [];
+            })}
+          </ul>
+        ) : null}
         <p className="text-sm text-muted-foreground">
           {t("joined", { date: format.dateTime(profile.createdAt, { month: "long", year: "numeric" }) })}
           {" · "}

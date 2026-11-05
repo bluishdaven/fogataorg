@@ -1,0 +1,55 @@
+import type { Metadata } from "next";
+import { getLocale, getTranslations } from "next-intl/server";
+import { notFound } from "next/navigation";
+import { Suspense } from "react";
+import { StoryCard } from "@/components/story-card";
+import { StoryListSkeleton } from "@/components/story-list-skeleton";
+import { Link } from "@/i18n/navigation";
+import { getTopicWithStories } from "@/lib/data/stories";
+
+type Props = PageProps<"/[locale]/topics/[slug]">;
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const [topic, locale, t] = await Promise.all([getTopicWithStories(slug), getLocale(), getTranslations("Topics")]);
+  if (!topic) return {};
+  const name = locale === "es" ? topic.nameEs : topic.nameEn;
+  return { title: name, description: t("topicLede", { name }) };
+}
+
+export default function TopicPage({ params }: Props) {
+  return (
+    <div className="mx-auto max-w-3xl px-4 py-12 sm:py-16">
+      <Suspense fallback={<StoryListSkeleton count={3} />}>
+        <Topic params={params} />
+      </Suspense>
+    </div>
+  );
+}
+
+async function Topic({ params }: Pick<Props, "params">) {
+  const { slug } = await params;
+  const topic = await getTopicWithStories(slug);
+  if (!topic) notFound();
+  const [t, locale] = await Promise.all([getTranslations("Topics"), getLocale()]);
+  const name = locale === "es" ? topic.nameEs : topic.nameEn;
+
+  return (
+    <>
+      <Link href="/topics" className="text-sm text-muted-foreground hover:text-foreground">
+        {t("all")}
+      </Link>
+      <h1 className="mt-2 font-serif text-4xl font-semibold">{name}</h1>
+      <p className="mt-2 mb-6 border-b border-border pb-6 text-muted-foreground">{t("count", { count: topic.stories.length })}</p>
+      {topic.stories.length === 0 ? (
+        <p className="text-muted-foreground">{t("empty", { name })}</p>
+      ) : (
+        <div data-testid="story-list">
+          {topic.stories.map((story) => (
+            <StoryCard key={`${story.author.username}/${story.slug}`} story={story} />
+          ))}
+        </div>
+      )}
+    </>
+  );
+}

@@ -262,7 +262,11 @@ export function PublishDialog({
                   </span>
                 </legend>
                 <div className="flex flex-wrap gap-2">
-                  {topics.map((topic) => {
+                  {[...topics]
+                    .sort((a, b) =>
+                      (locale === "es" ? a.nameEs : a.nameEn).localeCompare(locale === "es" ? b.nameEs : b.nameEn, locale),
+                    )
+                    .map((topic) => {
                     const active = selected.includes(topic.slug);
                     const full = !active && selected.length >= MAX_TOPICS_PER_STORY;
                     return (

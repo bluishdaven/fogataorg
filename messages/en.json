@@ -30,7 +30,8 @@
     "write": "Write",
     "myStories": "Your stories",
     "settings": "Settings",
-    "topics": "Topics"
+    "topics": "Topics",
+    "footer": "Footer"
   },
   "Theme": {
     "label": "Theme",
@@ -359,5 +360,44 @@
       "sepia": "Sepia",
       "system": "System"
     }
+  },
+  "Settings": {
+    "title": "Your profile",
+    "lede": "This is how you appear on your stories and your profile page.",
+    "displayName": "Name",
+    "username": "Username",
+    "usernameHint": "Your profile and story links use this. Changing it changes those links.",
+    "bio": "Short bio",
+    "links": "Links",
+    "linksHint": "Up to 5: your site, newsletter or social profiles.",
+    "linkLabel": "Link label",
+    "linkLabelPlaceholder": "e.g. Website",
+    "linkUrl": "Link URL",
+    "addLink": "Add a link",
+    "removeLink": "Remove link",
+    "save": "Save profile",
+    "saving": "Saving…",
+    "saved": "Profile saved.",
+    "viewProfile": "View your profile",
+    "errors": {
+      "unauthorized": "Your session ended. Sign in again.",
+      "displayName": "Your name can be at most 80 characters.",
+      "username": "Usernames use 3–30 letters, numbers or underscores.",
+      "usernameReserved": "That username is reserved. Pick another.",
+      "usernameTaken": "That username is taken. Pick another.",
+      "bio": "Your bio can be at most 280 characters.",
+      "linkLabel": "Every link needs a short label (up to 40 characters).",
+      "linkUrl": "Links must be full web addresses, like https://example.com.",
+      "tooManyLinks": "You can add up to 5 links.",
+      "invalid": "Something's not right. Check the form and try again."
+    }
+  },
+  "Topics": {
+    "title": "Topics",
+    "lede": "Browse stories by what they're about.",
+    "all": "All topics",
+    "count": "{count, plural, =0 {No stories yet} one {# story} other {# stories}}",
+    "empty": "No stories about {name} yet. Yours could be the first.",
+    "topicLede": "Stories about {name} on Fogata."
   }
 }

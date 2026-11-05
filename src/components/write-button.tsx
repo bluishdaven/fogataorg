@@ -9,10 +9,9 @@ export async function WriteButton() {
   return (
     <form action={createDraft}>
       <input type="hidden" name="locale" value={locale} />
-      <Button type="submit" variant="ghost" size="sm" data-testid="write-button">
-        <PenLine />
+      <Button type="submit" variant="ghost" size="sm" aria-label={t("write")} data-testid="write-button">
+        <PenLine aria-hidden />
         <span className="hidden sm:inline">{t("write")}</span>
-        <span className="sr-only sm:hidden">{t("write")}</span>
       </Button>
     </form>
   );

@@ -30,7 +30,8 @@
     "write": "Escribir",
     "myStories": "Tus historias",
     "settings": "Ajustes",
-    "topics": "Temas"
+    "topics": "Temas",
+    "footer": "Pie de página"
   },
   "Theme": {
     "label": "Tema",
@@ -359,5 +360,44 @@
       "sepia": "Sepia",
       "system": "Sistema"
     }
+  },
+  "Settings": {
+    "title": "Tu perfil",
+    "lede": "Así apareces en tus historias y en tu página de perfil.",
+    "displayName": "Nombre",
+    "username": "Nombre de usuario",
+    "usernameHint": "Tu perfil y los enlaces a tus historias lo usan. Si lo cambias, cambian esos enlaces.",
+    "bio": "Biografía breve",
+    "links": "Enlaces",
+    "linksHint": "Hasta 5: tu sitio, tu boletín o tus redes.",
+    "linkLabel": "Texto del enlace",
+    "linkLabelPlaceholder": "p. ej. Sitio web",
+    "linkUrl": "URL del enlace",
+    "addLink": "Agregar un enlace",
+    "removeLink": "Quitar enlace",
+    "save": "Guardar perfil",
+    "saving": "Guardando…",
+    "saved": "Perfil guardado.",
+    "viewProfile": "Ver tu perfil",
+    "errors": {
+      "unauthorized": "Tu sesión terminó. Vuelve a entrar.",
+      "displayName": "Tu nombre puede tener hasta 80 caracteres.",
+      "username": "Los nombres de usuario usan de 3 a 30 letras, números o guiones bajos.",
+      "usernameReserved": "Ese nombre de usuario está reservado. Elige otro.",
+      "usernameTaken": "Ese nombre de usuario ya está en uso. Elige otro.",
+      "bio": "Tu biografía puede tener hasta 280 caracteres.",
+      "linkLabel": "Cada enlace necesita un texto breve (hasta 40 caracteres).",
+      "linkUrl": "Los enlaces deben ser direcciones web completas, como https://ejemplo.com.",
+      "tooManyLinks": "Puedes agregar hasta 5 enlaces.",
+      "invalid": "Algo no está bien. Revisa el formulario y vuelve a intentarlo."
+    }
+  },
+  "Topics": {
+    "title": "Temas",
+    "lede": "Explora historias según de qué tratan.",
+    "all": "Todos los temas",
+    "count": "{count, plural, =0 {Todavía no hay historias} one {# historia} other {# historias}}",
+    "empty": "Todavía no hay historias sobre {name}. La tuya podría ser la primera.",
+    "topicLede": "Historias sobre {name} en Fogata."
   }
 }
