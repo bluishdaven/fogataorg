@@ -3,6 +3,8 @@ import NextLink from "next/link";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { ReaderControls } from "@/components/reader-controls";
+import { ReadingProgress } from "@/components/reading-progress";
 import { StoryBody } from "@/components/story-body";
 import { UnsplashCredit } from "@/components/unsplash/unsplash-credit";
 import { UnsplashImage } from "@/components/unsplash/unsplash-image";
@@ -63,7 +65,8 @@ async function Story({ params }: Pick<Props, "params">) {
   const authorName = story.authorDisplayName || story.authorUsername;
 
   return (
-    <article className="px-4 py-12 sm:py-16" lang={story.language}>
+    <article id="story" className="px-4 py-12 sm:py-16" lang={story.language}>
+      <ReadingProgress targetId="story" />
       <header className="mx-auto mb-10 flex max-w-[var(--measure)] flex-col gap-4">
         {story.topics.length > 0 ? (
           <ul className="flex flex-wrap gap-2 text-xs font-medium" lang={locale}>
@@ -100,6 +103,9 @@ async function Story({ params }: Pick<Props, "params">) {
           <span aria-hidden>·</span>
           <span title={t("Story.writtenIn", { language: t(`Common.languageName.${story.language}`) })}>
             {t(`Common.languageBadge.${story.language}`)}
+          </span>
+          <span className="ml-auto">
+            <ReaderControls />
           </span>
         </div>
       </header>

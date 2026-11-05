@@ -330,5 +330,34 @@
     "deleteConfirm": "Delete this story? This can't be undone from Fogata.",
     "emptyTitle": "Your first story starts here.",
     "emptyBody": "Drafts save as you type. Nothing is public until you publish it."
+  },
+  "Reader": {
+    "label": "Reading settings",
+    "short": "Aa",
+    "size": "Text size",
+    "sizes": {
+      "s": "Small",
+      "m": "Medium",
+      "l": "Large",
+      "xl": "Extra large"
+    },
+    "font": "Typeface",
+    "fonts": {
+      "serif": "Serif",
+      "sans": "Sans serif"
+    },
+    "width": "Line width",
+    "widths": {
+      "narrow": "Narrow",
+      "standard": "Standard",
+      "wide": "Wide"
+    },
+    "theme": "Theme",
+    "themes": {
+      "light": "Light",
+      "dark": "Dark",
+      "sepia": "Sepia",
+      "system": "System"
+    }
   }
 }

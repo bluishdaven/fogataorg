@@ -3,11 +3,13 @@ import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { Inter, Source_Serif_4 } from "next/font/google";
 import { notFound } from "next/navigation";
+import Script from "next/script";
 import { locale as rootLocale } from "next/root-params";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { ThemeProvider } from "@/components/theme-provider";
 import { routing } from "@/i18n/routing";
+import { READER_PREFS_SCRIPT } from "@/lib/domain/reader-prefs";
 import { publicEnv } from "@/lib/env";
 import "../globals.css";
 
@@ -51,6 +53,10 @@ export default async function LocaleLayout({ children }: LayoutProps<"/[locale]"
   return (
     <html lang={locale} className={`${inter.variable} ${sourceSerif.variable}`} suppressHydrationWarning>
       <body className="flex min-h-dvh flex-col">
+        {/* Applies saved reader preferences before paint (no layout jump). */}
+        <Script id="reader-prefs" strategy="beforeInteractive">
+          {READER_PREFS_SCRIPT}
+        </Script>
         <ThemeProvider>
           <NextIntlClientProvider>
             <a

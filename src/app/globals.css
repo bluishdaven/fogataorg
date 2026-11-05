@@ -138,6 +138,26 @@
   color-scheme: dark;
 }
 
+/* Reader preferences (set on <html> by the pre-paint script and ReaderControls). */
+html[data-reader-size="s"] {
+  --reading-size: 1.125rem;
+}
+html[data-reader-size="l"] {
+  --reading-size: 1.4375rem;
+}
+html[data-reader-size="xl"] {
+  --reading-size: 1.625rem;
+}
+html[data-reader-width="narrow"] {
+  --measure: 36rem;
+}
+html[data-reader-width="wide"] {
+  --measure: 50rem;
+}
+html[data-reader-font="sans"] .prose-fogata {
+  font-family: var(--font-sans);
+}
+
 .sepia {
   --background: #f4ecd8;
   --foreground: #3b2f22;

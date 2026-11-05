@@ -330,5 +330,34 @@
     "deleteConfirm": "¿Eliminar esta historia? No se puede deshacer desde Fogata.",
     "emptyTitle": "Tu primera historia empieza aquí.",
     "emptyBody": "Los borradores se guardan mientras escribes. Nada es público hasta que lo publicas."
+  },
+  "Reader": {
+    "label": "Opciones de lectura",
+    "short": "Aa",
+    "size": "Tamaño del texto",
+    "sizes": {
+      "s": "Pequeño",
+      "m": "Mediano",
+      "l": "Grande",
+      "xl": "Muy grande"
+    },
+    "font": "Tipografía",
+    "fonts": {
+      "serif": "Con serifa",
+      "sans": "Sin serifa"
+    },
+    "width": "Ancho de línea",
+    "widths": {
+      "narrow": "Angosto",
+      "standard": "Normal",
+      "wide": "Amplio"
+    },
+    "theme": "Tema",
+    "themes": {
+      "light": "Claro",
+      "dark": "Oscuro",
+      "sepia": "Sepia",
+      "system": "Sistema"
+    }
   }
 }
