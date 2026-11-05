@@ -78,7 +78,9 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
 - **Thumbnails** (`stories.thumbnail_url`) are set on publish: the cover, else the first figure.
 - **Reader preferences** (size, typeface, width) live in localStorage and are applied to `<html>` by
   `READER_PREFS_SCRIPT` before paint; CSS reads the data attributes. The reading column width is
-  `--measure` in rem, so headers and bodies always line up.
+  `--measure` in rem, so headers and bodies always line up. Once the story's header scrolls away,
+  `StoryTitleBar` shows title and writer in a 48px bar under the site header (decorative, hidden
+  from screen readers); in-story anchors need `scroll-mt-32` to land below both.
 - **Home headline** (`src/lib/domain/headlines.ts`, `src/components/home-headline.tsx`). Every
   `Home.headlines` entry is rendered so the page stays static; `HEADLINE_SCRIPT` (root layout, before
   paint) sets `<html data-headline>` to one that differs from the last visit's (localStorage) and CSS
