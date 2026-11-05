@@ -4,6 +4,7 @@
  * Keeps any lines you added that aren't managed here.
  */
 import { execFileSync } from "node:child_process";
+import { randomBytes } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 
 const raw = execFileSync("npx", ["supabase", "status", "-o", "json"], { encoding: "utf8" });
@@ -30,6 +31,13 @@ const kept = existing.filter((line) => {
   const key = line.split("=")[0]?.trim();
   return line.trim() !== "" && !line.startsWith("# Managed by") && !(key && key in managed);
 });
+
+// Local secrets for email: generated once, then kept like any line you added.
+for (const key of ["EMAIL_SIGNING_SECRET", "CRON_SECRET"]) {
+  if (!kept.some((line) => line.split("=")[0]?.trim() === key)) {
+    kept.push(`${key}=${randomBytes(32).toString("base64url")}`);
+  }
+}
 
 const body = [
   "# Managed by scripts/write-local-env.ts (local Supabase). Safe to re-run.",
