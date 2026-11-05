@@ -510,7 +510,13 @@
     "savedTitle": "Saved",
     "savedLede": "Stories you've kept for later. Only you can see this list.",
     "savedEmpty": "Nothing saved yet. Use the bookmark on any story to keep it here.",
-    "emailSettings": "Email settings"
+    "emailSettings": "Email settings",
+    "share": "Share",
+    "shareCopy": "Copy link",
+    "shareCopied": "Link copied",
+    "shareCopyFailed": "Couldn't copy the link. Copy it from the address bar.",
+    "shareEmail": "Email",
+    "shareText": "“{title}” by {author} on Fogata"
   },
   "Circles": {
     "title": "Circles",

@@ -30,7 +30,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const t = await getTranslations("Story");
   const url = storyPath(story.authorUsername, story.slug);
   const description = story.seoDescription || story.subtitle || story.excerpt;
-  const cover = story.coverUrl && isAllowedStoryImage(story.coverUrl) ? story.coverUrl : null;
+  // Share previews (WhatsApp, X, iMessage…) use the cover, else the story's first picture.
+  const cover =
+    [story.coverUrl, story.thumbnailUrl].find((url): url is string => !!url && isAllowedStoryImage(url)) ?? null;
   return {
     title: story.seoTitle || story.title,
     description,
@@ -45,7 +47,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       locale: story.language === "es" ? "es_MX" : "en_US",
       publishedTime: story.publishedAt?.toISOString(),
       authors: [t("by", { name: story.authorDisplayName || story.authorUsername })],
-      images: cover ? [{ url: coverImageUrl(cover, 1200), alt: story.coverAlt }] : undefined,
+      images: cover ? [{ url: coverImageUrl(cover, 1200), alt: cover === story.coverUrl ? story.coverAlt : story.title }] : undefined,
     },
     twitter: { card: cover ? "summary_large_image" : "summary" },
   };
@@ -141,6 +143,7 @@ async function Story({ params }: Pick<Props, "params">) {
       <Suspense fallback={<div className="mx-auto mt-12 h-12 w-56 animate-pulse rounded-full bg-muted" aria-hidden />}>
         <StorySocial
           storyId={story.id}
+          title={story.title}
           slug={story.slug}
           author={{
             id: story.authorId,

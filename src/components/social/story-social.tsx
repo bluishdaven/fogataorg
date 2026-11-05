@@ -6,6 +6,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { getViewer } from "@/lib/auth";
 import { getStorySocial } from "@/lib/data/social";
 import { profilePath, storyPath } from "@/lib/domain/handle-routes";
+import { publicEnv } from "@/lib/env";
+import { ShareButton } from "./share-button";
 import { SparkButton } from "./spark-button";
 import { FollowButton, SaveButton } from "./toggle-buttons";
 
@@ -15,10 +17,12 @@ import { FollowButton, SaveButton } from "./toggle-buttons";
  */
 export async function StorySocial({
   storyId,
+  title,
   author,
   slug,
 }: {
   storyId: string;
+  title: string;
   author: { id: string; username: string; displayName: string; avatarUrl: string | null; bio: string };
   slug: string;
 }) {
@@ -61,6 +65,12 @@ export async function StorySocial({
         </a>
         <span className="h-5 w-px bg-border" aria-hidden />
         <SaveButton storyId={storyId} initialSaved={social.saved} signedIn={social.signedIn} loginHref={loginHref} />
+        <span className="h-5 w-px bg-border" aria-hidden />
+        <ShareButton
+          url={new URL(storyPath(author.username, slug), publicEnv.NEXT_PUBLIC_SITE_URL).toString()}
+          title={title}
+          text={t("shareText", { title, author: name })}
+        />
       </div>
 
       <aside
