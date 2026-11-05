@@ -108,6 +108,10 @@ Never run `npm run db:seed` against production; it refuses unless you pass `--al
    Add the `NEXT_PUBLIC_*` values as **Config** variables: Vercel strips the `NEXT_PUBLIC_` prefix from
    **Secret** variables, so the app wouldn't find them (the publishable key is public by design).
    Vercel may ask you to verify your identity by email before a redeploy from a new browser.
+   A variable only reaches the site on the **next** deploy, and only if it shows up in the project's
+   Environment Variables list after you press Save (closing the form without saving drops it). If
+   photo search on fogata.org says it isn't set up, check that `UNSPLASH_ACCESS_KEY` is listed for
+   Production, then redeploy (or push any commit to `main`).
 3. `next build` reads published stories to prerender listings, so the build needs `DATABASE_URL`.
 4. Add the `fogata.org` domain. Until then the site is `https://fogataorg.vercel.app`; when the
    domain is attached, change `NEXT_PUBLIC_SITE_URL`, Supabase's Site URL and its redirect URL
