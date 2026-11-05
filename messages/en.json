@@ -525,7 +525,9 @@
       "follow": "{others, plural, =0 {{actor} started following you} one {{actor} and # other started following you} other {{actor} and # others started following you}}",
       "submission": "{others, plural, =0 {{actor} submitted “{title}” to {circle}} one {{actor} and # other submitted to {circle}} other {{actor} and # others submitted to {circle}}}",
       "accepted": "{others, plural, =0 {{actor} accepted “{title}” into {circle}} one {{actor} accepted “{title}” into {circle}} other {{actor} accepted “{title}” into {circle}}}",
-      "declined": "{others, plural, =0 {{actor} declined “{title}” for {circle}} one {{actor} declined “{title}” for {circle}} other {{actor} declined “{title}” for {circle}}}"
+      "declined": "{others, plural, =0 {{actor} declined “{title}” for {circle}} one {{actor} declined “{title}” for {circle}} other {{actor} declined “{title}” for {circle}}}",
+      "badge": "You earned the {badge, select, kindling {Kindling} candle {Candle} flame {Flame} torch {Torch} hearth {Hearth} bonfire {Bonfire} beacon {Beacon} star {Star} sun {Sun} phoenix {Phoenix} other {new}} badge: {count, plural, one {your first published story} other {# published stories}}. Keep the fire going!",
+      "donor": "You're a Firekeeper! Thank you for supporting Fogata with a donation."
     },
     "savedTitle": "Saved",
     "savedLede": "Stories you've kept for later. Only you can see this list.",

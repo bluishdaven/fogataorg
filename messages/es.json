@@ -525,7 +525,9 @@
       "follow": "{others, plural, =0 {{actor} empezó a seguirte} one {{actor} y # persona más empezaron a seguirte} other {{actor} y # personas más empezaron a seguirte}}",
       "submission": "{others, plural, =0 {{actor} envió «{title}» a {circle}} one {{actor} y # persona más enviaron historias a {circle}} other {{actor} y # personas más enviaron historias a {circle}}}",
       "accepted": "{others, plural, =0 {{actor} aceptó «{title}» en {circle}} one {{actor} aceptó «{title}» en {circle}} other {{actor} aceptó «{title}» en {circle}}}",
-      "declined": "{others, plural, =0 {{actor} rechazó «{title}» para {circle}} one {{actor} rechazó «{title}» para {circle}} other {{actor} rechazó «{title}» para {circle}}}"
+      "declined": "{others, plural, =0 {{actor} rechazó «{title}» para {circle}} one {{actor} rechazó «{title}» para {circle}} other {{actor} rechazó «{title}» para {circle}}}",
+      "badge": "Ganaste la insignia {badge, select, kindling {Yesca} candle {Vela} flame {Llama} torch {Antorcha} hearth {Hogar} bonfire {Hoguera} beacon {Faro} star {Estrella} sun {Sol} phoenix {Fénix} other {nueva}}: {count, plural, one {tu primera historia publicada} other {# historias publicadas}}. ¡Que no se apague el fuego!",
+      "donor": "¡Ya eres Mecenas! Gracias por apoyar a Fogata con una donación."
     },
     "savedTitle": "Leña guardada",
     "savedLede": "Historias que guardaste para después. Solo tú puedes ver esta lista.",

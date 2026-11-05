@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import { NextResponse, type NextRequest } from "next/server";
 import { db } from "@/lib/db/client";
 import { safeEqual } from "@/lib/domain/email-tokens";
@@ -26,6 +27,11 @@ export async function GET(request: NextRequest) {
   if (!secret || !safeEqual(authorization, `Bearer ${secret}`)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
+
+  // Scheduled stories go live without a database write, so tiers they complete are announced here
+  // (once a day), before the summaries are built. Runs even when email isn't configured.
+  const [badges] = await db.execute<{ checked: number }>(sql`select public.check_due_writing_badges() as checked`);
+  console.info("[badges] writers checked", badges?.checked ?? 0);
 
   const signingSecret = emailSigningSecret();
   if (!signingSecret) return NextResponse.json({ error: "not_configured" }, { status: 503 });

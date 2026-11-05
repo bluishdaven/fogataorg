@@ -3,11 +3,12 @@ import NextLink from "next/link";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import { DonorIcon, TierIcon } from "@/components/badges/badge-icons";
 import { Link } from "@/i18n/navigation";
 import { MarkNotificationsRead } from "@/components/social/mark-notifications-read";
 import { getViewer } from "@/lib/auth";
 import { listNotifications } from "@/lib/data/social";
-import { notificationMessage, notificationPath, type SocialTranslator } from "@/lib/domain/notification-text";
+import { badgeTier, notificationMessage, notificationPath, type SocialTranslator } from "@/lib/domain/notification-text";
 import { cn } from "@/lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -48,6 +49,7 @@ async function List() {
         {items.map((item) => {
           const message = notificationMessage(t as unknown as SocialTranslator, item);
           const href = notificationPath(item, locale);
+          const tier = item.type === "badge" ? badgeTier(item.badge?.key) : null;
           return (
             <li key={item.id}>
               <NextLink
@@ -57,6 +59,8 @@ async function List() {
               >
                 <span className="flex items-start gap-2">
                   {item.unread ? <span className="mt-2 size-2 shrink-0 rounded-full bg-primary" aria-label={t("unread")} /> : null}
+                  {tier ? <TierIcon tier={tier.key} className="mt-0.5 h-5 w-auto shrink-0" /> : null}
+                  {item.type === "donor" ? <DonorIcon className="mt-0.5 h-5 w-auto shrink-0" /> : null}
                   <span>{message}</span>
                 </span>
                 {item.responseExcerpt && item.type !== "spark" ? (

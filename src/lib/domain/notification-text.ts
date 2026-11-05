@@ -1,3 +1,4 @@
+import { WRITING_TIERS, type WritingTierKey } from "./badges";
 import { profilePath, storyPath } from "./handle-routes";
 
 /**
@@ -6,13 +7,22 @@ import { profilePath, storyPath } from "./handle-routes";
  */
 
 export type NotificationItem = {
-  type: "spark" | "response" | "reply" | "mention" | "follow" | "submission" | "accepted" | "declined";
+  type: "spark" | "response" | "reply" | "mention" | "follow" | "submission" | "accepted" | "declined" | "badge" | "donor";
   actor: { username: string; name: string } | null;
   others: number;
   story: { title: string; slug: string; author: string } | null;
   responseExcerpt: string | null;
   circle: { slug: string; name: string } | null;
+  /** Badge notifications: the writing tier key or "donor", and whose profile shows it. */
+  badge?: { key: string; username: string } | null;
 };
+
+/** A stored writing tier key, if it is one (rows come from the database). */
+export function badgeTier(key: string | null | undefined): (typeof WRITING_TIERS)[number] | null {
+  return WRITING_TIERS.find((tier) => tier.key === key) ?? null;
+}
+
+export type { WritingTierKey };
 
 /** A translator scoped to the `Social` namespace (next-intl's `t`). */
 export type SocialTranslator = (key: string, values: Record<string, string | number>) => string;
@@ -20,13 +30,22 @@ export type SocialTranslator = (key: string, values: Record<string, string | num
 export function notificationMessage(t: SocialTranslator, item: NotificationItem): string {
   const actor = item.actor?.name ?? t("someone", {});
   const title = item.story?.title ?? "";
-  const values = { actor, others: item.others, title, circle: item.circle?.name ?? "" };
+  const tier = badgeTier(item.badge?.key);
+  const values = {
+    actor,
+    others: item.others,
+    title,
+    circle: item.circle?.name ?? "",
+    badge: tier?.key ?? "other",
+    count: tier?.min ?? 0,
+  };
   if (item.type === "spark" && item.responseExcerpt) return t("notice.sparkResponse", values);
   return t(`notice.${item.type}`, values);
 }
 
 /** Site-relative link for a notification (locale prefix only where the UI needs one). */
 export function notificationPath(item: NotificationItem, locale: string): string {
+  if ((item.type === "badge" || item.type === "donor") && item.badge) return profilePath(item.badge.username);
   if (item.type === "submission" && item.circle) return `/${locale}/circles/${item.circle.slug}/manage`;
   if (item.type === "follow" && item.actor) return profilePath(item.actor.username);
   if (item.story) {

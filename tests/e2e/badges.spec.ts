@@ -1,6 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { becomeAdmin, setAdmin } from "./admin";
+import { publishStory } from "./helpers";
 import { signInWithMagicLink } from "./sign-in";
 
 async function usernameOf(page: Page) {
@@ -64,6 +65,11 @@ test("the owner grants and removes the donor badge", async ({ browser }) => {
     await donor.goto(`/@${donorUsername}`);
     await expect(donor.getByRole("main").locator('[data-badge="donor"]')).toContainText("Firekeeper");
 
+    // The donor gets a thank-you in the bell.
+    await expect(donor.getByTestId("notification-count")).toBeVisible();
+    await donor.getByTestId("notification-bell").click();
+    await expect(donor.getByTestId("notifications-list")).toContainText("You're a Firekeeper! Thank you for supporting Fogata");
+
     owner.once("dialog", (dialog) => void dialog.accept());
     await grant.getByTestId("remove-donor").click();
     await expect(grant).toContainText("removed");
@@ -74,4 +80,19 @@ test("the owner grants and removes the donor badge", async ({ browser }) => {
     await donorContext.close();
     await ownerContext.close();
   }
+});
+
+test("a writer's first story earns a badge, announced in the bell", async ({ page }) => {
+  test.setTimeout(90_000);
+  await signInWithMagicLink(page, "en");
+  await expect(page.getByTestId("notification-count")).toHaveCount(0);
+  await publishStory(page, `First light ${Date.now()}`);
+
+  await expect(page.getByTestId("notification-count")).toHaveText("1");
+  await page.getByTestId("notification-bell").click();
+  const notice = page.getByTestId("notification").filter({ hasText: "Kindling" });
+  await expect(notice).toHaveText(/You earned the Kindling badge: your first published story/);
+  // It opens the writer's profile, where the badge shows.
+  await notice.click();
+  await expect(page.getByRole("main").locator('li[data-badge="kindling"]')).toContainText("Kindling");
 });
