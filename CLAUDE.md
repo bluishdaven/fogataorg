@@ -103,10 +103,16 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   `<Avatar>`, which shows initials unless the URL is in our bucket; author queries carry `avatarUrl`.
 - **Topics** come from a catalog migration (`*_topics_catalog.sql`, EN + ES names, upsert by slug).
   Add or rename topics with a new migration; the seed only references slugs that exist there.
-- **Sharing** (`src/components/social/share-button.tsx`, `src/lib/domain/share.ts`). In the story action
-  bar: phones (coarse pointer) open the native share sheet; desktops get copy link plus one-tap
+- **Sharing** (`src/components/social/share-button.tsx`, `src/lib/domain/share.ts`). A menu in the story
+  action bar: "Share via…" (system sheet, phones only), "Image for Stories", copy link, then one-tap
   WhatsApp, X, Facebook, LinkedIn, Threads, Telegram and email. Links use the unprefixed share URL on
   `NEXT_PUBLIC_SITE_URL`. Share previews use the cover, else the story's first picture.
+- **Stories image** (`src/components/social/story-image.ts`, layout in `src/lib/domain/story-card.ts`).
+  Drawn on a canvas in the browser (1080×1920, Instagram safe zones) with the page's own fonts: no
+  server route and no font files. Its copy follows the story's language (`ShareCard` messages), not the
+  reader's UI. Phones hand the PNG to the share sheet (rendering starts when the menu opens, because
+  iOS only allows sharing shortly after a tap); desktops download it. Only our avatars bucket (CORS
+  enabled) is drawn, so the canvas can't be tainted.
 - **Touch targets.** Buttons and inputs are 44px on phones and compact from `sm:` up (sizes in
   `components/ui/button.tsx` / `input.tsx`). Custom controls follow the same rule (`min-h-11` /
   `min-h-10 … sm:min-h-8`), or get an invisible `after:` hit area when they must stay small visually.

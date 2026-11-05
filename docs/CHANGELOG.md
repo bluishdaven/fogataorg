@@ -1,5 +1,17 @@
 # Changelog
 
+## Stories image (2026-11-05)
+
+**Demo**: open any story → share → **Image for Stories**. A 1080×1920 image with the Fogata flame,
+the title, the writer, a few lines of the story and "Read the full story" (or "Lee la historia
+completa" for Spanish stories). On a phone it goes straight to the share sheet (Instagram, WhatsApp
+status…); on a computer it downloads.
+
+- Drawn in the browser with the site's fonts; no server work. The writer's photo appears when set.
+- The share menu now opens on phones too (with "Share via…" for the system sheet), and menu items
+  everywhere are 44px on phones.
+- Tests: 141 unit (layout, wrapping, title fitting), 54 RLS, 70 Playwright (downloads a 1080×1920 PNG).
+
 ## Topics in production, a share button and photo search (2026-11-05)
 
 - **Topics**: a 39-topic catalog (EN + ES) now ships as a migration, so the publish dialog has topics
