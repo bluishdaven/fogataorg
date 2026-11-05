@@ -1,0 +1,1 @@
+CREATE POLICY "responses_select_own" ON "responses" AS PERMISSIVE FOR SELECT TO "authenticated" USING ("responses"."author_id" = (select auth.uid()));

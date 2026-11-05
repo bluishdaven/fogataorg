@@ -1,0 +1,1 @@
+ALTER POLICY "responses_insert_own" ON "responses" TO authenticated WITH CHECK ("responses"."author_id" = (select auth.uid()) and "responses"."pinned_at" is null and "responses"."deleted_at" is null and exists (select 1 from public.stories s where s.id = "responses"."story_id" and s.deleted_at is null and s.status in ('published', 'unlisted') and s.published_at <= now()));

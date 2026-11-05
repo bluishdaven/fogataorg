@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
+  type AnyPgColumn,
   boolean,
   check,
   index,
@@ -197,6 +198,215 @@ export const storyTopics = pgTable(
       to: authenticatedRole,
       using: sql`exists (select 1 from public.stories s where s.id = ${t.storyId} and s.author_id = ${authUid})`,
     }),
+  ],
+);
+
+// ---------------------------------------------------------------------------
+// Phase 2: social
+// ---------------------------------------------------------------------------
+
+const LIVE_STORY = (storyId: AnyPgColumn) =>
+  sql`exists (select 1 from public.stories s where s.id = ${storyId} and s.deleted_at is null and s.status in ('published', 'unlisted') and s.published_at <= now())`;
+
+export const notificationType = pgEnum("notification_type", ["spark", "response", "reply", "mention", "follow"]);
+
+/** A reader following a writer or a topic (circles later). Exactly one target is set. */
+export const follows = pgTable(
+  "follows",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    followerId: uuid("follower_id")
+      .notNull()
+      .references(() => profiles.id, { onDelete: "cascade" }),
+    followedUserId: uuid("followed_user_id").references(() => profiles.id, { onDelete: "cascade" }),
+    followedTopicId: uuid("followed_topic_id").references(() => topics.id, { onDelete: "cascade" }),
+    ...timestamps,
+  },
+  (t) => [
+    check("follows_one_target", sql`num_nonnulls(${t.followedUserId}, ${t.followedTopicId}) = 1`),
+    check("follows_not_self", sql`${t.followedUserId} is distinct from ${t.followerId}`),
+    uniqueIndex("follows_user_key").on(t.followerId, t.followedUserId).where(sql`${t.followedUserId} is not null`),
+    uniqueIndex("follows_topic_key").on(t.followerId, t.followedTopicId).where(sql`${t.followedTopicId} is not null`),
+    index("follows_followed_user_idx").on(t.followedUserId),
+    index("follows_followed_topic_idx").on(t.followedTopicId),
+    pgPolicy("follows_select_public", { for: "select", to: everyone, using: sql`true` }),
+    pgPolicy("follows_insert_own", { for: "insert", to: authenticatedRole, withCheck: sql`${t.followerId} = ${authUid}` }),
+    pgPolicy("follows_delete_own", { for: "delete", to: authenticatedRole, using: sql`${t.followerId} = ${authUid}` }),
+  ],
+);
+
+/** Up to 50 sparks per reader per story; one row holds the reader's total. */
+export const sparks = pgTable(
+  "sparks",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => profiles.id, { onDelete: "cascade" }),
+    storyId: uuid("story_id")
+      .notNull()
+      .references(() => stories.id, { onDelete: "cascade" }),
+    count: integer("count").notNull().default(1),
+    ...timestamps,
+  },
+  (t) => [
+    uniqueIndex("sparks_user_story_key").on(t.userId, t.storyId),
+    index("sparks_story_idx").on(t.storyId),
+    check("sparks_count_range", sql`${t.count} between 1 and 50`),
+    pgPolicy("sparks_select_public", { for: "select", to: everyone, using: sql`true` }),
+    // Only live stories, and never your own.
+    pgPolicy("sparks_insert_own", {
+      for: "insert",
+      to: authenticatedRole,
+      withCheck: sql`${t.userId} = ${authUid} and ${LIVE_STORY(t.storyId)} and not exists (select 1 from public.stories s where s.id = ${t.storyId} and s.author_id = ${authUid})`,
+    }),
+    pgPolicy("sparks_update_own", {
+      for: "update",
+      to: authenticatedRole,
+      using: sql`${t.userId} = ${authUid}`,
+      withCheck: sql`${t.userId} = ${authUid}`,
+    }),
+    pgPolicy("sparks_delete_own", { for: "delete", to: authenticatedRole, using: sql`${t.userId} = ${authUid}` }),
+  ],
+);
+
+/** Private reading list ("Saved" / "Leña guardada"). */
+export const bookmarks = pgTable(
+  "bookmarks",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => profiles.id, { onDelete: "cascade" }),
+    storyId: uuid("story_id")
+      .notNull()
+      .references(() => stories.id, { onDelete: "cascade" }),
+    ...timestamps,
+  },
+  (t) => [
+    uniqueIndex("bookmarks_user_story_key").on(t.userId, t.storyId),
+    index("bookmarks_user_idx").on(t.userId, t.createdAt.desc()),
+    pgPolicy("bookmarks_select_own", { for: "select", to: authenticatedRole, using: sql`${t.userId} = ${authUid}` }),
+    pgPolicy("bookmarks_insert_own", {
+      for: "insert",
+      to: authenticatedRole,
+      withCheck: sql`${t.userId} = ${authUid} and exists (select 1 from public.stories s where s.id = ${t.storyId})`,
+    }),
+    pgPolicy("bookmarks_delete_own", { for: "delete", to: authenticatedRole, using: sql`${t.userId} = ${authUid}` }),
+  ],
+);
+
+/** Responses: top-level or one-level replies, optionally anchored to a paragraph (block id). */
+export const responses = pgTable(
+  "responses",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    storyId: uuid("story_id")
+      .notNull()
+      .references(() => stories.id, { onDelete: "cascade" }),
+    authorId: uuid("author_id")
+      .notNull()
+      .references(() => profiles.id, { onDelete: "cascade" }),
+    parentId: uuid("parent_id").references((): AnyPgColumn => responses.id, { onDelete: "cascade" }),
+    blockId: text("block_id"),
+    body: text("body").notNull(),
+    pinnedAt: timestamp("pinned_at", { withTimezone: true }),
+    ...timestamps,
+    deletedAt: timestamp("deleted_at", { withTimezone: true }),
+  },
+  (t) => [
+    index("responses_story_idx").on(t.storyId, t.createdAt),
+    index("responses_parent_idx").on(t.parentId),
+    check("responses_body_length", sql`char_length(btrim(${t.body})) between 1 and 4000`),
+    check(
+      "responses_block_id_format",
+      sql`${t.blockId} is null or ${t.blockId} ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'`,
+    ),
+    pgPolicy("responses_select_visible", {
+      for: "select",
+      to: everyone,
+      using: sql`${t.deletedAt} is null and exists (select 1 from public.stories s where s.id = ${t.storyId})`,
+    }),
+    // Authors see their own (even soft-deleted) responses; needed so soft-deleting passes RLS.
+    pgPolicy("responses_select_own", { for: "select", to: authenticatedRole, using: sql`${t.authorId} = ${authUid}` }),
+    // New responses can't arrive pinned or deleted (pinning goes through set_response_pinned()).
+    pgPolicy("responses_insert_own", {
+      for: "insert",
+      to: authenticatedRole,
+      withCheck: sql`${t.authorId} = ${authUid} and ${t.pinnedAt} is null and ${t.deletedAt} is null and ${LIVE_STORY(t.storyId)}`,
+    }),
+    pgPolicy("responses_update_own", {
+      for: "update",
+      to: authenticatedRole,
+      using: sql`${t.authorId} = ${authUid} and ${t.deletedAt} is null`,
+      withCheck: sql`${t.authorId} = ${authUid}`,
+    }),
+  ],
+);
+
+/** One spark per reader per response. */
+export const responseSparks = pgTable(
+  "response_sparks",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => profiles.id, { onDelete: "cascade" }),
+    responseId: uuid("response_id")
+      .notNull()
+      .references(() => responses.id, { onDelete: "cascade" }),
+    ...timestamps,
+  },
+  (t) => [
+    uniqueIndex("response_sparks_user_response_key").on(t.userId, t.responseId),
+    index("response_sparks_response_idx").on(t.responseId),
+    pgPolicy("response_sparks_select_public", { for: "select", to: everyone, using: sql`true` }),
+    pgPolicy("response_sparks_insert_own", {
+      for: "insert",
+      to: authenticatedRole,
+      withCheck: sql`${t.userId} = ${authUid} and exists (select 1 from public.responses r where r.id = ${t.responseId} and r.author_id <> ${authUid})`,
+    }),
+    pgPolicy("response_sparks_delete_own", { for: "delete", to: authenticatedRole, using: sql`${t.userId} = ${authUid}` }),
+  ],
+);
+
+/**
+ * Grouped notifications ("12 people sparked your story"). Written only by
+ * database triggers; one unread row per recipient, type and target.
+ */
+export const notifications = pgTable(
+  "notifications",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => profiles.id, { onDelete: "cascade" }),
+    type: notificationType("type").notNull(),
+    storyId: uuid("story_id").references(() => stories.id, { onDelete: "cascade" }),
+    responseId: uuid("response_id").references(() => responses.id, { onDelete: "cascade" }),
+    actorIds: uuid("actor_ids").array().notNull().default(sql`'{}'::uuid[]`),
+    actorCount: integer("actor_count").notNull().default(1),
+    readAt: timestamp("read_at", { withTimezone: true }),
+    ...timestamps,
+  },
+  (t) => [
+    index("notifications_user_idx").on(t.userId, t.updatedAt.desc()),
+    uniqueIndex("notifications_unread_group_key")
+      .on(
+        t.userId,
+        t.type,
+        sql`coalesce(${t.storyId}, '00000000-0000-0000-0000-000000000000'::uuid)`,
+        sql`coalesce(${t.responseId}, '00000000-0000-0000-0000-000000000000'::uuid)`,
+      )
+      .where(sql`${t.readAt} is null`),
+    pgPolicy("notifications_select_own", { for: "select", to: authenticatedRole, using: sql`${t.userId} = ${authUid}` }),
+    pgPolicy("notifications_update_own", {
+      for: "update",
+      to: authenticatedRole,
+      using: sql`${t.userId} = ${authUid}`,
+      withCheck: sql`${t.userId} = ${authUid}`,
+    }),
+    pgPolicy("notifications_delete_own", { for: "delete", to: authenticatedRole, using: sql`${t.userId} = ${authUid}` }),
   ],
 );
 
