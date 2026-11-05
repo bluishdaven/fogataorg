@@ -36,7 +36,8 @@
     "notifications": "Notifications",
     "circles": "Circles",
     "merch": "Merch",
-    "comingSoon": "Coming soon"
+    "comingSoon": "Coming soon",
+    "donors": "Donors"
   },
   "Theme": {
     "label": "Theme",
@@ -658,5 +659,46 @@
   "ShareCard": {
     "eyebrow": "A story on Fogata",
     "cta": "Read the full story"
+  },
+  "Badges": {
+    "tiers": {
+      "kindling": "Kindling",
+      "candle": "Candle",
+      "flame": "Flame",
+      "torch": "Torch",
+      "hearth": "Hearth",
+      "bonfire": "Bonfire",
+      "beacon": "Beacon",
+      "star": "Star",
+      "sun": "Sun",
+      "phoenix": "Phoenix"
+    },
+    "tierLabel": "{name}: {count, plural, one {first published story} other {#+ published stories}}",
+    "donor": "Firekeeper",
+    "donorLabel": "{name}: supports Fogata with a donation"
+  },
+  "Admin": {
+    "donorsTitle": "Firekeepers",
+    "donorsLede": "Grant the donor badge to people who email you a donation receipt from the address of their Fogata account. It stays until you remove it.",
+    "target": "Username or email",
+    "targetPlaceholder": "@username or name@example.com",
+    "targetHint": "Their @username, or the email they sign in to Fogata with.",
+    "note": "Private note",
+    "notePlaceholder": "Buy Me a Coffee, 5 Nov, receipt in Gmail",
+    "grant": "Grant badge",
+    "granting": "Granting…",
+    "granted": "{name} is now a Firekeeper.",
+    "grants": "Grants",
+    "empty": "No badges granted yet.",
+    "grantedOn": "Granted {date}",
+    "removedOn": "removed {date}",
+    "remove": "Remove",
+    "removeConfirm": "Remove {name}'s Firekeeper badge?",
+    "errors": {
+      "unauthorized": "Only the owner can do this. Sign in again if you were just made admin.",
+      "invalid": "Check the username or email.",
+      "notFound": "No account has that username or email.",
+      "failed": "That didn't work. Try again."
+    }
   }
 }

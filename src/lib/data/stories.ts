@@ -3,8 +3,10 @@ import { and, desc, eq, isNull, lte, sql } from "drizzle-orm";
 import { cacheLife, cacheTag } from "next/cache";
 import { asAnon } from "@/lib/db/rls";
 import { profiles, stories, storyTopics, topics } from "@/lib/db/schema";
+import { badgeData } from "@/lib/domain/badges";
 import { excerpt } from "@/lib/domain/content";
 import { isAllowedStoryImage } from "@/lib/story-images";
+import { publishedCountSql } from "./badge-sql";
 
 /**
  * Public story reads. They run as `anon`, so RLS guarantees drafts never leak
@@ -27,6 +29,8 @@ const cardColumns = {
   authorUsername: profiles.username,
   authorDisplayName: profiles.displayName,
   authorAvatarUrl: profiles.avatarUrl,
+  authorPublishedCount: publishedCountSql(),
+  authorDonorSince: profiles.donorSince,
 };
 
 type CardRow = {
@@ -42,6 +46,8 @@ type CardRow = {
   authorUsername: string;
   authorDisplayName: string;
   authorAvatarUrl: string | null;
+  authorPublishedCount: number;
+  authorDonorSince: Date | null;
 };
 
 function toCard(row: CardRow) {
@@ -55,7 +61,12 @@ function toCard(row: CardRow) {
     excerpt: excerpt(row.contentText),
     thumbnail:
       row.thumbnailUrl && isAllowedStoryImage(row.thumbnailUrl) ? { url: row.thumbnailUrl, alt: row.thumbnailAlt } : null,
-    author: { username: row.authorUsername, displayName: row.authorDisplayName, avatarUrl: row.authorAvatarUrl },
+    author: {
+      username: row.authorUsername,
+      displayName: row.authorDisplayName,
+      avatarUrl: row.authorAvatarUrl,
+      badges: badgeData({ publishedCount: row.authorPublishedCount, donorSince: row.authorDonorSince }),
+    },
   };
 }
 
@@ -110,6 +121,8 @@ export async function getStory(handle: string, slug: string) {
         authorUsername: profiles.username,
         authorDisplayName: profiles.displayName,
         authorAvatarUrl: profiles.avatarUrl,
+        authorPublishedCount: publishedCountSql(),
+        authorDonorSince: profiles.donorSince,
         authorBio: profiles.bio,
       })
       .from(stories)
@@ -160,6 +173,8 @@ export async function getProfileWithStories(handle: string) {
         username: profiles.username,
         displayName: profiles.displayName,
         avatarUrl: profiles.avatarUrl,
+        publishedCount: publishedCountSql(),
+        donorSince: profiles.donorSince,
         bio: profiles.bio,
         links: profiles.links,
         createdAt: profiles.createdAt,

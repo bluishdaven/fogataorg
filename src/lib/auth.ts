@@ -3,7 +3,9 @@ import { eq } from "drizzle-orm";
 import { connection } from "next/server";
 import { cache } from "react";
 import { profiles } from "@/lib/db/schema";
+import { publishedCountSql } from "@/lib/data/badge-sql";
 import { withRls, type RlsClaims } from "@/lib/db/rls";
+import { badgeData, isAdminClaims, type BadgeData } from "@/lib/domain/badges";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export type Viewer = {
@@ -12,6 +14,9 @@ export type Viewer = {
   username: string;
   displayName: string;
   avatarUrl: string | null;
+  badges: BadgeData;
+  /** Owner account (Supabase app_metadata.role = "admin"); can grant donor badges. */
+  isAdmin: boolean;
 };
 
 /**
@@ -30,7 +35,13 @@ export const getViewer = cache(async (): Promise<Viewer | null> => {
   const claims = { ...data.claims, sub: data.claims.sub } as NonNullable<RlsClaims>;
   const profile = await withRls(claims, (tx) =>
     tx
-      .select({ username: profiles.username, displayName: profiles.displayName, avatarUrl: profiles.avatarUrl })
+      .select({
+        username: profiles.username,
+        displayName: profiles.displayName,
+        avatarUrl: profiles.avatarUrl,
+        publishedCount: publishedCountSql(),
+        donorSince: profiles.donorSince,
+      })
       .from(profiles)
       .where(eq(profiles.id, claims.sub))
       .limit(1),
@@ -44,5 +55,7 @@ export const getViewer = cache(async (): Promise<Viewer | null> => {
     username: row.username,
     displayName: row.displayName || row.username,
     avatarUrl: row.avatarUrl,
+    badges: badgeData(row),
+    isAdmin: isAdminClaims(claims),
   };
 });

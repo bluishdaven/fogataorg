@@ -4,6 +4,7 @@ import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { Avatar } from "@/components/avatar";
+import { UserBadges } from "@/components/badges/user-badges";
 import { ReaderControls } from "@/components/reader-controls";
 import { ReadingProgress } from "@/components/reading-progress";
 import { StoryBody } from "@/components/story-body";
@@ -13,6 +14,7 @@ import { UnsplashCredit } from "@/components/unsplash/unsplash-credit";
 import { UnsplashImage } from "@/components/unsplash/unsplash-image";
 import { Link } from "@/i18n/navigation";
 import { getStory } from "@/lib/data/stories";
+import { badgeData } from "@/lib/domain/badges";
 import { excerpt } from "@/lib/domain/content";
 import { profilePath, storyPath } from "@/lib/domain/handle-routes";
 import { imageCreditSchema, isUnsplashImageUrl, unsplashImageUrl } from "@/lib/domain/unsplash";
@@ -109,12 +111,12 @@ async function Story({ params }: Pick<Props, "params">) {
             <Avatar name={authorName} url={story.authorAvatarUrl} className="size-11 text-sm" />
           </NextLink>
           <div className="min-w-0 flex-1">
-            <NextLink
-              href={profilePath(story.authorUsername)}
-              className="block w-fit font-medium text-foreground hover:text-ember-text"
-            >
-              {authorName}
-            </NextLink>
+            <span className="flex items-center gap-1.5">
+              <NextLink href={profilePath(story.authorUsername)} className="font-medium text-foreground hover:text-ember-text">
+                {authorName}
+              </NextLink>
+              <UserBadges badges={badgeData({ publishedCount: story.authorPublishedCount, donorSince: story.authorDonorSince })} />
+            </span>
             <p className="flex flex-wrap items-center gap-x-1.5 text-sm text-muted-foreground">
               {story.publishedAt ? (
                 <>
@@ -154,6 +156,7 @@ async function Story({ params }: Pick<Props, "params">) {
             username: story.authorUsername,
             displayName: story.authorDisplayName,
             avatarUrl: story.authorAvatarUrl,
+            badges: badgeData({ publishedCount: story.authorPublishedCount, donorSince: story.authorDonorSince }),
             bio: story.authorBio,
           }}
         />

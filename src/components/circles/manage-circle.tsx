@@ -9,10 +9,18 @@ import { addCircleMember, decideSubmission, removeCircleMember, removeSubmission
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { UserBadges } from "@/components/badges/user-badges";
+import type { BadgeData } from "@/lib/domain/badges";
 import { profilePath, storyPath } from "@/lib/domain/handle-routes";
 
 type Submission = { id: string; createdAt: Date; storyTitle: string; storySlug: string; authorUsername: string; authorName: string };
-type Member = { userId: string; role: "owner" | "editor" | "writer"; username: string; displayName: string };
+type Member = {
+  userId: string;
+  role: "owner" | "editor" | "writer";
+  username: string;
+  displayName: string;
+  badges?: BadgeData;
+};
 
 export function SubmissionQueue({ pending, accepted }: { pending: Submission[]; accepted: Submission[] }) {
   const t = useTranslations("Circles");
@@ -143,6 +151,7 @@ export function MembersManager({ circleId, members, isOwner }: { circleId: strin
               <NextLink href={profilePath(member.username)} className="font-medium hover:text-ember-text">
                 {member.displayName}
               </NextLink>{" "}
+              <UserBadges badges={member.badges} />{" "}
               <span className="text-xs text-muted-foreground">@{member.username}</span>
             </span>
             <span className="flex items-center gap-2 text-sm text-muted-foreground">

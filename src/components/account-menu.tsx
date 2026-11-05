@@ -28,6 +28,8 @@ export async function AccountMenu() {
         displayName={viewer.displayName}
         username={viewer.username}
         avatarUrl={viewer.avatarUrl}
+        badges={viewer.badges}
+        isAdmin={viewer.isAdmin}
         locale={locale}
       />
     </div>

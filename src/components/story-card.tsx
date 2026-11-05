@@ -1,7 +1,9 @@
 import NextLink from "next/link";
 import { useFormatter, useTranslations } from "next-intl";
 import { Avatar } from "@/components/avatar";
+import { UserBadges } from "@/components/badges/user-badges";
 import { UnsplashImage } from "@/components/unsplash/unsplash-image";
+import type { BadgeData } from "@/lib/domain/badges";
 import { storyPath } from "@/lib/domain/handle-routes";
 import type { Locale } from "@/lib/domain/locale";
 import { isUnsplashImageUrl } from "@/lib/domain/unsplash";
@@ -16,7 +18,7 @@ export type StoryCardData = {
   excerpt: string;
   /** Cover, else first image in the story; only URLs from allowed hosts reach here. */
   thumbnail: { url: string; alt: string } | null;
-  author: { username: string; displayName: string; avatarUrl?: string | null };
+  author: { username: string; displayName: string; avatarUrl?: string | null; badges?: BadgeData };
 };
 
 export function StoryCard({ story }: { story: StoryCardData }) {
@@ -31,6 +33,7 @@ export function StoryCard({ story }: { story: StoryCardData }) {
         <p className="flex items-center gap-2 text-sm text-muted-foreground">
           <Avatar name={authorName} url={story.author.avatarUrl} className="size-6 text-[0.625rem]" />
           <span className="font-medium text-foreground">{authorName}</span>
+          <UserBadges badges={story.author.badges} />
         </p>
         <h3 className="font-serif text-xl leading-snug font-semibold text-balance sm:text-2xl" lang={story.language}>
           {/* Next's Link (not the i18n one): share URLs have no locale prefix. */}

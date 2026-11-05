@@ -1,10 +1,12 @@
 import { MessageCircle } from "lucide-react";
 import NextLink from "next/link";
 import { Avatar } from "@/components/avatar";
+import { UserBadges } from "@/components/badges/user-badges";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Toaster } from "@/components/ui/sonner";
 import { getViewer } from "@/lib/auth";
 import { getStorySocial } from "@/lib/data/social";
+import type { BadgeData } from "@/lib/domain/badges";
 import { profilePath, storyPath } from "@/lib/domain/handle-routes";
 import { storyImageFileName } from "@/lib/domain/story-card";
 import { publicEnv } from "@/lib/env";
@@ -31,7 +33,7 @@ export async function StorySocial({
   readingTime: number;
   /** A few sentences from the start of the story, for the Stories image. */
   preview: string;
-  author: { id: string; username: string; displayName: string; avatarUrl: string | null; bio: string };
+  author: { id: string; username: string; displayName: string; avatarUrl: string | null; badges: BadgeData; bio: string };
   slug: string;
 }) {
   const viewer = await getViewer();
@@ -107,9 +109,12 @@ export async function StorySocial({
           </NextLink>
           <div className="min-w-0">
             <p className="text-sm text-muted-foreground">{t("writtenBy")}</p>
-            <NextLink href={profilePath(author.username)} className="font-serif text-xl font-semibold hover:text-ember-text">
-              {name}
-            </NextLink>
+            <span className="flex items-center gap-2">
+              <NextLink href={profilePath(author.username)} className="font-serif text-xl font-semibold hover:text-ember-text">
+                {name}
+              </NextLink>
+              <UserBadges badges={author.badges} className="text-lg" />
+            </span>
             <p className="text-sm text-muted-foreground">{t("followers", { count: social.followerCount })}</p>
             {author.bio ? <p className="mt-2 max-w-prose text-sm text-pretty">{author.bio}</p> : null}
           </div>

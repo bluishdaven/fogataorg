@@ -13,6 +13,7 @@ import {
   type PostedResponse,
 } from "@/app/actions/social";
 import { Avatar } from "@/components/avatar";
+import { UserBadges } from "@/components/badges/user-badges";
 import { Button, buttonVariants } from "@/components/ui/button";
 import type { ResponseView } from "@/lib/data/social";
 import { profilePath } from "@/lib/domain/handle-routes";
@@ -252,6 +253,7 @@ function ResponseItem({
           <Avatar name={item.author.displayName} url={item.author.avatarUrl} className="size-8 text-[0.7rem]" />
           {item.author.displayName}
         </NextLink>
+        <UserBadges badges={item.author.badges} />
         {isWriter ? (
           <span className="rounded-full bg-ember-soft px-2 py-px text-xs font-medium text-ember-text">{t("writerBadge")}</span>
         ) : null}

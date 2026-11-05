@@ -4,9 +4,11 @@ import { cacheLife, cacheTag } from "next/cache";
 import type { Viewer } from "@/lib/auth";
 import { asAnon, withRls } from "@/lib/db/rls";
 import { circleMembers, circles, circleSubmissions, follows, profiles, stories } from "@/lib/db/schema";
+import { badgeData } from "@/lib/domain/badges";
 import { excerpt } from "@/lib/domain/content";
 import { imageCreditSchema } from "@/lib/domain/unsplash";
 import { isAllowedStoryImage } from "@/lib/story-images";
+import { publishedCountSql } from "./badge-sql";
 
 /**
  * Circles: public reads run as anon and are cached (tags `circles` and
@@ -52,7 +54,14 @@ export async function getCircle(slug: string) {
     if (!circle) return null;
 
     const members = await tx
-      .select({ userId: circleMembers.userId, role: circleMembers.role, username: profiles.username, displayName: profiles.displayName })
+      .select({
+        userId: circleMembers.userId,
+        role: circleMembers.role,
+        username: profiles.username,
+        displayName: profiles.displayName,
+        publishedCount: publishedCountSql(),
+        donorSince: profiles.donorSince,
+      })
       .from(circleMembers)
       .innerJoin(profiles, eq(profiles.id, circleMembers.userId))
       .where(eq(circleMembers.circleId, circle.id))
@@ -72,6 +81,8 @@ export async function getCircle(slug: string) {
         username: profiles.username,
         displayName: profiles.displayName,
         avatarUrl: profiles.avatarUrl,
+        publishedCount: publishedCountSql(),
+        donorSince: profiles.donorSince,
       })
       .from(circleSubmissions)
       .innerJoin(stories, eq(stories.id, circleSubmissions.storyId))
@@ -88,7 +99,11 @@ export async function getCircle(slug: string) {
       accentColor: circle.accentColor,
       header: header(circle),
       createdAt: circle.createdAt,
-      members: members.map((m) => ({ ...m, displayName: m.displayName || m.username })),
+      members: members.map(({ publishedCount, donorSince, ...m }) => ({
+        ...m,
+        displayName: m.displayName || m.username,
+        badges: badgeData({ publishedCount, donorSince }),
+      })),
       stories: rows.map((row) => ({
         title: row.title,
         subtitle: row.subtitle,
@@ -98,7 +113,12 @@ export async function getCircle(slug: string) {
         publishedAt: row.publishedAt,
         excerpt: excerpt(row.contentText),
         thumbnail: row.thumbnailUrl && isAllowedStoryImage(row.thumbnailUrl) ? { url: row.thumbnailUrl, alt: row.thumbnailAlt } : null,
-        author: { username: row.username, displayName: row.displayName, avatarUrl: row.avatarUrl },
+        author: {
+          username: row.username,
+          displayName: row.displayName,
+          avatarUrl: row.avatarUrl,
+          badges: badgeData(row),
+        },
       })),
     };
   });
@@ -165,7 +185,14 @@ export async function getCircleForManage(viewer: Viewer, slug: string) {
     if (!membership || (membership.role !== "owner" && membership.role !== "editor")) return null;
 
     const members = await tx
-      .select({ userId: circleMembers.userId, role: circleMembers.role, username: profiles.username, displayName: profiles.displayName })
+      .select({
+        userId: circleMembers.userId,
+        role: circleMembers.role,
+        username: profiles.username,
+        displayName: profiles.displayName,
+        publishedCount: publishedCountSql(),
+        donorSince: profiles.donorSince,
+      })
       .from(circleMembers)
       .innerJoin(profiles, eq(profiles.id, circleMembers.userId))
       .where(eq(circleMembers.circleId, circle.id))
@@ -196,7 +223,11 @@ export async function getCircleForManage(viewer: Viewer, slug: string) {
       accentColor: circle.accentColor,
       header: header(circle),
       role: membership.role,
-      members: members.map((m) => ({ ...m, displayName: m.displayName || m.username })),
+      members: members.map(({ publishedCount, donorSince, ...m }) => ({
+        ...m,
+        displayName: m.displayName || m.username,
+        badges: badgeData({ publishedCount, donorSince }),
+      })),
       pending: submissions.filter((s) => s.status === "pending"),
       accepted: submissions.filter((s) => s.status === "accepted"),
     };

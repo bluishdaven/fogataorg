@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, Bookmark, BookOpenText, LogOut, Settings, UserRound } from "lucide-react";
+import { Bell, Bookmark, BookOpenText, HandHeart, LogOut, Settings, UserRound } from "lucide-react";
 import NextLink from "next/link";
 import { useTranslations } from "next-intl";
 import { signOut } from "@/app/actions/auth";
@@ -15,18 +15,24 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar } from "@/components/avatar";
+import { UserBadges } from "@/components/badges/user-badges";
 import { initials } from "@/lib/domain/avatars";
+import type { BadgeData } from "@/lib/domain/badges";
 import { profilePath } from "@/lib/domain/handle-routes";
 
 export function AccountDropdown({
   displayName,
   username,
   avatarUrl,
+  badges,
+  isAdmin,
   locale,
 }: {
   displayName: string;
   username: string;
   avatarUrl: string | null;
+  badges: BadgeData;
+  isAdmin: boolean;
   locale: string;
 }) {
   const t = useTranslations();
@@ -47,7 +53,10 @@ export function AccountDropdown({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="min-w-52">
         <DropdownMenuLabel className="font-normal">
-          <span className="block text-sm font-medium text-foreground">{displayName}</span>
+          <span className="flex items-center gap-1.5 text-sm font-medium text-foreground">
+            {displayName}
+            <UserBadges badges={badges} />
+          </span>
           <span className="block text-xs text-muted-foreground">@{username}</span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
@@ -81,6 +90,14 @@ export function AccountDropdown({
             {t("Nav.settings")}
           </Link>
         </DropdownMenuItem>
+        {isAdmin ? (
+          <DropdownMenuItem asChild>
+            <Link href="/admin/donors" data-testid="admin-donors-link">
+              <HandHeart />
+              {t("Nav.donors")}
+            </Link>
+          </DropdownMenuItem>
+        ) : null}
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <form action={signOut} className="w-full">

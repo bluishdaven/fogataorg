@@ -13,7 +13,9 @@ import {
   stories,
   topics,
 } from "@/lib/db/schema";
+import { badgeData, type BadgeData } from "@/lib/domain/badges";
 import { excerpt } from "@/lib/domain/content";
+import { publishedCountSql } from "./badge-sql";
 import { selectNotificationItems } from "./notification-items";
 import { isAllowedStoryImage } from "@/lib/story-images";
 
@@ -78,7 +80,7 @@ export type ResponseView = {
   body: string;
   createdAt: Date;
   pinned: boolean;
-  author: { id: string; username: string; displayName: string; avatarUrl: string | null };
+  author: { id: string; username: string; displayName: string; avatarUrl: string | null; badges: BadgeData };
   sparks: number;
   sparkedByViewer: boolean;
   replies: ResponseView[];
@@ -98,6 +100,8 @@ export async function listResponses(viewer: Viewer | null, storyId: string): Pro
         username: profiles.username,
         displayName: profiles.displayName,
         avatarUrl: profiles.avatarUrl,
+        publishedCount: publishedCountSql(),
+        donorSince: profiles.donorSince,
       })
       .from(responses)
       .innerJoin(profiles, eq(profiles.id, responses.authorId))
@@ -138,6 +142,7 @@ export async function listResponses(viewer: Viewer | null, storyId: string): Pro
           username: row.username,
           displayName: row.displayName || row.username,
           avatarUrl: row.avatarUrl,
+          badges: badgeData(row),
         },
         sparks: countById.get(row.id) ?? 0,
         sparkedByViewer: mine.has(row.id),
@@ -186,6 +191,8 @@ export async function listSaved(viewer: Viewer) {
         username: profiles.username,
         displayName: profiles.displayName,
         avatarUrl: profiles.avatarUrl,
+        publishedCount: publishedCountSql(),
+        donorSince: profiles.donorSince,
       })
       .from(bookmarks)
       .innerJoin(stories, eq(stories.id, bookmarks.storyId))
@@ -202,7 +209,7 @@ export async function listSaved(viewer: Viewer) {
       publishedAt: row.publishedAt,
       excerpt: excerpt(row.contentText),
       thumbnail: row.thumbnailUrl && isAllowedStoryImage(row.thumbnailUrl) ? { url: row.thumbnailUrl, alt: row.thumbnailAlt } : null,
-      author: { username: row.username, displayName: row.displayName, avatarUrl: row.avatarUrl },
+      author: { username: row.username, displayName: row.displayName, avatarUrl: row.avatarUrl, badges: badgeData(row) },
     }));
   });
 }

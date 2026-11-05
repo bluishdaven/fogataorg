@@ -36,7 +36,8 @@
     "notifications": "Notificaciones",
     "circles": "Fogatas",
     "merch": "Merch",
-    "comingSoon": "Próximamente"
+    "comingSoon": "Próximamente",
+    "donors": "Mecenas"
   },
   "Theme": {
     "label": "Tema",
@@ -658,5 +659,46 @@
   "ShareCard": {
     "eyebrow": "Una historia en Fogata",
     "cta": "Lee la historia completa"
+  },
+  "Badges": {
+    "tiers": {
+      "kindling": "Yesca",
+      "candle": "Vela",
+      "flame": "Llama",
+      "torch": "Antorcha",
+      "hearth": "Hogar",
+      "bonfire": "Hoguera",
+      "beacon": "Faro",
+      "star": "Estrella",
+      "sun": "Sol",
+      "phoenix": "Fénix"
+    },
+    "tierLabel": "{name}: {count, plural, one {primera historia publicada} other {#+ historias publicadas}}",
+    "donor": "Mecenas",
+    "donorLabel": "{name}: apoya a Fogata con una donación"
+  },
+  "Admin": {
+    "donorsTitle": "Mecenas",
+    "donorsLede": "Otorga la insignia de mecenas a quienes te envíen el comprobante de su donación desde el correo de su cuenta de Fogata. Se queda hasta que la quites.",
+    "target": "Nombre de usuario o correo",
+    "targetPlaceholder": "@usuario o nombre@ejemplo.com",
+    "targetHint": "Su @usuario, o el correo con el que entra a Fogata.",
+    "note": "Nota privada",
+    "notePlaceholder": "Buy Me a Coffee, 5 nov, comprobante en Gmail",
+    "grant": "Otorgar insignia",
+    "granting": "Otorgando…",
+    "granted": "{name} ahora es Mecenas.",
+    "grants": "Insignias otorgadas",
+    "empty": "Todavía no has otorgado insignias.",
+    "grantedOn": "Otorgada el {date}",
+    "removedOn": "quitada el {date}",
+    "remove": "Quitar",
+    "removeConfirm": "¿Quitar la insignia de Mecenas de {name}?",
+    "errors": {
+      "unauthorized": "Solo la cuenta administradora puede hacer esto. Vuelve a entrar si acabas de recibir el permiso.",
+      "invalid": "Revisa el usuario o el correo.",
+      "notFound": "Ninguna cuenta tiene ese usuario o correo.",
+      "failed": "No funcionó. Inténtalo de nuevo."
+    }
   }
 }

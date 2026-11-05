@@ -4,6 +4,7 @@ import NextLink from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 import { Avatar } from "@/components/avatar";
+import { UserBadges } from "@/components/badges/user-badges";
 import { StoryCard } from "@/components/story-card";
 import { StoryListSkeleton } from "@/components/story-list-skeleton";
 import { Link } from "@/i18n/navigation";
@@ -164,7 +165,10 @@ async function Results({ searchParams }: Pick<Props, "searchParams">) {
                 <NextLink href={profilePath(person.username)} className="group flex items-start gap-3">
                   <Avatar name={person.displayName || person.username} url={person.avatarUrl} className="size-11 text-sm" />
                   <span className="flex min-w-0 flex-col">
-                    <span className="font-medium group-hover:text-ember-text">{person.displayName || person.username}</span>
+                    <span className="flex items-center gap-1.5">
+                      <span className="font-medium group-hover:text-ember-text">{person.displayName || person.username}</span>
+                      <UserBadges badges={person.badges} />
+                    </span>
                     <span className="text-sm text-muted-foreground">@{person.username}</span>
                     {person.bio ? <span className="mt-1 line-clamp-2 text-sm text-muted-foreground">{person.bio}</span> : null}
                   </span>

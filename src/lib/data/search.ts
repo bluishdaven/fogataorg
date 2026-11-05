@@ -2,9 +2,11 @@ import "server-only";
 import { sql } from "drizzle-orm";
 import { cacheLife, cacheTag } from "next/cache";
 import { asAnon } from "@/lib/db/rls";
+import { badgeData } from "@/lib/domain/badges";
 import { excerpt } from "@/lib/domain/content";
 import type { Locale } from "@/lib/domain/locale";
 import { isAllowedStoryImage } from "@/lib/story-images";
+import { publishedCountRaw } from "./badge-sql";
 
 /**
  * Public search across stories, people and topics. Runs as `anon`, so only
@@ -26,9 +28,18 @@ type StoryRow = {
   username: string;
   display_name: string;
   avatar_url: string | null;
+  published_count: number;
+  donor_since: string | null;
 };
 
-type PersonRow = { username: string; display_name: string; bio: string; avatar_url: string | null };
+type PersonRow = {
+  username: string;
+  display_name: string;
+  bio: string;
+  avatar_url: string | null;
+  published_count: number;
+  donor_since: string | null;
+};
 type TopicRow = { slug: string; name_en: string; name_es: string };
 type CircleRow = { slug: string; name: string; description: string; accent_color: string };
 
@@ -51,7 +62,8 @@ export async function search(query: string, lang: "all" | Locale) {
       )
       select s.title, s.subtitle, s.slug, s.language, s.reading_time, s.published_at,
              left(s.content_text, 400) as content_text, s.thumbnail_url, s.thumbnail_alt,
-             p.username, p.display_name, p.avatar_url
+             p.username, p.display_name, p.avatar_url, p.donor_since,
+             ${publishedCountRaw("p")} as published_count
       from public.stories s
       join public.profiles p on p.id = s.author_id
       cross join query
@@ -72,7 +84,8 @@ export async function search(query: string, lang: "all" | Locale) {
 
     const people = await tx.execute<PersonRow>(sql`
       with query as (select public.f_unaccent(lower(${q})) as plain)
-      select pr.username, pr.display_name, pr.bio, pr.avatar_url
+      select pr.username, pr.display_name, pr.bio, pr.avatar_url, pr.donor_since,
+             ${publishedCountRaw("pr")} as published_count
       from public.profiles pr
       cross join query
       where strpos(lower(pr.username), query.plain) > 0
@@ -125,13 +138,19 @@ export async function search(query: string, lang: "all" | Locale) {
           row.thumbnail_url && isAllowedStoryImage(row.thumbnail_url)
             ? { url: row.thumbnail_url, alt: row.thumbnail_alt }
             : null,
-        author: { username: row.username, displayName: row.display_name, avatarUrl: row.avatar_url },
+        author: {
+          username: row.username,
+          displayName: row.display_name,
+          avatarUrl: row.avatar_url,
+          badges: badgeData({ publishedCount: row.published_count, donorSince: row.donor_since }),
+        },
       })),
       people: people.map((row) => ({
         username: row.username,
         displayName: row.display_name,
         bio: row.bio,
         avatarUrl: row.avatar_url,
+        badges: badgeData({ publishedCount: row.published_count, donorSince: row.donor_since }),
       })),
       topics: topicRows.map((row) => ({ slug: row.slug, nameEn: row.name_en, nameEs: row.name_es })),
     };

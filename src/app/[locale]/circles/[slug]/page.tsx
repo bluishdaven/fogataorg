@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import NextLink from "next/link";
+import { UserBadges } from "@/components/badges/user-badges";
 import { getLocale, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -73,6 +74,7 @@ async function Circle({ params }: Pick<Props, "params">) {
                 <NextLink href={profilePath(member.username)} className="hover:text-ember-text">
                   {member.displayName}
                 </NextLink>{" "}
+                <UserBadges badges={member.badges} />{" "}
                 <span className="text-xs text-muted-foreground">{t(`roles.${member.role}`)}</span>
               </li>
             ))}

@@ -14,6 +14,7 @@ import {
   sparksSchema,
   type ResponseInput,
 } from "@/lib/domain/social";
+import type { BadgeData } from "@/lib/domain/badges";
 
 type Ok<T = object> = { ok: true } & T;
 type Fail = { ok: false; error: "unauthorized" | "invalid" | "not_allowed" | "empty" | "tooLong" };
@@ -104,7 +105,7 @@ export type PostedResponse = {
   blockId: string | null;
   body: string;
   createdAt: string;
-  author: { id: string; username: string; displayName: string; avatarUrl: string | null };
+  author: { id: string; username: string; displayName: string; avatarUrl: string | null; badges: BadgeData };
 };
 
 export async function postResponse(input: ResponseInput): Promise<Ok<{ response: PostedResponse }> | Fail> {
@@ -136,7 +137,13 @@ export async function postResponse(input: ResponseInput): Promise<Ok<{ response:
         blockId: created.blockId,
         body,
         createdAt: created.createdAt.toISOString(),
-        author: { id: viewer.id, username: viewer.username, displayName: viewer.displayName, avatarUrl: viewer.avatarUrl },
+        author: {
+          id: viewer.id,
+          username: viewer.username,
+          displayName: viewer.displayName,
+          avatarUrl: viewer.avatarUrl,
+          badges: viewer.badges,
+        },
       },
     };
   });
