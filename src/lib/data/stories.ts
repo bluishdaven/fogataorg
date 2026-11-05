@@ -103,6 +103,7 @@ export async function getStory(handle: string, slug: string) {
         coverCredit: stories.coverCredit,
         seoTitle: stories.seoTitle,
         seoDescription: stories.seoDescription,
+        authorId: profiles.id,
         authorUsername: profiles.username,
         authorDisplayName: profiles.displayName,
         authorBio: profiles.bio,

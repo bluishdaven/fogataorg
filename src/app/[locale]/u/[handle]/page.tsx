@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
-import { getFormatter, getTranslations } from "next-intl/server";
+import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { StoryCard } from "@/components/story-card";
 import { StoryListSkeleton } from "@/components/story-list-skeleton";
+import { FollowButton } from "@/components/social/toggle-buttons";
+import { getViewer } from "@/lib/auth";
+import { getFollowState } from "@/lib/data/social";
 import { getProfileWithStories } from "@/lib/data/stories";
 import { profilePath } from "@/lib/domain/handle-routes";
 import { safeHref } from "@/lib/domain/story-doc";
@@ -77,6 +80,9 @@ async function Profile({ params }: Pick<Props, "params">) {
           {" · "}
           {t("storyCount", { count: profile.stories.length })}
         </p>
+        <Suspense fallback={<div className="h-8 w-48 animate-pulse rounded bg-muted" aria-hidden />}>
+          <ProfileFollow userId={profile.id} username={profile.username} />
+        </Suspense>
       </header>
       <h2 className="sr-only">{t("stories")}</h2>
       {profile.stories.length === 0 ? (
@@ -85,5 +91,27 @@ async function Profile({ params }: Pick<Props, "params">) {
         profile.stories.map((story) => <StoryCard key={story.slug} story={story} />)
       )}
     </>
+  );
+}
+
+async function ProfileFollow({ userId, username }: { userId: string; username: string }) {
+  const viewer = await getViewer();
+  const [state, t, locale] = await Promise.all([getFollowState(viewer, { userId }), getTranslations("Social"), getLocale()]);
+  return (
+    <div className="mt-2 flex flex-wrap items-center gap-4">
+      <p className="text-sm text-muted-foreground" data-testid="follower-count">
+        {t("followers", { count: state.followers })}
+        {state.following !== null ? ` · ${t("followingCount", { count: state.following })}` : ""}
+      </p>
+      {viewer?.id === userId ? null : (
+        <FollowButton
+          target="user"
+          id={userId}
+          initialFollowing={state.isFollowing}
+          signedIn={state.signedIn}
+          loginHref={`/${locale}/login?next=${encodeURIComponent(`/@${username}`)}`}
+        />
+      )}
+    </div>
   );
 }

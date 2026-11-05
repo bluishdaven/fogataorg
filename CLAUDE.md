@@ -14,6 +14,7 @@ Phase plans: `docs/plans/`. What shipped: `docs/CHANGELOG.md`. Setup and deploys
 | Lint + typecheck + unit tests | `npm run check` |
 | RLS tests (needs local Supabase) | `npm run test:db` |
 | E2E tests (needs Supabase + seed) | `npm run test:e2e` (reuses a running dev server) |
+| E2E against a production build | `npm run build && PORT=3100 npm run start`, then `PORT=3100 npm run test:e2e` |
 | New migration from schema change | edit `src/lib/db/schema.ts` → `npm run db:generate -- --name <what>` |
 | Hand-written SQL migration | `npm run db:migration -- --name <what>` |
 | Apply migrations from scratch | `npm run db:reset` then `npm run db:seed` |
@@ -28,6 +29,20 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   reads use `'use cache'` + `cacheTag` in `src/lib/data/*`. Never read request data at the top of a
   layout. Client hooks like `usePathname()` outside Suspense also block prerendering: read
   `window.location` in event handlers instead.
+- **Search** (`src/lib/data/search.ts`). `stories.search_vector` is a generated tsvector (Spanish or
+  English config by story language, accents folded with `public.f_unaccent`), defined in the
+  `*_search.sql` migration, not in the Drizzle schema; query it with raw SQL. Titles, usernames and
+  display names also have trigram indexes for typo tolerance.
+- **Social** (`src/lib/data/social.ts`, `src/app/actions/social.ts`, `src/components/social/`). Follows,
+  sparks (one row per reader per story, 1–50), bookmarks, responses (one reply level, optional
+  `block_id` paragraph anchor) and response sparks. Notifications are written only by database
+  triggers (`public.notify`), grouped per recipient/type/target while unread, and pushed to the bell
+  through Supabase Realtime. Per-reader data on story pages loads in its own `<Suspense>` so the cached
+  story text never waits for it. Pinning goes through `public.set_response_pinned()`.
+- **Grants vs. Drizzle inserts:** Drizzle names every column in INSERT (DEFAULT for unset ones), and
+  Postgres checks column privileges even for DEFAULT, so don't rely on column-level INSERT grants;
+  put "can't set X on insert" in the insert policy instead. Column-level UPDATE grants are fine.
+- **Thumbnails** (`stories.thumbnail_url`) are set on publish: the cover, else the first figure.
 - **Reader preferences** (size, typeface, width) live in localStorage and are applied to `<html>` by
   `READER_PREFS_SCRIPT` before paint; CSS reads the data attributes. The reading column width is
   `--measure` in rem, so headers and bodies always line up.
@@ -133,5 +148,12 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
 - Turnstile on sign-up, rate limits and new-account limits are not in yet (spec: Trust & safety).
   That includes a per-writer limit on photo searches; today only caching protects the Unsplash quota.
 - Changing a username breaks old `/@old/...` links; add redirects from previous usernames.
+- Phase 2 still to do: circles (community publications with editors and a submission queue) and email
+  notifications/digests (needs an email provider; Resend in the spec). Reading lists beyond one
+  "Saved" list, undoing sparks, editing responses, blocking/muting and rate limits are also open.
+- Unsplash thumbnails in lists show without a credit line (the credit is on the story page). Check
+  this is acceptable when applying for Unsplash production access.
+- A long-running `next dev` can lose track of routes after many new route folders are added (all
+  `/@…` pages 404 with no error). Restart the dev server if that happens.
 - E2E runs against `npm run dev` locally (magic links only redirect to port 3000) and against the
   production build in CI.

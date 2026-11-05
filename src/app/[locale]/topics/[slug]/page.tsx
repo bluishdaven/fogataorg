@@ -5,6 +5,9 @@ import { Suspense } from "react";
 import { StoryCard } from "@/components/story-card";
 import { StoryListSkeleton } from "@/components/story-list-skeleton";
 import { Link } from "@/i18n/navigation";
+import { FollowButton } from "@/components/social/toggle-buttons";
+import { getViewer } from "@/lib/auth";
+import { getFollowState } from "@/lib/data/social";
 import { getTopicWithStories } from "@/lib/data/stories";
 
 type Props = PageProps<"/[locale]/topics/[slug]">;
@@ -39,7 +42,12 @@ async function Topic({ params }: Pick<Props, "params">) {
       <Link href="/topics" className="text-sm text-muted-foreground hover:text-foreground">
         {t("all")}
       </Link>
-      <h1 className="mt-2 font-serif text-4xl font-semibold">{name}</h1>
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
+        <h1 className="font-serif text-4xl font-semibold">{name}</h1>
+        <Suspense fallback={<div className="h-8 w-24 animate-pulse rounded bg-muted" aria-hidden />}>
+          <TopicFollow topicId={topic.id} slug={topic.slug} />
+        </Suspense>
+      </div>
       <p className="mt-2 mb-6 border-b border-border pb-6 text-muted-foreground">{t("count", { count: topic.stories.length })}</p>
       {topic.stories.length === 0 ? (
         <p className="text-muted-foreground">{t("empty", { name })}</p>
@@ -51,5 +59,19 @@ async function Topic({ params }: Pick<Props, "params">) {
         </div>
       )}
     </>
+  );
+}
+
+async function TopicFollow({ topicId, slug }: { topicId: string; slug: string }) {
+  const viewer = await getViewer();
+  const [state, locale] = await Promise.all([getFollowState(viewer, { topicId }), getLocale()]);
+  return (
+    <FollowButton
+      target="topic"
+      id={topicId}
+      initialFollowing={state.isFollowing}
+      signedIn={state.signedIn}
+      loginHref={`/${locale}/login?next=${encodeURIComponent(`/${locale}/topics/${slug}`)}`}
+    />
   );
 }

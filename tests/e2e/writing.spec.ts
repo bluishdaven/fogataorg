@@ -1,33 +1,7 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test } from "@playwright/test";
+import { deleteFromMyStories, startDraft, waitSaved, writeStory } from "./helpers";
 import { solidPng } from "./png";
 import { signInWithMagicLink } from "./sign-in";
-
-const BODY =
-  "We built the fire on the shore just after sunset, when the wind finally dropped and the water turned the color of old silver. Someone had brought tamales.";
-
-async function startDraft(page: Page) {
-  await page.getByTestId("write-button").click();
-  await expect(page).toHaveURL(/\/en\/write\/[0-9a-f-]{36}$/);
-  await expect(page.getByTestId("editor-body")).toBeVisible();
-}
-
-async function waitSaved(page: Page) {
-  await expect(page.getByTestId("save-status")).toHaveAttribute("data-status", "saved", { timeout: 15_000 });
-}
-
-async function writeStory(page: Page, title: string) {
-  await page.getByTestId("editor-title").fill(title);
-  await page.getByTestId("editor-subtitle").fill("Testing the editor end to end.");
-  await page.getByTestId("editor-body").click();
-  await page.keyboard.type(BODY);
-}
-
-async function deleteFromMyStories(page: Page, title: string) {
-  await page.goto("/en/me/stories");
-  page.once("dialog", (dialog) => void dialog.accept());
-  await page.getByTestId("my-story").filter({ hasText: title }).getByRole("button", { name: "Delete" }).click();
-  await expect(page.getByTestId("my-story").filter({ hasText: title })).toHaveCount(0);
-}
 
 test("write, autosave, add an image, publish, then delete", async ({ page }) => {
   test.setTimeout(90_000);
@@ -76,8 +50,10 @@ test("write, autosave, add an image, publish, then delete", async ({ page }) => 
   await expect(page.locator("article figure img")).toHaveAttribute("alt", "A small orange square");
   await expect(page.getByRole("link", { name: "Nature" })).toBeVisible();
 
+  // The home list shows the story with a thumbnail of its first picture.
   await page.goto("/en");
   await expect(page.getByRole("link", { name: title })).toBeVisible();
+  await expect(page.getByRole("article").filter({ hasText: title }).getByTestId("story-thumbnail")).toBeVisible();
 
   await deleteFromMyStories(page, title);
   await page.goto(storyUrl);

@@ -1,0 +1,264 @@
+import "server-only";
+import { and, asc, count, desc, eq, inArray, isNull, sql, sum } from "drizzle-orm";
+import type { Viewer } from "@/lib/auth";
+import { withRls } from "@/lib/db/rls";
+import {
+  bookmarks,
+  follows,
+  notifications,
+  profiles,
+  responses,
+  responseSparks,
+  sparks,
+  stories,
+  topics,
+} from "@/lib/db/schema";
+import { excerpt } from "@/lib/domain/content";
+import { isAllowedStoryImage } from "@/lib/story-images";
+
+/**
+ * Per-reader social data. Never cached: it depends on who's asking. Runs as
+ * the reader (or anon), so RLS keeps bookmarks and notifications private.
+ */
+
+const claimsOf = (viewer: Viewer | null) => viewer?.claims ?? null;
+
+export async function getStorySocial(viewer: Viewer | null, storyId: string, authorId: string) {
+  return withRls(claimsOf(viewer), async (tx) => {
+    const [totals] = await tx
+      .select({ total: sum(sparks.count).mapWith(Number), readers: count() })
+      .from(sparks)
+      .where(eq(sparks.storyId, storyId));
+    const [responseCount] = await tx
+      .select({ value: count() })
+      .from(responses)
+      .where(and(eq(responses.storyId, storyId), isNull(responses.deletedAt)));
+    const [followers] = await tx.select({ value: count() }).from(follows).where(eq(follows.followedUserId, authorId));
+
+    let mine = 0;
+    let saved = false;
+    let following = false;
+    if (viewer) {
+      const [own] = await tx
+        .select({ count: sparks.count })
+        .from(sparks)
+        .where(and(eq(sparks.storyId, storyId), eq(sparks.userId, viewer.id)));
+      mine = own?.count ?? 0;
+      const [bookmark] = await tx
+        .select({ id: bookmarks.id })
+        .from(bookmarks)
+        .where(and(eq(bookmarks.storyId, storyId), eq(bookmarks.userId, viewer.id)));
+      saved = Boolean(bookmark);
+      const [follow] = await tx
+        .select({ id: follows.id })
+        .from(follows)
+        .where(and(eq(follows.followerId, viewer.id), eq(follows.followedUserId, authorId)));
+      following = Boolean(follow);
+    }
+
+    return {
+      sparkTotal: totals?.total ?? 0,
+      sparkReaders: totals?.readers ?? 0,
+      responseCount: responseCount?.value ?? 0,
+      followerCount: followers?.value ?? 0,
+      mine,
+      saved,
+      following,
+      signedIn: Boolean(viewer),
+      isAuthor: viewer?.id === authorId,
+    };
+  });
+}
+
+export type ResponseView = {
+  id: string;
+  parentId: string | null;
+  blockId: string | null;
+  body: string;
+  createdAt: Date;
+  pinned: boolean;
+  author: { id: string; username: string; displayName: string };
+  sparks: number;
+  sparkedByViewer: boolean;
+  replies: ResponseView[];
+};
+
+export async function listResponses(viewer: Viewer | null, storyId: string): Promise<ResponseView[]> {
+  return withRls(claimsOf(viewer), async (tx) => {
+    const rows = await tx
+      .select({
+        id: responses.id,
+        parentId: responses.parentId,
+        blockId: responses.blockId,
+        body: responses.body,
+        createdAt: responses.createdAt,
+        pinnedAt: responses.pinnedAt,
+        authorId: profiles.id,
+        username: profiles.username,
+        displayName: profiles.displayName,
+      })
+      .from(responses)
+      .innerJoin(profiles, eq(profiles.id, responses.authorId))
+      .where(and(eq(responses.storyId, storyId), isNull(responses.deletedAt)))
+      .orderBy(asc(responses.createdAt))
+      .limit(500);
+    if (!rows.length) return [];
+
+    const ids = rows.map((r) => r.id);
+    const sparkCounts = await tx
+      .select({ responseId: responseSparks.responseId, value: count() })
+      .from(responseSparks)
+      .where(inArray(responseSparks.responseId, ids))
+      .groupBy(responseSparks.responseId);
+    const countById = new Map(sparkCounts.map((r) => [r.responseId, r.value]));
+    const mine = viewer
+      ? new Set(
+          (
+            await tx
+              .select({ responseId: responseSparks.responseId })
+              .from(responseSparks)
+              .where(and(inArray(responseSparks.responseId, ids), eq(responseSparks.userId, viewer.id)))
+          ).map((r) => r.responseId),
+        )
+      : new Set<string>();
+
+    const views = new Map<string, ResponseView>();
+    for (const row of rows) {
+      views.set(row.id, {
+        id: row.id,
+        parentId: row.parentId,
+        blockId: row.blockId,
+        body: row.body,
+        createdAt: row.createdAt,
+        pinned: Boolean(row.pinnedAt),
+        author: { id: row.authorId, username: row.username, displayName: row.displayName || row.username },
+        sparks: countById.get(row.id) ?? 0,
+        sparkedByViewer: mine.has(row.id),
+        replies: [],
+      });
+    }
+    const top: ResponseView[] = [];
+    for (const view of views.values()) {
+      const parent = view.parentId ? views.get(view.parentId) : null;
+      if (parent) parent.replies.push(view);
+      else if (!view.parentId) top.push(view);
+    }
+    // Pinned first, then oldest first so conversations read in order.
+    return top.sort((a, b) => Number(b.pinned) - Number(a.pinned) || a.createdAt.getTime() - b.createdAt.getTime());
+  });
+}
+
+export async function getFollowState(viewer: Viewer | null, target: { userId?: string; topicId?: string }) {
+  return withRls(claimsOf(viewer), async (tx) => {
+    const condition = target.userId ? eq(follows.followedUserId, target.userId) : eq(follows.followedTopicId, target.topicId!);
+    const [followers] = await tx.select({ value: count() }).from(follows).where(condition);
+    const following =
+      viewer && target.userId
+        ? (await tx.select({ value: count() }).from(follows).where(eq(follows.followerId, target.userId)))[0]?.value ?? 0
+        : null;
+    const [mine] = viewer
+      ? await tx.select({ id: follows.id }).from(follows).where(and(condition, eq(follows.followerId, viewer.id)))
+      : [];
+    return { followers: followers?.value ?? 0, following, isFollowing: Boolean(mine), signedIn: Boolean(viewer) };
+  });
+}
+
+export async function listSaved(viewer: Viewer) {
+  return withRls(viewer.claims, async (tx) => {
+    const rows = await tx
+      .select({
+        title: stories.title,
+        subtitle: stories.subtitle,
+        slug: stories.slug,
+        language: stories.language,
+        readingTime: stories.readingTime,
+        publishedAt: stories.publishedAt,
+        contentText: sql<string>`left(${stories.contentText}, 400)`,
+        thumbnailUrl: stories.thumbnailUrl,
+        thumbnailAlt: stories.thumbnailAlt,
+        username: profiles.username,
+        displayName: profiles.displayName,
+      })
+      .from(bookmarks)
+      .innerJoin(stories, eq(stories.id, bookmarks.storyId))
+      .innerJoin(profiles, eq(profiles.id, stories.authorId))
+      .where(and(eq(bookmarks.userId, viewer.id), isNull(stories.deletedAt)))
+      .orderBy(desc(bookmarks.createdAt))
+      .limit(200);
+    return rows.map((row) => ({
+      title: row.title,
+      subtitle: row.subtitle,
+      slug: row.slug,
+      language: row.language,
+      readingTime: row.readingTime,
+      publishedAt: row.publishedAt,
+      excerpt: excerpt(row.contentText),
+      thumbnail: row.thumbnailUrl && isAllowedStoryImage(row.thumbnailUrl) ? { url: row.thumbnailUrl, alt: row.thumbnailAlt } : null,
+      author: { username: row.username, displayName: row.displayName },
+    }));
+  });
+}
+
+export async function unreadNotificationCount(viewer: Viewer): Promise<number> {
+  return withRls(viewer.claims, async (tx) => {
+    const [row] = await tx
+      .select({ value: count() })
+      .from(notifications)
+      .where(and(eq(notifications.userId, viewer.id), isNull(notifications.readAt)));
+    return row?.value ?? 0;
+  });
+}
+
+export async function listNotifications(viewer: Viewer) {
+  return withRls(viewer.claims, async (tx) => {
+    const rows = await tx
+      .select({
+        id: notifications.id,
+        type: notifications.type,
+        actorIds: notifications.actorIds,
+        actorCount: notifications.actorCount,
+        readAt: notifications.readAt,
+        updatedAt: notifications.updatedAt,
+        storyTitle: stories.title,
+        storySlug: stories.slug,
+        storyAuthor: sql<string | null>`(select p.username from public.profiles p where p.id = ${stories.authorId})`,
+        responseBody: responses.body,
+      })
+      .from(notifications)
+      .leftJoin(stories, eq(stories.id, notifications.storyId))
+      .leftJoin(responses, eq(responses.id, notifications.responseId))
+      .where(eq(notifications.userId, viewer.id))
+      .orderBy(desc(notifications.updatedAt))
+      .limit(100);
+
+    const actorIds = [...new Set(rows.flatMap((row) => row.actorIds.slice(0, 2)))];
+    const actors = actorIds.length
+      ? await tx
+          .select({ id: profiles.id, username: profiles.username, displayName: profiles.displayName })
+          .from(profiles)
+          .where(inArray(profiles.id, actorIds))
+      : [];
+    const actorById = new Map(actors.map((a) => [a.id, a]));
+
+    return rows.map((row) => {
+      const first = actorById.get(row.actorIds[0] ?? "");
+      return {
+        id: row.id,
+        type: row.type,
+        unread: !row.readAt,
+        updatedAt: row.updatedAt,
+        actor: first ? { username: first.username, name: first.displayName || first.username } : null,
+        others: Math.max(0, row.actorCount - 1),
+        story: row.storySlug && row.storyAuthor ? { title: row.storyTitle ?? "", slug: row.storySlug, author: row.storyAuthor } : null,
+        responseExcerpt: row.responseBody ? excerpt(row.responseBody, 90) : null,
+      };
+    });
+  });
+}
+
+export async function getTopicId(slug: string): Promise<string | null> {
+  return withRls(null, async (tx) => {
+    const [row] = await tx.select({ id: topics.id }).from(topics).where(eq(topics.slug, slug)).limit(1);
+    return row?.id ?? null;
+  });
+}

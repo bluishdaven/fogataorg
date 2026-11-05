@@ -63,4 +63,13 @@ describe("seed data", () => {
   it("only uses reserved .test email addresses", () => {
     for (const author of authors) expect(author.email.endsWith("@fogata.test")).toBe(true);
   });
+
+  it("gives every block a stable, UUID-shaped id when seeded", () => {
+    const a = markdownToTiptap("Uno\n\nDos", "lucia/el-mole");
+    const b = markdownToTiptap("Uno\n\nDos", "lucia/el-mole");
+    const ids = a.content?.map((n) => n.attrs?.id);
+    expect(ids).toEqual(b.content?.map((n) => n.attrs?.id));
+    expect(new Set(ids).size).toBe(2);
+    for (const id of ids ?? []) expect(id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-a[0-9a-f]{3}-[0-9a-f]{12}$/);
+  });
 });

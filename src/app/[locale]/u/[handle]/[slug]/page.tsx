@@ -6,6 +6,8 @@ import { Suspense } from "react";
 import { ReaderControls } from "@/components/reader-controls";
 import { ReadingProgress } from "@/components/reading-progress";
 import { StoryBody } from "@/components/story-body";
+import { StoryResponses } from "@/components/social/story-responses";
+import { StorySocial } from "@/components/social/story-social";
 import { UnsplashCredit } from "@/components/unsplash/unsplash-credit";
 import { UnsplashImage } from "@/components/unsplash/unsplash-image";
 import { Link } from "@/i18n/navigation";
@@ -112,7 +114,31 @@ async function Story({ params }: Pick<Props, "params">) {
       {story.coverUrl && isAllowedStoryImage(story.coverUrl) ? (
         <StoryCover url={story.coverUrl} alt={story.coverAlt} credit={story.coverCredit} />
       ) : null}
-      <StoryBody doc={story.content} lang={story.language} imagePrefixes={allowedImagePrefixes()} />
+      {/* Positioned so paragraph-response markers can sit beside their paragraph. */}
+      <div id="story-body" className="relative mx-auto max-w-[var(--measure)]">
+        <StoryBody doc={story.content} lang={story.language} imagePrefixes={allowedImagePrefixes()} />
+      </div>
+      <Suspense fallback={<div className="mx-auto mt-12 h-12 w-56 animate-pulse rounded-full bg-muted" aria-hidden />}>
+        <StorySocial
+          storyId={story.id}
+          slug={story.slug}
+          author={{
+            id: story.authorId,
+            username: story.authorUsername,
+            displayName: story.authorDisplayName,
+            bio: story.authorBio,
+          }}
+        />
+      </Suspense>
+      <Suspense fallback={<div className="mx-auto mt-12 h-40 max-w-[var(--measure)] animate-pulse rounded-xl bg-muted" aria-hidden />}>
+        <StoryResponses
+          storyId={story.id}
+          storyAuthorId={story.authorId}
+          authorUsername={story.authorUsername}
+          slug={story.slug}
+          content={story.content}
+        />
+      </Suspense>
     </article>
   );
 }

@@ -104,9 +104,9 @@ async function main() {
       if (!authorId) throw new Error(`Unknown author ${story.author}`);
       if (story.topics.length > MAX_TOPICS_PER_STORY) throw new Error(`Too many topics: ${story.title}`);
 
-      const content = markdownToTiptap(story.body);
-      const contentText = tiptapToText(content);
       const slug = slugify(story.title);
+      const content = markdownToTiptap(story.body, `${story.author}/${slug}`);
+      const contentText = tiptapToText(content);
       // Spread publish times across the day so ordering is stable and realistic.
       const publishedAt =
         story.status === "draft" ? null : new Date(now - story.daysAgo * DAY - (index % 9) * 47 * 60 * 1000);

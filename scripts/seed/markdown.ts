@@ -1,4 +1,14 @@
+import { createHash } from "node:crypto";
 import type { TiptapDoc, TiptapMark, TiptapNode } from "../../src/lib/domain/content";
+
+/**
+ * Stable block id (UUID-shaped) from a seed string, so re-seeding keeps the same
+ * paragraph anchors and paragraph responses stay attached.
+ */
+export function stableBlockId(seed: string): string {
+  const hex = createHash("sha1").update(seed).digest("hex");
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-4${hex.slice(13, 16)}-a${hex.slice(17, 20)}-${hex.slice(20, 32)}`;
+}
 
 /**
  * Converts the small Markdown subset used by seed stories into Tiptap JSON:
@@ -37,7 +47,7 @@ function paragraph(text: string): TiptapNode {
   return { type: "paragraph", content: inline(text.replace(/\s*\n\s*/g, " ").trim()) };
 }
 
-export function markdownToTiptap(source: string): TiptapDoc {
+export function markdownToTiptap(source: string, idSeed?: string): TiptapDoc {
   const blocks = source
     .trim()
     .split(/\n\s*\n/)
@@ -76,5 +86,10 @@ export function markdownToTiptap(source: string): TiptapDoc {
     return paragraph(block);
   });
 
+  if (idSeed) {
+    content.forEach((block, index) => {
+      block.attrs = { ...block.attrs, id: stableBlockId(`${idSeed}:${index}`) };
+    });
+  }
   return { type: "doc", content };
 }

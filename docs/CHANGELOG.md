@@ -1,5 +1,32 @@
 # Changelog
 
+## Phase 2, part 1 — Social, search and thumbnails (2026-11-05)
+
+**Demo** (restart `npm run dev` first; signed in):
+
+1. The home page, profiles, topics and search show a thumbnail of each story's cover or first picture.
+2. Click the search icon (or press `/`) and search stories, people and topics. Accents and small
+   typos don't matter ("manana", "libreria", "herron"); filter stories by language.
+3. Open someone else's story. The floating bar lets you spark it (tap up to 50 times), jump to
+   responses and save it. Follow the writer from the card at the end.
+4. Respond to the story, or select a few words in a paragraph and tap **Respond** to answer that
+   paragraph. Mention people with `@username`. Writers can reply, pin a response and see a "Writer"
+   badge on their replies; paragraphs with responses get a small marker.
+5. The bell in the header counts unread notifications live; **Notifications** groups them
+   ("Ana and 3 others sparked your story"). **Saved** (avatar menu) lists stories you kept.
+6. Follow topics from their pages; follower counts appear on profiles.
+
+**What's in**
+
+- Story thumbnails (set on publish, backfilled) and lighter listing queries.
+- Search: generated tsvector with Spanish/English stemming and accent folding, trigram similarity.
+- Follows, sparks, saved stories, responses (threads, paragraph anchors, mentions, pinning, sparks)
+  and grouped notifications written by database triggers, live via Supabase Realtime.
+- Seed stories now carry stable block ids, so paragraph responses work on them too.
+- Tests: 109 unit, 33 RLS/trigger, 57 Playwright (two-user social flow, paragraph responses, search).
+
+**Not yet:** circles and email notifications (see `docs/plans/phase-2.md`).
+
 ## Phase 1 — Write and read (2026-11-05)
 
 **Demo** (signed in, after `npm run dev`):

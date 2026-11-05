@@ -342,6 +342,70 @@ html[data-reader-font="sans"] .prose-fogata {
   }
 }
 
+/* Spark burst: a ring of embers and a "+N" bubble on each tap. */
+.spark-burst::before,
+.spark-burst::after {
+  content: "";
+  position: absolute;
+  inset: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 9999px;
+  background: var(--ember);
+  box-shadow:
+    0 -16px 0 var(--ember),
+    14px -8px 0 #ffd27a,
+    14px 8px 0 var(--ember),
+    0 16px 0 #ffd27a,
+    -14px 8px 0 var(--ember),
+    -14px -8px 0 #ffd27a;
+  animation: spark-burst 450ms ease-out forwards;
+}
+.spark-burst::after {
+  transform: rotate(30deg);
+  animation-delay: 40ms;
+}
+.spark-bubble {
+  position: absolute;
+  left: 50%;
+  top: -0.25rem;
+  transform: translate(-50%, -100%);
+  border-radius: 9999px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  padding: 0.05rem 0.45rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  animation: spark-bubble 800ms ease-out forwards;
+}
+@keyframes spark-burst {
+  from {
+    opacity: 1;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+@keyframes spark-bubble {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -60%);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(-50%, -100%);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -160%);
+  }
+}
+
 /* Editor (Tiptap) */
 .editor-body p.is-empty::before,
 .editor-body h2.is-empty::before,

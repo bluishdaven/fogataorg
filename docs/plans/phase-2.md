@@ -3,6 +3,12 @@
 Goal: readers can follow writers and topics, spark stories, save them for later, respond (to the
 whole story or to one paragraph) and get grouped notifications that never spam.
 
+## Status (2026-11-05)
+
+Done: follows, sparks, saved, responses (threads, paragraph anchors, mentions, pinning, sparks),
+in-app notifications with Realtime. Also shipped alongside: list thumbnails and search.
+Remaining: circles; email notifications (provider decision pending).
+
 ## Order
 
 1. Follows (writers, topics; circles reuse the same table later).
