@@ -277,7 +277,7 @@ export function PublishDialog({
                         disabled={full}
                         onClick={() => toggleTopic(topic.slug)}
                         className={cn(
-                          "rounded-full border px-3 py-1 text-sm transition-colors disabled:opacity-40",
+                          "min-h-10 rounded-full border px-4 text-sm transition-colors disabled:opacity-40 sm:min-h-8 sm:px-3",
                           active ? "border-transparent bg-primary text-primary-foreground" : "border-border hover:bg-accent",
                         )}
                       >

@@ -148,6 +148,13 @@
       "when": 1793861139395,
       "tag": "20261105064539_avatars_bucket",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1793883031488,
+      "tag": "20261105125031_topics_catalog",
+      "breakpoints": true
     }
   ]
 }

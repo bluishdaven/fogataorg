@@ -417,6 +417,18 @@ describe("profile photos", () => {
   });
 });
 
+describe("topic catalog", () => {
+  it("ships with the migrations, named in both languages", async () => {
+    await scenario(async (h) => {
+      const rows = await h.tx.select().from(topics);
+      const slugs = rows.map((row) => row.slug);
+      expect(rows.length).toBeGreaterThanOrEqual(39);
+      expect(slugs).toEqual(expect.arrayContaining(["writing", "poetry", "fiction", "latin-america", "mental-health"]));
+      expect(rows.every((row) => row.nameEn.trim() && row.nameEs.trim())).toBe(true);
+    });
+  });
+});
+
 describe("story_topics", () => {
   it("are visible only when the story is visible", async () => {
     await scenario(async (h) => {
