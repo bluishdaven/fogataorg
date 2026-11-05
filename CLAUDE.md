@@ -211,7 +211,7 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
 - **Unprefixed share URLs**: stories have one language; links pasted into WhatsApp/X must be stable.
 - **English fallback, browser detection first**: spec says English-first with Spanish as an equal.
 - **Campfire vocabulary per locale**: ES UI says Chispas / Lo que arde; EN UI says Sparks /
-  Burning now.
+  Burning now. Circles are Círculos in Spanish, not Fogatas (Fogata is the site's name).
 - **Two kinds of email only**: sign-in links and a weekly summary (or none). Quiet by design.
   Weekly sends are phased by a per-reader weekday so each day carries a seventh of them, which keeps
   Resend's free tier (100/day, shared with sign-in links) usable for longer; the daily cron fits
