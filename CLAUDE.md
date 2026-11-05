@@ -116,10 +116,19 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
 - **Badges** (`src/lib/domain/badges.ts`, `src/components/badges/`, plan in `docs/plans/badges.md`).
   Writing tiers come from a live count of published, public stories (`publishedCountSql` in
   `src/lib/data/badge-sql.ts`, carried by every author query as `badges`); ten tiers from 1 to 1,000.
-  The donor badge is `profiles.donor_since`, permanent until removed; only admins
+  The donor badge lasts two months per grant (`profiles.donor_until`; a grant while active stacks on
+  the time left), checked in SQL with `donorActiveSql()` so pages never read the clock. Only admins
   (`app_metadata.role = "admin"`, set in the Supabase dashboard) grant or remove it, through
   `grant_donor_badge` / `remove_donor_badge` on `/admin/donors`, with a private `donor_grants` log.
   Show badges with `<UserBadges>` right after a person's name; new screens that name people must too.
+- **Moderation** (`src/lib/data/moderation-sql.ts`, `src/components/moderation/`, `/admin/moderation`).
+  Admins mark a story NSFW or remove it with a public reason via `moderate_story()`; state lives in
+  `story_moderation` (public read, written only by that function, so authors can't undo it) and every
+  action in the admin-only `moderation_log`. Removed: the story's address shows a "moderated for"
+  notice, it leaves every list and the writer's tier count. NSFW: a click-through warning with the
+  reason, no image in previews or lists, noindex, and off feeds (home, topics, circles, search) but
+  still on the writer's profile and saved lists with a label. Queries over stories must use
+  `notRemoved` (all lists) or `notModerated` (feeds).
 - **Touch targets.** Buttons and inputs are 44px on phones and compact from `sm:` up (sizes in
   `components/ui/button.tsx` / `input.tsx`). Custom controls follow the same rule (`min-h-11` /
   `min-h-10 … sm:min-h-8`), or get an invisible `after:` hit area when they must stay small visually.

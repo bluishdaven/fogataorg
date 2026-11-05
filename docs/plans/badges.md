@@ -3,8 +3,8 @@
 Goal: quiet recognition next to writers' names, without a paid tier. Two kinds: a writing tier that
 grows with published stories (1 to 1,000), and a permanent donor badge the owner grants.
 
-Status: built 2026-11-05 as described below (ten tiers up to 1,000 stories; permanent donor badge).
-Still open: the donations inbox (decision 3).
+Status: built 2026-11-05 (ten tiers up to 1,000 stories). The donor badge was briefly permanent and
+is now two months per grant again; see "Donor badge". Still open: the donations inbox (decision 3).
 
 ## Writing tiers
 
@@ -47,8 +47,9 @@ Saved, Fogata / Circle, Lo que arde / Burning now).
 - **How someone gets it**: they donate on Buy Me a Coffee, then email a screenshot of the receipt,
   from the address of their Fogata account, to a donations inbox. The owner grants it in an admin
   page.
-- **Permanent**: once granted it stays. Later donations change nothing (they're noted in the log).
-  The owner can remove it, e.g. when someone asks or for a refunded donation.
+- **Two months per grant**: granting again while the badge is active adds two months to the end date,
+  so donating early never loses days; after it runs out, a new grant starts from that day. It
+  disappears on its own (checked in SQL). The owner can remove it, e.g. for a refunded donation.
 - **Look**: a gold circle with a cream flame, shown next to the writing tier, never instead.
 - **Consent**: the badge reveals that someone donated, so it's granted only when they ask (the email
   is the request) and removed whenever they ask.
@@ -76,13 +77,13 @@ the Supabase dashboard or service key can set, so no one can grant themselves ad
 
 - Tier: computed in author queries from a count of published stories; no new column. (If listings
   get heavy, add a trigger-maintained `profiles.published_count` later.)
-- `profiles.donor_since timestamptz`: public, read by every author query; the badge shows when set.
-  Users can't update it (no column grant).
+- `profiles.donor_until timestamptz` (and `donor_since`, the first grant): public; the badge shows
+  while `donor_until` is in the future. Users can't update either (no column grant).
 - `donor_grants` (id, user_id, granted_by, note, granted_at, removed_at): private log; RLS lets only
   admins read it.
 - `public.grant_donor_badge(target uuid, note text)` and `public.remove_donor_badge(target uuid)`:
   security-definer functions that check `is_admin()`, write the log and set or clear `donor_since`.
-- No expiry, so no cron.
+- Expiry needs no cron. Cached listings can show the badge for up to about an hour after it ends.
 
 ## Open decisions for the owner
 

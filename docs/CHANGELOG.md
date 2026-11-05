@@ -1,5 +1,21 @@
 # Changelog
 
+## Story moderation, and two-month donor badges (2026-11-05)
+
+**Demo** (as an admin): open any story → the **Moderation** bar under the header → **Mark NSFW** or
+**Remove story**, with a reason readers will see. **Moderation** in the account menu lists moderated
+stories, lets you lift moderation and shows a log of every action.
+
+- **Removed** stories show "This story was moderated / Moderated for: …" at their address, leave every
+  list and no longer count toward the writer's badge tier. Writers see the reason in Your stories.
+- **NSFW** stories open behind a content warning that states the reason; no picture in link previews
+  or lists, not indexed, and off the home feed, topics, circles and search (still on the writer's
+  profile and in readers' saved lists, labelled).
+- **Donor badge** is temporary again: two months per grant, stacking when renewed early. Donors see
+  their end date in Settings → Profile; the admin list shows "active until" or "ended".
+- Tests: 153 unit, 65 RLS (admin-only moderation, authors can't undo it, tier counts), 73 Playwright
+  (NSFW warning, removal notice, lift; donor grant with end date).
+
 ## Badges (2026-11-05)
 
 **Demo**: badges sit right after names in story lists, bylines, the writer card, responses, search,
