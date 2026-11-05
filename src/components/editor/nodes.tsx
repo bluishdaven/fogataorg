@@ -1,6 +1,7 @@
 "use client";
 
 import { mergeAttributes, Node, type CommandProps } from "@tiptap/core";
+import { AllSelection, NodeSelection } from "@tiptap/pm/state";
 import { NodeViewWrapper, ReactNodeViewRenderer, type ReactNodeViewProps } from "@tiptap/react";
 import { Maximize2, Minimize2, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -126,11 +127,21 @@ export const Figure = Node.create({
     return {
       insertFigure:
         (attrs) =>
-        ({ commands }: CommandProps) =>
-          commands.insertContent([
+        ({ commands, state }: CommandProps) => {
+          const content = [
             { type: this.name, attrs: { alt: "", caption: "", layout: "inset", credit: null, ...attrs } },
             { type: "paragraph" },
-          ]),
+          ];
+          // A photo goes at the cursor, but never replaces a selected block or the whole story
+          // (an editor that hasn't been tapped yet may have its first image or everything selected).
+          const { selection, doc } = state;
+          if (selection instanceof NodeSelection) return commands.insertContentAt(selection.to, content);
+          if (selection instanceof AllSelection) {
+            const blank = doc.childCount === 1 && doc.firstChild?.isTextblock === true && doc.firstChild.content.size === 0;
+            return commands.insertContentAt(blank ? { from: 0, to: doc.content.size } : doc.content.size, content);
+          }
+          return commands.insertContent(content);
+        },
     };
   },
 });
