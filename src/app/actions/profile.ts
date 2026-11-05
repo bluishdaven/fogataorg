@@ -5,6 +5,8 @@ import { updateTag } from "next/cache";
 import { getViewer } from "@/lib/auth";
 import { withRls } from "@/lib/db/rls";
 import { profiles } from "@/lib/db/schema";
+import { avatarUpdateSchema, isOwnAvatarUrl, type AvatarUpdateResult } from "@/lib/domain/avatars";
+import { publicEnv } from "@/lib/env";
 import {
   profileUpdateSchema,
   type ProfileErrorKey,
@@ -61,4 +63,27 @@ export async function updateProfile(input: ProfileUpdateInput): Promise<ProfileU
   updateTag(`profile:${viewer.username.toLowerCase()}`);
   updateTag(`profile:${username.toLowerCase()}`);
   return { ok: true, username };
+}
+
+/**
+ * Saves (or clears) the signed-in user's profile photo. The browser uploads the
+ * cropped WebP to avatars/<user id>/ first; only a URL in that folder is accepted
+ * (the database checks the same rule).
+ */
+export async function updateAvatar(input: unknown): Promise<AvatarUpdateResult> {
+  const viewer = await getViewer();
+  if (!viewer) return { ok: false, error: "unauthorized" };
+  const parsed = avatarUpdateSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: "invalid" };
+  const { avatarUrl } = parsed.data;
+  if (avatarUrl !== null && !isOwnAvatarUrl(avatarUrl, publicEnv.NEXT_PUBLIC_SUPABASE_URL, viewer.id)) {
+    return { ok: false, error: "invalid" };
+  }
+
+  await withRls(viewer.claims, (tx) => tx.update(profiles).set({ avatarUrl }).where(eq(profiles.id, viewer.id)));
+
+  // Avatars appear next to bylines on every listing and story page.
+  updateTag("stories");
+  updateTag(`profile:${viewer.username.toLowerCase()}`);
+  return { ok: true };
 }

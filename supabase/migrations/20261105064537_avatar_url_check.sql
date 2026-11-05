@@ -1,0 +1,1 @@
+ALTER TABLE "profiles" ADD CONSTRAINT "profiles_avatar_url_own_folder" CHECK ("profiles"."avatar_url" is null or "profiles"."avatar_url" ~ ('^https?://[^/]+/storage/v1/object/public/avatars/' || "profiles"."id"::text || '/[0-9a-f-]{36}[.]webp$'));

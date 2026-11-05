@@ -67,6 +67,12 @@ export const profiles = pgTable(
     check("profiles_display_name_length", sql`char_length(${t.displayName}) <= 80`),
     check("profiles_bio_length", sql`char_length(${t.bio}) <= 280`),
     check("profiles_email_weekday_range", sql`${t.emailWeekday} between 0 and 6`),
+    // Profile photos may only point into the owner's own folder of the avatars bucket (uploaded as
+    // <user id>/<uuid>.webp), so no one can set an outside image or tracking pixel via the Data API.
+    check(
+      "profiles_avatar_url_own_folder",
+      sql`${t.avatarUrl} is null or ${t.avatarUrl} ~ ('^https?://[^/]+/storage/v1/object/public/avatars/' || ${t.id}::text || '/[0-9a-f-]{36}[.]webp$')`,
+    ),
     pgPolicy("profiles_select_public", { for: "select", to: everyone, using: sql`true` }),
     pgPolicy("profiles_update_own", {
       for: "update",

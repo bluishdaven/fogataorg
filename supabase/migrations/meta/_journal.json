@@ -134,6 +134,20 @@
       "when": 1793853309332,
       "tag": "20261105043509_email_weekday",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1793861137860,
+      "tag": "20261105064537_avatar_url_check",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1793861139395,
+      "tag": "20261105064539_avatars_bucket",
+      "breakpoints": true
     }
   ]
 }

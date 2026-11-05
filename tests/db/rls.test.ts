@@ -373,6 +373,50 @@ describe("story image storage", () => {
   });
 });
 
+describe("profile photos", () => {
+  const insertObject = (h: Harness, claims: Parameters<Harness["as"]>[0], name: string) =>
+    h.as(claims, (tx) => tx.execute(sql`insert into storage.objects (bucket_id, name) values ('avatars', ${name})`));
+  const photo = (owner: string) =>
+    `http://127.0.0.1:54321/storage/v1/object/public/avatars/${owner}/1f2e3d4c-5b6a-4789-8a7b-6c5d4e3f2a1b.webp`;
+
+  it("live in a public bucket that takes only small WebP files", async () => {
+    await scenario(async (h) => {
+      const [bucket] = await h.tx.execute<{ public: boolean; file_size_limit: number; allowed_mime_types: string[] }>(
+        sql`select public, file_size_limit, allowed_mime_types from storage.buckets where id = 'avatars'`,
+      );
+      expect(bucket?.public).toBe(true);
+      expect(Number(bucket?.file_size_limit)).toBe(1_048_576);
+      expect(bucket?.allowed_mime_types).toEqual(["image/webp"]);
+    });
+  });
+
+  it("can be uploaded only into your own folder", async () => {
+    await scenario(async (h) => {
+      const me = await h.createUser();
+      const other = await h.createUser();
+      await insertObject(h, h.claimsFor(me), `${me}/a.webp`);
+      await expectPgError(insertObject(h, h.claimsFor(me), `${other}/a.webp`), PG.insufficientPrivilege);
+      await expectPgError(insertObject(h, null, `${me}/anon.webp`), PG.insufficientPrivilege);
+    });
+  });
+
+  it("can only point into the owner's own folder, even through the Data API", async () => {
+    await scenario(async (h) => {
+      const me = await h.createUser();
+      const other = await h.createUser();
+      const setAvatar = (url: string | null) =>
+        h.as(h.claimsFor(me), (tx) => tx.update(profiles).set({ avatarUrl: url }).where(eq(profiles.id, me)));
+
+      await setAvatar(photo(me));
+      await setAvatar(null);
+      await expectPgError(setAvatar(photo(other)), PG.checkViolation);
+      await expectPgError(setAvatar("https://tracker.example/pixel.gif"), PG.checkViolation);
+      await expectPgError(setAvatar(photo(me).replace(".webp", "xwebp")), PG.checkViolation);
+      await expectPgError(setAvatar(photo(me).replace("/avatars/", "/story-images/")), PG.checkViolation);
+    });
+  });
+});
+
 describe("story_topics", () => {
   it("are visible only when the story is visible", async () => {
     await scenario(async (h) => {
