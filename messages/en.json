@@ -696,7 +696,19 @@
     },
     "tierLabel": "{name}: {count, plural, one {first published story} other {#+ published stories}}",
     "donor": "Firekeeper",
-    "donorLabel": "{name}: supports Fogata with a donation"
+    "donorLabel": "{name}: supports Fogata with a donation",
+    "tierMeaning": "Earned by publishing {count, plural, one {a first public story} other {# public stories}} on Fogata.",
+    "donorMeaning": "Firekeepers support Fogata with a donation. Each donation lights this badge for two months.",
+    "writingHeading": "Writing badges",
+    "writingIntro": "Writers move up a badge as they publish public stories. Badges are a thank-you only: they never unlock features.",
+    "personStories": "{name} has published {count, plural, =0 {no stories yet} one {# story} other {# stories}}.",
+    "nextTier": "{count, plural, one {# more story} other {# more stories}} to {tier}.",
+    "tierThreshold": "{count, plural, one {First story} other {# stories}}",
+    "earned": "Earned",
+    "donorHeading": "Donor badge",
+    "donorInfo": "For people who support Fogata with a donation. Lasts two months per donation.",
+    "support": "Support Fogata",
+    "close": "Close"
   },
   "Admin": {
     "donorsTitle": "Firekeepers",

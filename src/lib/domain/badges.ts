@@ -28,6 +28,12 @@ export function writingTier(publishedStories: number): WritingTier | null {
   return reached;
 }
 
+/** The next tier to reach and how many more stories it takes, or null after the last tier. */
+export function nextWritingTier(publishedStories: number): { tier: WritingTier; remaining: number } | null {
+  const tier = WRITING_TIERS.find((t) => t.min > publishedStories);
+  return tier ? { tier, remaining: tier.min - Math.max(0, publishedStories) } : null;
+}
+
 /** What badge components need about a person. */
 export type BadgeData = { stories: number; donor: boolean };
 

@@ -3,7 +3,7 @@ import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { Avatar } from "@/components/avatar";
-import { UserBadges } from "@/components/badges/user-badges";
+import { BadgeChips } from "@/components/badges/badge-guide";
 import { StoryCard } from "@/components/story-card";
 import { StoryListSkeleton } from "@/components/story-list-skeleton";
 import { FollowButton } from "@/components/social/toggle-buttons";
@@ -61,7 +61,7 @@ async function Profile({ params }: Pick<Props, "params">) {
         <Avatar name={name} url={profile.avatarUrl} className="mb-3 size-24 text-3xl ring-4 ring-card shadow-sm sm:size-28" />
         <h1 className="font-serif text-4xl font-semibold">{name}</h1>
         <p className="text-muted-foreground">@{profile.username}</p>
-        <UserBadges badges={badgeData(profile)} variant="chips" className="mt-1" />
+        <BadgeChips badges={badgeData(profile)} name={name} className="mt-1" />
         {profile.bio ? <p className="max-w-prose font-serif text-lg text-pretty">{profile.bio}</p> : null}
         {profile.links.length ? (
           <ul className="flex flex-wrap gap-x-4 gap-y-1 text-sm">

@@ -1,13 +1,15 @@
 // @vitest-environment jsdom
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { NextIntlClientProvider } from "next-intl";
 import { describe, expect, it } from "vitest";
+import { BadgeChips } from "@/components/badges/badge-guide";
 import { UserBadges } from "@/components/badges/user-badges";
 import {
   badgeData,
   donorGrantSchema,
   donorRemoveSchema,
   isAdminClaims,
+  nextWritingTier,
   WRITING_TIERS,
   writingTier,
   type BadgeData,
@@ -39,6 +41,14 @@ describe("writing tiers", () => {
     expect(writingTier(12_345)?.key).toBe("phoenix");
   });
 
+  it("say how far the next tier is", () => {
+    expect(nextWritingTier(0)).toEqual({ tier: WRITING_TIERS[0], remaining: 1 });
+    expect(nextWritingTier(3)).toEqual({ tier: WRITING_TIERS[1], remaining: 2 });
+    expect(nextWritingTier(5)).toEqual({ tier: WRITING_TIERS[2], remaining: 7 });
+    expect(nextWritingTier(999)?.remaining).toBe(1);
+    expect(nextWritingTier(1000)).toBeNull();
+  });
+
   it("are read from query rows", () => {
     expect(badgeData({ publishedCount: 7, donorActive: false })).toEqual({ stories: 7, donor: false });
     expect(badgeData({ publishedCount: null, donorActive: true })).toEqual({ stories: 0, donor: true });
@@ -62,10 +72,10 @@ describe("donor admin rules", () => {
   });
 });
 
-function renderBadges(badges: BadgeData, locale: "en" | "es" = "en", variant?: "chips") {
+function renderBadges(badges: BadgeData, locale: "en" | "es" = "en", chips = false) {
   return render(
     <NextIntlClientProvider locale={locale} messages={locale === "en" ? en : es} timeZone="UTC">
-      <UserBadges badges={badges} variant={variant} />
+      {chips ? <BadgeChips badges={badges} name="Dana" /> : <UserBadges badges={badges} />}
     </NextIntlClientProvider>,
   );
 }
@@ -89,8 +99,33 @@ describe("UserBadges", () => {
   });
 
   it("shows labeled chips on profiles", () => {
-    renderBadges({ stories: 1000, donor: false }, "es", "chips");
+    renderBadges({ stories: 1000, donor: false }, "es", true);
     expect(screen.getByText("Fénix")).toBeInTheDocument();
     expect(screen.queryByText("Mecenas")).not.toBeInTheDocument();
+  });
+});
+
+describe("BadgeChips", () => {
+  it("explain a writing badge and list every badge, marking the ones earned", () => {
+    renderBadges({ stories: 7, donor: false }, "en", true);
+    fireEvent.click(screen.getByRole("button", { name: /^Candle/ }));
+    const dialog = screen.getByRole("dialog", { name: "Candle" });
+    expect(within(dialog).getByText("Earned by publishing 5 public stories on Fogata.")).toBeInTheDocument();
+    expect(within(dialog).getByText("Dana has published 7 stories. 5 more stories to Flame.")).toBeInTheDocument();
+    const ladder = within(dialog).getByTestId("badge-ladder");
+    expect(within(ladder).getAllByRole("listitem")).toHaveLength(10);
+    expect(ladder.querySelectorAll('[data-earned="true"]')).toHaveLength(2);
+    expect(ladder.querySelector('[aria-current="true"]')).toHaveAttribute("data-tier", "candle");
+    expect(dialog.querySelector('[data-tier="donor"]')).toHaveAttribute("data-earned", "false");
+    expect(within(dialog).getByRole("link", { name: "Support Fogata" })).toHaveAttribute("target", "_blank");
+  });
+
+  it("explain the donor badge, in Spanish", () => {
+    renderBadges({ stories: 1, donor: true }, "es", true);
+    fireEvent.click(screen.getByRole("button", { name: /^Mecenas/ }));
+    const dialog = screen.getByRole("dialog", { name: "Mecenas" });
+    expect(within(dialog).getByText(/Cada donación enciende esta insignia durante dos meses/)).toBeInTheDocument();
+    expect(within(dialog).getByText("Dana ha publicado 1 historia. Faltan 4 historias para Vela.")).toBeInTheDocument();
+    expect(dialog.querySelector('[data-tier="donor"]')).toHaveAttribute("data-earned", "true");
   });
 });

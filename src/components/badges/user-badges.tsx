@@ -5,16 +5,14 @@ import { DonorIcon, TierIcon } from "./badge-icons";
 
 /**
  * A person's badges, shown right after their name everywhere: the writing tier (highest reached)
- * and the donor badge. `icons` for bylines and lists (labelled for screen readers, with a
- * tooltip); `chips` for the profile page.
+ * and the donor badge, as icons labelled for screen readers, with a tooltip. Profiles use
+ * BadgeChips (badge-guide.tsx) instead, which explain each badge.
  */
 export function UserBadges({
   badges,
-  variant = "icons",
   className,
 }: {
   badges: BadgeData | null | undefined;
-  variant?: "icons" | "chips";
   className?: string;
 }) {
   const t = useTranslations("Badges");
@@ -25,35 +23,6 @@ export function UserBadges({
   const tierName = tier ? t(`tiers.${tier.key}`) : "";
   const tierLabel = tier ? t("tierLabel", { name: tierName, count: tier.min }) : "";
   const donorLabel = t("donorLabel", { name: t("donor") });
-
-  if (variant === "chips") {
-    return (
-      <ul className={cn("flex flex-wrap gap-2", className)} data-testid="user-badges">
-        {tier ? (
-          <li
-            className="inline-flex min-h-8 items-center gap-2 rounded-full border border-border px-3 text-sm"
-            title={tierLabel}
-            data-badge={tier.key}
-          >
-            <TierIcon tier={tier.key} className="h-4 w-auto" />
-            <span>{tierName}</span>
-            <span className="sr-only">: {tierLabel}</span>
-          </li>
-        ) : null}
-        {badges.donor ? (
-          <li
-            className="inline-flex min-h-8 items-center gap-2 rounded-full border border-border px-3 text-sm"
-            title={donorLabel}
-            data-badge="donor"
-          >
-            <DonorIcon className="h-4 w-auto" />
-            <span>{t("donor")}</span>
-            <span className="sr-only">: {donorLabel}</span>
-          </li>
-        ) : null}
-      </ul>
-    );
-  }
 
   return (
     <span className={cn("inline-flex shrink-0 items-center gap-1 align-middle", className)} data-testid="user-badges">

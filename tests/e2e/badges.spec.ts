@@ -95,4 +95,14 @@ test("a writer's first story earns a badge, announced in the bell", async ({ pag
   // It opens the writer's profile, where the badge shows.
   await notice.click();
   await expect(page.getByRole("main").locator('li[data-badge="kindling"]')).toContainText("Kindling");
+
+  // Tapping the badge explains it and shows the whole ladder.
+  await page.getByRole("main").getByRole("button", { name: /^Kindling/ }).click();
+  const guide = page.getByRole("dialog", { name: "Kindling" });
+  await expect(guide).toContainText("Earned by publishing a first public story on Fogata.");
+  await expect(guide).toContainText("4 more stories to Candle.");
+  await expect(guide.getByTestId("badge-ladder").getByRole("listitem")).toHaveCount(10);
+  await expect(guide.locator('[data-earned="true"]')).toHaveCount(1);
+  await page.keyboard.press("Escape");
+  await expect(guide).toHaveCount(0);
 });

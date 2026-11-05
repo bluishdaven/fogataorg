@@ -696,7 +696,19 @@
     },
     "tierLabel": "{name}: {count, plural, one {primera historia publicada} other {#+ historias publicadas}}",
     "donor": "Mecenas",
-    "donorLabel": "{name}: apoya a Fogata con una donación"
+    "donorLabel": "{name}: apoya a Fogata con una donación",
+    "tierMeaning": "Se gana al publicar {count, plural, one {una primera historia pública} other {# historias públicas}} en Fogata.",
+    "donorMeaning": "Quienes son Mecenas apoyan a Fogata con una donación. Cada donación enciende esta insignia durante dos meses.",
+    "writingHeading": "Insignias de escritura",
+    "writingIntro": "Quienes escriben suben de insignia al publicar historias públicas. Las insignias son solo un agradecimiento: nunca desbloquean funciones.",
+    "personStories": "{name} {count, plural, =0 {aún no ha publicado historias} one {ha publicado # historia} other {ha publicado # historias}}.",
+    "nextTier": "{count, plural, one {Falta # historia} other {Faltan # historias}} para {tier}.",
+    "tierThreshold": "{count, plural, one {Primera historia} other {# historias}}",
+    "earned": "Conseguida",
+    "donorHeading": "Insignia de donación",
+    "donorInfo": "Para quienes apoyan a Fogata con una donación. Dura dos meses por cada donación.",
+    "support": "Apoyar a Fogata",
+    "close": "Cerrar"
   },
   "Admin": {
     "donorsTitle": "Mecenas",
