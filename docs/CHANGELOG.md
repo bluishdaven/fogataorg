@@ -20,8 +20,8 @@ or declines under **Requests to join** on the manage page. On any profile, tap a
   summary). Each tier is announced once; scheduled stories are covered by the daily job. The donor
   badge is now a heart in flames.
 - Tests: 170 unit, 73 RLS (private submissions, request/decide rules, grouping per circle, tier
-  announcements), Playwright for the private-circle flow, the badge dialog in three themes and the
-  first-badge notification.
+  announcements), 80 Playwright (private-circle flow, the badge dialog in three themes, the
+  first-badge notification).
 
 ## Story moderation, and two-month donor badges (2026-11-05)
 
