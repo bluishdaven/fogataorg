@@ -113,27 +113,27 @@
 }
 
 .dark {
-  /* Night: deep blue background, charcoal-blue surfaces */
-  --background: #0f1420;
+  /* Night: near-black blue background, charcoal-blue surfaces (lighter = raised) */
+  --background: #0a0d14;
   --foreground: #ece6da;
-  --card: #161c2b;
+  --card: #121621;
   --card-foreground: #ece6da;
-  --popover: #161c2b;
+  --popover: #121621;
   --popover-foreground: #ece6da;
   --primary: #ff7a2f;
   --primary-foreground: #1a0f08;
-  --secondary: #1e2536;
+  --secondary: #181d29;
   --secondary-foreground: #ece6da;
-  --muted: #1e2536;
+  --muted: #181d29;
   --muted-foreground: #a3a9b6;
-  --accent: #232b3e;
+  --accent: #1d2332;
   --accent-foreground: #ece6da;
   --destructive: #f97066;
-  --border: #263044;
-  --input: #2c364b;
+  --border: #232b3c;
+  --input: #2a3346;
   --ring: #ff7a2f;
   --ember: #ff7a2f;
-  --ember-soft: #3a2216;
+  --ember-soft: #33200f;
   --ember-text: #ff9a5c;
   color-scheme: dark;
 }
