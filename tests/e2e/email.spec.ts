@@ -6,13 +6,19 @@ import { signInWithMagicLink } from "./sign-in";
 
 const MAILPIT = process.env.MAILPIT_URL ?? "http://127.0.0.1:54324";
 
-/** The summary job leaves notifications younger than 10 minutes for the next run; age this reader's. */
-async function settleNotifications(email: string) {
+/**
+ * Makes this reader due in today's run: the job leaves notifications younger than 10 minutes for
+ * later and only emails readers whose summary weekday is today.
+ */
+async function makeDueToday(email: string) {
   const sql = postgres(process.env.DATABASE_URL!, { max: 1, onnotice: () => {} });
   try {
     await sql`
       update public.notifications set updated_at = updated_at - interval '15 minutes'
       where user_id = (select id from auth.users where email = ${email})`;
+    await sql`
+      update public.profiles set email_weekday = ${new Date().getUTCDay()}
+      where id = (select id from auth.users where email = ${email})`;
   } finally {
     await sql.end();
   }
@@ -73,12 +79,14 @@ test("writers get a summary email and can unsubscribe from it", async ({ browser
   await reader.getByRole("complementary", { name: "About the writer" }).getByTestId("follow-button").click();
   await expect(reader.getByRole("complementary", { name: "About the writer" })).toContainText("1 follower");
 
-  // Summaries are on by default (daily).
+  // Weekly summaries are on by default, on a weekday the reader is told about.
   await writer.goto("/en/settings/notifications");
-  await expect(writer.getByRole("radio", { name: /Daily/ })).toBeChecked();
+  await expect(writer.getByRole("radio", { name: /Weekly summary/ })).toBeChecked();
+  await expect(writer.getByRole("main")).toContainText(/Yours arrives on (Sun|Mon|Tues|Wednes|Thurs|Fri|Satur)days\./);
+  await expect(writer.getByRole("main")).toContainText("only emails you sign-in links");
   expect(await axeSerious(writer)).toEqual([]);
 
-  await settleNotifications(writerEmail);
+  await makeDueToday(writerEmail);
   const run = await request.get("/api/cron/notification-emails", {
     headers: { Authorization: `Bearer ${process.env.CRON_SECRET}` },
   });
@@ -88,6 +96,7 @@ test("writers get a summary email and can unsubscribe from it", async ({ browser
   const message = await waitForSummary(writerEmail);
   expect(message.Subject).toBe("1 new notification on Fogata");
   expect(message.Text).toContain("started following you");
+  expect(message.Text).toContain("once a week at most");
   const headers = (await (await fetch(`${MAILPIT}/api/v1/message/${message.ID}/headers`)).json()) as Record<string, string[]>;
   expect(headers["List-Unsubscribe-Post"]?.[0]).toBe("List-Unsubscribe=One-Click");
   const oneClick = /<([^>]+)>/.exec(headers["List-Unsubscribe"]?.[0] ?? "")?.[1];
@@ -108,7 +117,7 @@ test("writers get a summary email and can unsubscribe from it", async ({ browser
   await expect(writer.getByRole("radio", { name: /Off/ })).toBeChecked();
 
   // Turn them back on, then use the one-click header link the way a mail client does.
-  await writer.getByRole("radio", { name: /Weekly/ }).check();
+  await writer.getByRole("radio", { name: /Weekly summary/ }).check();
   await writer.getByTestId("email-settings-save").click();
   await expect(writer.getByTestId("email-settings-saved")).toBeVisible();
   const post = await request.post(localPath(oneClick!), {

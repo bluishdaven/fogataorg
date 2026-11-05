@@ -33,8 +33,10 @@ async function Form() {
   const locale = await getLocale();
   if (!viewer) redirect(`/${locale}/login?next=${encodeURIComponent(`/${locale}/settings/notifications`)}`);
   const [profile] = await withRls(viewer.claims, (tx) =>
-    tx.select({ frequency: profiles.emailFrequency }).from(profiles).where(eq(profiles.id, viewer.id)).limit(1),
+    tx
+      .select({ frequency: profiles.emailFrequency, weekday: profiles.emailWeekday })
+      .from(profiles).where(eq(profiles.id, viewer.id)).limit(1),
   );
   if (!profile) redirect(`/${locale}`);
-  return <EmailFrequencyForm initial={profile.frequency} />;
+  return <EmailFrequencyForm initial={profile.frequency} weekday={profile.weekday} />;
 }

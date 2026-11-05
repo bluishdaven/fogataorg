@@ -1,4 +1,4 @@
-import { and, asc, eq, gt, inArray, isNull, lte, or, sql } from "drizzle-orm";
+import { and, eq, gt, inArray, isNull, lte, or, sql } from "drizzle-orm";
 import { selectNotificationItems } from "@/lib/data/notification-items";
 import type { DbExecutor } from "@/lib/db/rls-context";
 import { notifications, profiles } from "@/lib/db/schema";
@@ -7,20 +7,27 @@ import { buildSummaryEmail } from "./summary";
 import type { SendEmail } from "./transport";
 
 /**
- * Batched activity summaries. Each run emails every reader who has unread
- * notifications they haven't been emailed about, at most once per day or week
- * depending on their setting. Runs as the database owner because recipient
- * addresses live in `auth.users`; nothing here takes user input.
+ * Weekly activity summaries, phased: every reader has a fixed weekday
+ * (`profiles.email_weekday`, random at sign-up) and the daily run only emails
+ * readers whose day it is, so sends spread evenly across the week.
+ * A reader gets nothing in a week without new activity. Runs as the database
+ * owner because recipient addresses live in `auth.users`; nothing here takes
+ * user input.
  */
+
+const DAY_MS = 24 * 60 * 60_000;
 
 /** Leave just-created notifications for the next run, in case they're seen in the app first. */
 export const SETTLE_MS = 10 * 60_000;
-/** Older unread notifications are never emailed (avoids a backlog email when someone opts in). */
-export const LOOKBACK_MS = 8 * 24 * 60 * 60_000;
-/** Slightly under a day/week so a daily cron that drifts within the hour still sends. */
-export const MIN_GAP_MS = { daily: 23 * 60 * 60_000, weekly: 6.5 * 24 * 60 * 60_000 } as const;
-/** Bounds one run; anyone left over is picked up by the next one. */
-export const USERS_PER_RUN = 300;
+/** Older unread notifications are never emailed. Two weeks, so a reader skipped once still hears about them. */
+export const LOOKBACK_MS = 15 * DAY_MS;
+/** On their day, at most one summary: guards reruns and a cron that drifts within the hour. */
+export const WEEK_GUARD_MS = 6 * DAY_MS;
+/**
+ * Most summaries per run. Resend's free tier allows 100 emails a day, shared with magic links.
+ * Readers past the cap keep their notifications pending and are first in line next week.
+ */
+export const DEFAULT_DAILY_LIMIT = 80;
 const ITEMS_PER_EMAIL = 50;
 
 export type NotificationEmailJob = {
@@ -34,11 +41,18 @@ export type NotificationEmailJob = {
   onlyUserIds?: string[];
 };
 
-export type NotificationEmailResult = { sent: number; failed: number; skipped: number };
+export type NotificationEmailResult = {
+  sent: number;
+  failed: number;
+  skipped: number;
+  /** True when the run stopped at its cap; some of today's readers wait until next week. */
+  limited: boolean;
+};
 
 export async function sendNotificationEmails(job: NotificationEmailJob): Promise<NotificationEmailResult> {
   const { db, send } = job;
   const now = job.now ?? new Date();
+  const limit = job.limit ?? DEFAULT_DAILY_LIMIT;
   const settledBefore = new Date(now.getTime() - SETTLE_MS);
   const since = new Date(now.getTime() - LOOKBACK_MS);
 
@@ -69,10 +83,9 @@ export async function sendNotificationEmails(job: NotificationEmailJob): Promise
     .where(
       and(
         job.onlyUserIds ? inArray(profiles.id, job.onlyUserIds) : undefined,
-        or(
-          and(eq(profiles.emailFrequency, "daily"), or(isNull(profiles.emailLastSentAt), lte(profiles.emailLastSentAt, new Date(now.getTime() - MIN_GAP_MS.daily)))),
-          and(eq(profiles.emailFrequency, "weekly"), or(isNull(profiles.emailLastSentAt), lte(profiles.emailLastSentAt, new Date(now.getTime() - MIN_GAP_MS.weekly)))),
-        ),
+        eq(profiles.emailFrequency, "weekly"),
+        eq(profiles.emailWeekday, now.getUTCDay()),
+        or(isNull(profiles.emailLastSentAt), lte(profiles.emailLastSentAt, new Date(now.getTime() - WEEK_GUARD_MS))),
         sql`exists (
           select 1 from public.notifications n
           where n.user_id = "profiles"."id" and n.read_at is null and n.emailed_at is null
@@ -81,13 +94,14 @@ export async function sendNotificationEmails(job: NotificationEmailJob): Promise
         )`,
       ),
     )
-    .orderBy(asc(profiles.emailLastSentAt))
-    .limit(job.limit ?? USERS_PER_RUN);
+    // Whoever has waited longest goes first, in case the cap cuts the run short.
+    .orderBy(sql`${profiles.emailLastSentAt} asc nulls first`)
+    .limit(limit + 1);
 
-  const result: NotificationEmailResult = { sent: 0, failed: 0, skipped: 0 };
+  const result: NotificationEmailResult = { sent: 0, failed: 0, skipped: 0, limited: candidates.length > limit };
 
-  for (const user of candidates) {
-    if (!user.email || user.frequency === "off") {
+  for (const user of candidates.slice(0, limit)) {
+    if (!user.email || user.frequency !== "weekly") {
       result.skipped += 1;
       continue;
     }
@@ -115,7 +129,6 @@ export async function sendNotificationEmails(job: NotificationEmailJob): Promise
         userId: user.id,
         to: user.email,
         locale: isLocale(user.locale) ? user.locale : "en",
-        frequency: user.frequency,
         items,
         total: Math.max(user.total, items.length),
         siteUrl: job.siteUrl,

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { EMAIL_FREQUENCIES, type EmailFrequency } from "@/lib/domain/email-settings";
 import { cn } from "@/lib/utils";
 
-export function EmailFrequencyForm({ initial }: { initial: EmailFrequency }) {
+export function EmailFrequencyForm({ initial, weekday }: { initial: EmailFrequency; weekday: number }) {
   const t = useTranslations("EmailSettings");
   const [frequency, setFrequency] = useState<EmailFrequency>(initial);
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error" | "unauthorized">("idle");
@@ -48,7 +48,9 @@ export function EmailFrequencyForm({ initial }: { initial: EmailFrequency }) {
             />
             <span className="flex flex-col gap-0.5">
               <span className="font-medium">{t(option)}</span>
-              <span className="text-sm text-muted-foreground">{t(`${option}Hint`)}</span>
+              <span className="text-sm text-muted-foreground">
+                {option === "weekly" ? t("weeklyHint", { day: String(weekday) }) : t("offHint")}
+              </span>
             </span>
           </label>
         ))}

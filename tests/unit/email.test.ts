@@ -77,6 +77,8 @@ describe("unsubscribe tokens", () => {
 describe("email settings input", () => {
   it("accepts only known frequencies and bounded tokens", () => {
     expect(emailFrequencyInputSchema.safeParse({ frequency: "weekly" }).success).toBe(true);
+    expect(emailFrequencyInputSchema.safeParse({ frequency: "off" }).success).toBe(true);
+    expect(emailFrequencyInputSchema.safeParse({ frequency: "daily" }).success).toBe(false);
     expect(emailFrequencyInputSchema.safeParse({ frequency: "hourly" }).success).toBe(false);
     expect(unsubscribeInputSchema.safeParse({ token: "a.b", locale: "es" }).success).toBe(true);
     expect(unsubscribeInputSchema.safeParse({ token: "x".repeat(201), locale: "es" }).success).toBe(false);
@@ -104,7 +106,6 @@ describe("summary email", () => {
   const base = {
     userId: USER,
     to: "ana@fogata.test",
-    frequency: "daily" as const,
     siteUrl: "https://fogata.example",
     signingSecret: SECRET,
   };
@@ -116,6 +117,7 @@ describe("summary email", () => {
     expect(email.html).toContain("El río &lt;de noche&gt;");
     expect(email.html).not.toContain("<de noche>");
     expect(email.html).toContain('lang="en"');
+    expect(email.html).toContain("once a week at most");
     expect(email.text).toContain("Lucía Ramírez and 2 others started following you");
 
     const token = createUnsubscribeToken(USER, SECRET);
@@ -127,7 +129,7 @@ describe("summary email", () => {
 
   it("speaks Spanish, caps the list and says how many more there are", async () => {
     const items = Array.from({ length: SUMMARY_ITEM_LIMIT + 3 }, () => follow);
-    const email = await buildSummaryEmail({ ...base, locale: "es", frequency: "weekly", items, total: 20 });
+    const email = await buildSummaryEmail({ ...base, locale: "es", items, total: 20 });
     expect(email.subject).toBe("20 notificaciones nuevas en Fogata");
     expect(email.html).toContain('lang="es"');
     expect(email.html).toContain(`Y ${20 - SUMMARY_ITEM_LIMIT} más.`);

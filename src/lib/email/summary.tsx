@@ -15,7 +15,6 @@ export type SummaryInput = {
   userId: string;
   to: string;
   locale: Locale;
-  frequency: "daily" | "weekly";
   items: NotificationItem[];
   /** Unread, not-yet-emailed notifications in total (can exceed `items.length`). */
   total: number;
@@ -61,7 +60,7 @@ export async function buildSummaryEmail(input: SummaryInput): Promise<OutgoingEm
       more={remaining > 0 ? t("more", { count: remaining }) : null}
       cta={{ label: t("cta"), href: new URL(`/${locale}/me/notifications`, siteUrl).toString() }}
       footer={{
-        why: input.frequency === "weekly" ? t("whyWeekly") : t("whyDaily"),
+        why: t("why"),
         settingsLabel: t("settings"),
         settingsHref: new URL(`/${locale}/settings/notifications`, siteUrl).toString(),
         unsubscribeLabel: t("unsubscribe"),

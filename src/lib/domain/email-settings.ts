@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { LOCALES } from "./locale";
 
-export const EMAIL_FREQUENCIES = ["off", "daily", "weekly"] as const;
+export const EMAIL_FREQUENCIES = ["weekly", "off"] as const;
 export type EmailFrequency = (typeof EMAIL_FREQUENCIES)[number];
 
 export const emailFrequencyInputSchema = z.object({
