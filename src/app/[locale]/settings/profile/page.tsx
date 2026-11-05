@@ -56,7 +56,7 @@ async function Form() {
     <>
       {profile.donorActive && profile.donorUntil ? (
         <p className="mb-8 flex items-center gap-2 rounded-2xl border border-border bg-card px-4 py-3 text-sm" data-testid="donor-until">
-          <DonorIcon className="size-5 shrink-0" />
+          <DonorIcon className="h-5 w-auto shrink-0" />
           {t("donorUntil", { date: format.dateTime(profile.donorUntil, { dateStyle: "long" }) })}
         </p>
       ) : null}

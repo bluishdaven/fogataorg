@@ -22,7 +22,7 @@ export default async function DonorsPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
       <h1 className="flex items-center gap-3 font-serif text-4xl font-semibold">
-        <DonorIcon className="size-9" />
+        <DonorIcon className="h-9 w-auto" />
         {t("donorsTitle")}
       </h1>
       <p className="mt-2 mb-8 text-muted-foreground">{t("donorsLede")}</p>

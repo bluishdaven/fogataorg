@@ -46,7 +46,7 @@ export function UserBadges({
             title={donorLabel}
             data-badge="donor"
           >
-            <DonorIcon className="size-4" />
+            <DonorIcon className="h-4 w-auto" />
             <span>{t("donor")}</span>
             <span className="sr-only">: {donorLabel}</span>
           </li>
@@ -64,7 +64,7 @@ export function UserBadges({
       ) : null}
       {badges.donor ? (
         <span role="img" aria-label={donorLabel} title={donorLabel} data-badge="donor" className="inline-flex">
-          <DonorIcon className="size-[1.05em]" />
+          <DonorIcon className="h-[1.1em] w-auto" />
         </span>
       ) : null}
     </span>

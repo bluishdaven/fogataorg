@@ -112,11 +112,22 @@ export function TierIcon({ tier, className }: { tier: WritingTierKey; className?
   );
 }
 
+const HEART =
+  "M20 42.5C13.2 37.6 6.5 32 6.5 25.2c0-4.5 3.3-7.7 7.2-7.7 2.7 0 4.9 1.5 6.3 3.8 1.4-2.3 3.6-3.8 6.3-3.8 3.9 0 7.2 3.2 7.2 7.7 0 6.8-6.7 12.4-13.5 17.3Z";
+const CRIMSON = "#c8233f";
+
+/** The donor badge: a heart in flames. The cream outline keeps the heart apart from the fire. */
 export function DonorIcon({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 40 40" className={className} aria-hidden focusable="false">
-      <circle cx={20} cy={20} r={19} fill={GOLD} />
-      <Flame x={11.2} y={8} s={0.55} fill={CREAM} />
+    <svg viewBox="0 0 40 44" className={className} aria-hidden focusable="false">
+      <Flame x={1.76} y={6} s={0.6} fill={DEEP} />
+      <g transform="translate(38.24 6) scale(-0.6 0.6)">
+        <path d={OUTER} fill={DEEP} />
+      </g>
+      <Flame x={7.2} s={0.8} glow />
+      <g transform="translate(20 42.5) scale(0.88) translate(-20 -42.5)">
+        <path d={HEART} fill={CRIMSON} stroke={CREAM} strokeWidth={2.05} strokeLinejoin="round" paintOrder="stroke" />
+      </g>
     </svg>
   );
 }
