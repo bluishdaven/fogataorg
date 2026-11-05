@@ -516,7 +516,11 @@
     "shareCopied": "Enlace copiado",
     "shareCopyFailed": "No se pudo copiar el enlace. Cópialo desde la barra de direcciones.",
     "shareEmail": "Correo",
-    "shareText": "“{title}”, de {author}, en Fogata"
+    "shareText": "“{title}”, de {author}, en Fogata",
+    "shareVia": "Compartir con…",
+    "shareStories": "Imagen para historias",
+    "storyImageSaved": "Imagen guardada. Súbela a tu historia con el enlace.",
+    "storyImageFailed": "No se pudo crear la imagen. Inténtalo de nuevo."
   },
   "Circles": {
     "title": "Fogatas",
@@ -650,5 +654,9 @@
     "settings": "Ajustes de correo",
     "invalidTitle": "Este enlace no funciona",
     "invalid": "El enlace para darte de baja está incompleto o fue modificado. Entra y desactiva los correos en tus ajustes."
+  },
+  "ShareCard": {
+    "eyebrow": "Una historia en Fogata",
+    "cta": "Lee la historia completa"
   }
 }

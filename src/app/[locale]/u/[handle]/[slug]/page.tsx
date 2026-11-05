@@ -13,6 +13,7 @@ import { UnsplashCredit } from "@/components/unsplash/unsplash-credit";
 import { UnsplashImage } from "@/components/unsplash/unsplash-image";
 import { Link } from "@/i18n/navigation";
 import { getStory } from "@/lib/data/stories";
+import { excerpt } from "@/lib/domain/content";
 import { profilePath, storyPath } from "@/lib/domain/handle-routes";
 import { imageCreditSchema, isUnsplashImageUrl, unsplashImageUrl } from "@/lib/domain/unsplash";
 import { allowedImagePrefixes, isAllowedStoryImage } from "@/lib/story-images";
@@ -144,6 +145,9 @@ async function Story({ params }: Pick<Props, "params">) {
         <StorySocial
           storyId={story.id}
           title={story.title}
+          language={story.language}
+          readingTime={story.readingTime}
+          preview={excerpt(story.contentText, 300)}
           slug={story.slug}
           author={{
             id: story.authorId,

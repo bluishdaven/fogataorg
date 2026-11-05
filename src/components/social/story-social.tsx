@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { getViewer } from "@/lib/auth";
 import { getStorySocial } from "@/lib/data/social";
 import { profilePath, storyPath } from "@/lib/domain/handle-routes";
+import { storyImageFileName } from "@/lib/domain/story-card";
 import { publicEnv } from "@/lib/env";
 import { ShareButton } from "./share-button";
 import { SparkButton } from "./spark-button";
@@ -18,22 +19,33 @@ import { FollowButton, SaveButton } from "./toggle-buttons";
 export async function StorySocial({
   storyId,
   title,
+  language,
+  readingTime,
+  preview,
   author,
   slug,
 }: {
   storyId: string;
   title: string;
+  language: "en" | "es";
+  readingTime: number;
+  /** A few sentences from the start of the story, for the Stories image. */
+  preview: string;
   author: { id: string; username: string; displayName: string; avatarUrl: string | null; bio: string };
   slug: string;
 }) {
   const viewer = await getViewer();
-  const [social, t, locale] = await Promise.all([
+  const [social, t, locale, card, common] = await Promise.all([
     getStorySocial(viewer, storyId, author.id),
     getTranslations("Social"),
     getLocale(),
+    // The share image speaks the story's language, whoever shares it.
+    getTranslations({ locale: language, namespace: "ShareCard" }),
+    getTranslations({ locale: language, namespace: "Common" }),
   ]);
   const loginHref = `/${locale}/login?next=${encodeURIComponent(storyPath(author.username, slug))}`;
   const name = author.displayName || author.username;
+  const shareUrl = new URL(storyPath(author.username, slug), publicEnv.NEXT_PUBLIC_SITE_URL).toString();
 
   return (
     <>
@@ -67,9 +79,21 @@ export async function StorySocial({
         <SaveButton storyId={storyId} initialSaved={social.saved} signedIn={social.signedIn} loginHref={loginHref} />
         <span className="h-5 w-px bg-border" aria-hidden />
         <ShareButton
-          url={new URL(storyPath(author.username, slug), publicEnv.NEXT_PUBLIC_SITE_URL).toString()}
+          url={shareUrl}
           title={title}
           text={t("shareText", { title, author: name })}
+          fileName={storyImageFileName(slug)}
+          image={{
+            title,
+            author: name,
+            avatarUrl: author.avatarUrl,
+            preview,
+            eyebrow: card("eyebrow"),
+            readingLabel: common("minRead", { minutes: readingTime }),
+            cta: card("cta"),
+            url: shareUrl,
+            lang: language,
+          }}
         />
       </div>
 

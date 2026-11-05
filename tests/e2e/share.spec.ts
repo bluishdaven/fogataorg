@@ -1,3 +1,4 @@
+import { readFile } from "node:fs/promises";
 import { expect, test } from "@playwright/test";
 
 const STORY = "/@danawrites/the-heron-knows-something-i-dont";
@@ -28,4 +29,26 @@ test("the share menu speaks Spanish on Spanish pages", async ({ page, context, b
   await page.getByTestId("story-actions").getByTestId("share-button").click();
   await expect(page.getByTestId("share-copy")).toHaveText("Copiar enlace");
   await expect(page.getByTestId("share-email")).toHaveText("Correo");
+});
+
+/** Width and height from a PNG's IHDR chunk. */
+function pngSize(buffer: Buffer): [number, number] {
+  expect(buffer.subarray(1, 4).toString()).toBe("PNG");
+  return [buffer.readUInt32BE(16), buffer.readUInt32BE(20)];
+}
+
+test("readers can download a ready-to-post Stories image of the story", async ({ page }, testInfo) => {
+  await page.goto(STORY);
+  await page.getByTestId("story-actions").getByTestId("share-button").click();
+  const downloading = page.waitForEvent("download");
+  await page.getByTestId("share-stories").click();
+  const download = await downloading;
+  expect(download.suggestedFilename()).toBe("fogata-the-heron-knows-something-i-dont.png");
+  await expect(page.getByText("Image saved. Add it to your Story with the link.")).toBeVisible();
+
+  const path = testInfo.outputPath("story-image.png");
+  await download.saveAs(path);
+  const png = await readFile(path);
+  expect(pngSize(png)).toEqual([1080, 1920]);
+  expect(png.length).toBeGreaterThan(40_000); // real content, not a blank canvas
 });

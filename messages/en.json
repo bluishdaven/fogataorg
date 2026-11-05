@@ -516,7 +516,11 @@
     "shareCopied": "Link copied",
     "shareCopyFailed": "Couldn't copy the link. Copy it from the address bar.",
     "shareEmail": "Email",
-    "shareText": "“{title}” by {author} on Fogata"
+    "shareText": "“{title}” by {author} on Fogata",
+    "shareVia": "Share via…",
+    "shareStories": "Image for Stories",
+    "storyImageSaved": "Image saved. Add it to your Story with the link.",
+    "storyImageFailed": "Couldn't create the image. Try again."
   },
   "Circles": {
     "title": "Circles",
@@ -650,5 +654,9 @@
     "settings": "Email settings",
     "invalidTitle": "This link doesn't work",
     "invalid": "The unsubscribe link is incomplete or was changed. Sign in and turn emails off in your settings instead."
+  },
+  "ShareCard": {
+    "eyebrow": "A story on Fogata",
+    "cta": "Read the full story"
   }
 }
