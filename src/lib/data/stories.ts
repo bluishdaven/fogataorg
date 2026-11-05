@@ -4,6 +4,7 @@ import { cacheLife, cacheTag } from "next/cache";
 import { asAnon } from "@/lib/db/rls";
 import { profiles, stories, storyTopics, topics } from "@/lib/db/schema";
 import { excerpt } from "@/lib/domain/content";
+import { isAllowedStoryImage } from "@/lib/story-images";
 
 /**
  * Public story reads. They run as `anon`, so RLS guarantees drafts never leak
@@ -19,7 +20,10 @@ const cardColumns = {
   language: stories.language,
   readingTime: stories.readingTime,
   publishedAt: stories.publishedAt,
-  contentText: stories.contentText,
+  // Listings only need an excerpt, not the whole story.
+  contentText: sql<string>`left(${stories.contentText}, 400)`,
+  thumbnailUrl: stories.thumbnailUrl,
+  thumbnailAlt: stories.thumbnailAlt,
   authorUsername: profiles.username,
   authorDisplayName: profiles.displayName,
 };
@@ -32,6 +36,8 @@ type CardRow = {
   readingTime: number;
   publishedAt: Date | null;
   contentText: string;
+  thumbnailUrl: string | null;
+  thumbnailAlt: string;
   authorUsername: string;
   authorDisplayName: string;
 };
@@ -45,6 +51,8 @@ function toCard(row: CardRow) {
     readingTime: row.readingTime,
     publishedAt: row.publishedAt,
     excerpt: excerpt(row.contentText),
+    thumbnail:
+      row.thumbnailUrl && isAllowedStoryImage(row.thumbnailUrl) ? { url: row.thumbnailUrl, alt: row.thumbnailAlt } : null,
     author: { username: row.authorUsername, displayName: row.authorDisplayName },
   };
 }

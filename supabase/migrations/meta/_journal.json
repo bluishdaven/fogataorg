@@ -36,6 +36,20 @@
       "when": 1793828369496,
       "tag": "20261104213930_story_images_bucket",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793849434131,
+      "tag": "20261105033034_story_thumbnails",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793849435717,
+      "tag": "20261105033035_backfill_story_thumbnails",
+      "breakpoints": true
     }
   ]
 }

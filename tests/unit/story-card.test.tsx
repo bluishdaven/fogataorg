@@ -14,6 +14,7 @@ const story: StoryCardData = {
   readingTime: 4,
   publishedAt: new Date("2026-11-03T15:00:00Z"),
   excerpt: "There is a great blue heron…",
+  thumbnail: null,
   author: { username: "danawrites", displayName: "Dana Whitfield" },
 };
 
@@ -44,5 +45,16 @@ describe("StoryCard", () => {
   it("marks the title with the story's own language", () => {
     renderIn("es");
     expect(screen.getByRole("heading", { level: 3 })).toHaveAttribute("lang", "en");
+  });
+
+  it("shows a decorative thumbnail when the story has an image", () => {
+    render(
+      <NextIntlClientProvider locale="en" messages={en} timeZone="UTC">
+        <StoryCard story={{ ...story, thumbnail: { url: "https://cdn.example/x.webp", alt: "A heron" } }} />
+      </NextIntlClientProvider>,
+    );
+    const img = screen.getByTestId("story-thumbnail").querySelector("img");
+    expect(img).toHaveAttribute("src", "https://cdn.example/x.webp");
+    expect(img).toHaveAttribute("alt", "");
   });
 });

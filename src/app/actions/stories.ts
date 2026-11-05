@@ -138,6 +138,13 @@ export async function publishStory(input: PublishInput): Promise<PublishResult> 
     if (figuresOf(content).some((figure) => !figure.alt)) errors.push("imageAlt");
     if (data.cover && !isAllowedStoryImage(data.cover.url)) errors.push("unsafeImage");
 
+    const firstFigure = figuresOf(content)[0];
+    const thumbnail = data.cover
+      ? { url: data.cover.url, alt: data.cover.alt }
+      : firstFigure
+        ? { url: firstFigure.src, alt: firstFigure.alt }
+        : null;
+
     const publishAt = data.publishAt ? new Date(data.publishAt) : null;
     if (publishAt && publishAt.getTime() < now.getTime() - 60_000) errors.push("scheduleInPast");
 
@@ -177,6 +184,8 @@ export async function publishStory(input: PublishInput): Promise<PublishResult> 
         coverUrl: data.cover?.url ?? null,
         coverAlt: data.cover?.alt ?? "",
         coverCredit: data.cover?.credit ?? null,
+        thumbnailUrl: thumbnail?.url ?? null,
+        thumbnailAlt: thumbnail?.alt ?? "",
         seoTitle: data.seoTitle,
         seoDescription: data.seoDescription,
         canonicalUrl: data.canonicalUrl || null,

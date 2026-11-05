@@ -107,6 +107,9 @@ export const stories = pgTable(
     coverAlt: text("cover_alt").notNull().default(""),
     // Who to credit for the cover (e.g. an Unsplash photographer). Null for the writer's own uploads.
     coverCredit: jsonb("cover_credit").$type<ImageCredit>(),
+    // List-view thumbnail, set on publish: the cover, else the first image in the story.
+    thumbnailUrl: text("thumbnail_url"),
+    thumbnailAlt: text("thumbnail_alt").notNull().default(""),
     canonicalUrl: text("canonical_url"),
     seoTitle: text("seo_title").notNull().default(""),
     seoDescription: text("seo_description").notNull().default(""),
