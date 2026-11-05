@@ -125,6 +125,12 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   (`app_metadata.role = "admin"`, set in the Supabase dashboard) grant or remove it, through
   `grant_donor_badge` / `remove_donor_badge` on `/admin/donors`, with a private `donor_grants` log.
   Show badges with `<UserBadges>` right after a person's name; new screens that name people must too.
+  New badges ring the bell: `check_writing_badge()` (stories/moderation triggers, plus
+  `check_due_writing_badges()` in the daily cron for scheduled stories, so those arrive within a day)
+  announces a tier only above `profiles.badge_tier_notified`, and `grant_donor_badge` notifies the
+  donor. They're `badge`/`donor` notifications with no actors (`notifications.badge` holds the key),
+  inserted by `notify_badge()`. SQL tier thresholds mirror `WRITING_TIERS` (a db test checks).
+  The donor badge is a heart in flames.
 - **Moderation** (`src/lib/data/moderation-sql.ts`, `src/components/moderation/`, `/admin/moderation`).
   Admins mark a story NSFW or remove it with a public reason via `moderate_story()`; state lives in
   `story_moderation` (public read, written only by that function, so authors can't undo it) and every
