@@ -425,6 +425,8 @@ html[data-reader-font="sans"] .prose-fogata {
 .editor-body .ProseMirror-selectednode {
   outline: none;
 }
-.editor-body :focus-visible {
+/* Only the writing surface goes without an outline (the caret shows focus). Buttons, fields and
+   links inside figures keep theirs. */
+.editor-body:focus-visible {
   outline: none;
 }

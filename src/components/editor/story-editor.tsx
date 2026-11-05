@@ -286,7 +286,10 @@ export function StoryEditor({
       <Toaster position="bottom-center" />
       <div className="sticky top-14 z-30 border-b border-border/60 bg-background/90 backdrop-blur">
         <div className="mx-auto flex h-12 max-w-5xl items-center justify-between gap-3 px-4 text-sm">
-          <Link href="/me/stories" className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground">
+          <Link
+            href="/me/stories"
+            className="flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-full text-muted-foreground hover:text-foreground sm:min-h-0 sm:min-w-0 sm:justify-start"
+          >
             <ArrowLeft className="size-4" aria-hidden />
             {/* Hidden visually on phones only: display:none would leave the link without a name. */}
             <span className="sr-only sm:not-sr-only">{t("backToStories")}</span>
