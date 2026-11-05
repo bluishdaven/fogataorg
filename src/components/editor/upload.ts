@@ -1,3 +1,4 @@
+import { scaledSize } from "@/lib/domain/images";
 import { supabaseBrowser } from "@/lib/supabase/client";
 
 /**
@@ -8,7 +9,6 @@ import { supabaseBrowser } from "@/lib/supabase/client";
  * writer may write to (enforced by storage policies).
  */
 
-export const MAX_DIMENSION = 2400;
 export const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 const ACCEPTED = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/avif"];
 export const ACCEPTED_IMAGE_TYPES = ACCEPTED.join(",");
@@ -21,11 +21,6 @@ export class UploadError extends Error {
 }
 
 export type UploadedImage = { url: string; width: number; height: number };
-
-export function scaledSize(width: number, height: number, max = MAX_DIMENSION): { width: number; height: number } {
-  const scale = Math.min(1, max / Math.max(width, height));
-  return { width: Math.max(1, Math.round(width * scale)), height: Math.max(1, Math.round(height * scale)) };
-}
 
 async function prepare(file: File): Promise<{ blob: Blob; width: number; height: number; type: string }> {
   if (!ACCEPTED.includes(file.type)) throw new UploadError("type");

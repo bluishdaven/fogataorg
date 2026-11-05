@@ -44,7 +44,8 @@ jobs:
       - run: npm ci
 
       - name: Start Supabase (applies migrations)
-        run: npx supabase start -x studio,imgproxy,realtime,storage-api,edge-runtime,logflare,vector,postgres-meta,supavisor
+        # Storage stays on: e2e uploads story images.
+        run: npx supabase start -x studio,imgproxy,realtime,edge-runtime,logflare,vector,postgres-meta,supavisor
 
       - name: Export local Supabase env
         run: |

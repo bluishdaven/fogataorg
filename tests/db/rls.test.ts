@@ -289,6 +289,90 @@ describe("story covers", () => {
   });
 });
 
+describe("story editing", () => {
+  it("lets drafts be untitled but never publishes an untitled story", async () => {
+    await scenario(async (h) => {
+      const author = await h.createUser();
+      const [draft] = await h.as(h.claimsFor(author), (tx) =>
+        tx
+          .insert(stories)
+          .values({ authorId: author, title: "", slug: "draft-0123456789ab", language: "es" })
+          .returning({ id: stories.id }),
+      );
+      expect(draft?.id).toBeTruthy();
+      await expectPgError(
+        h.as(h.claimsFor(author), (tx) =>
+          tx.update(stories).set({ status: "published", publishedAt: new Date() }).where(eq(stories.id, draft!.id)),
+        ),
+        PG.checkViolation,
+      );
+    });
+  });
+
+  it("keeps pending changes private to the author", async () => {
+    await scenario(async (h) => {
+      const author = await h.createUser();
+      const other = await h.createUser();
+      const story = await makeStory(h, author);
+      const pending = { title: "Nuevo título", subtitle: "", content: { type: "doc", content: [] } };
+      const updated = await h.as(h.claimsFor(author), (tx) =>
+        tx
+          .update(stories)
+          .set({ pendingChanges: pending, revision: sql`${stories.revision} + 1` })
+          .where(eq(stories.id, story.id))
+          .returning({ revision: stories.revision }),
+      );
+      expect(updated[0]?.revision).toBe(1);
+
+      const foreign = await h.as(h.claimsFor(other), (tx) =>
+        tx.update(stories).set({ pendingChanges: null }).where(eq(stories.id, story.id)).returning({ id: stories.id }),
+      );
+      expect(foreign).toHaveLength(0);
+    });
+  });
+});
+
+describe("story image storage", () => {
+  const insertObject = (h: Harness, claims: Parameters<Harness["as"]>[0], bucket: string, name: string) =>
+    h.as(claims, (tx) => tx.execute(sql`insert into storage.objects (bucket_id, name) values (${bucket}, ${name})`));
+
+  it("is a public bucket limited to images up to 10 MB", async () => {
+    await scenario(async (h) => {
+      const [bucket] = await h.tx.execute<{ public: boolean; file_size_limit: number; allowed_mime_types: string[] }>(
+        sql`select public, file_size_limit, allowed_mime_types from storage.buckets where id = 'story-images'`,
+      );
+      expect(bucket?.public).toBe(true);
+      expect(Number(bucket?.file_size_limit)).toBe(10_485_760);
+      expect(bucket?.allowed_mime_types).toEqual(expect.arrayContaining(["image/webp", "image/jpeg", "image/png"]));
+    });
+  });
+
+  it("lets writers upload only into their own folder", async () => {
+    await scenario(async (h) => {
+      const writer = await h.createUser();
+      const other = await h.createUser();
+      await insertObject(h, h.claimsFor(writer), "story-images", `${writer}/photo.webp`);
+      await expectPgError(insertObject(h, h.claimsFor(writer), "story-images", `${other}/photo.webp`), PG.insufficientPrivilege);
+      await expectPgError(insertObject(h, h.claimsFor(writer), "story-images", "photo.webp"), PG.insufficientPrivilege);
+      await expectPgError(insertObject(h, null, "story-images", `${writer}/anon.webp`), PG.insufficientPrivilege);
+    });
+  });
+
+  it("limits deletes to the writer's own folder", async () => {
+    // Supabase blocks direct SQL deletes on storage.objects (deletes go through the Storage API,
+    // which applies these policies), so check the policy itself.
+    await scenario(async (h) => {
+      const policies = await h.tx.execute<{ policyname: string; cmd: string; qual: string | null }>(
+        sql`select policyname, cmd, qual from pg_policies where schemaname = 'storage' and tablename = 'objects' and policyname like 'story_images_%'`,
+      );
+      const del = policies.find((p) => p.cmd === "DELETE");
+      expect(del?.qual).toContain("story-images");
+      expect(del?.qual).toContain("auth.uid()");
+      expect(del?.qual).toContain("foldername");
+    });
+  });
+});
+
 describe("story_topics", () => {
   it("are visible only when the story is visible", async () => {
     await scenario(async (h) => {

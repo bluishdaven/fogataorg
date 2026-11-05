@@ -28,6 +28,9 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   reads use `'use cache'` + `cacheTag` in `src/lib/data/*`. Never read request data at the top of a
   layout. Client hooks like `usePathname()` outside Suspense also block prerendering: read
   `window.location` in event handlers instead.
+- **Reader preferences** (size, typeface, width) live in localStorage and are applied to `<html>` by
+  `READER_PREFS_SCRIPT` before paint; CSS reads the data attributes. The reading column width is
+  `--measure` in rem, so headers and bodies always line up.
 - **Partial prefetching** also prerenders with the reader's cookies, where clock reads
   (`Date.now()`) are errors. Anything that checks a session or the current time must call
   `await connection()` first, as `getViewer()` does.
@@ -63,7 +66,22 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   `UnsplashCredit` ("Photo by X on Unsplash" with UTM links). Store `ImageCredit` next to the image
   (`stories.cover_credit`; inline images will carry it as a node attr).
 - **Rendering stored content.** `StoryBody` renders Tiptap JSON through an allowlist of node and
-  mark types. Never use `dangerouslySetInnerHTML` for user content.
+  mark types, and only renders images from `allowedImagePrefixes()`. Never use
+  `dangerouslySetInnerHTML` for user content.
+- **Writing** (`src/components/editor/`, `src/app/actions/stories.ts`). Tiptap 3 editor (client-only,
+  `immediatelyRender: false`) with custom `figure`, `callout` and `pullQuote` nodes, a `/` menu and a
+  selection toolbar. Every save goes through `sanitizeStoryDoc()` (`src/lib/domain/story-doc.ts`), the
+  server-side allowlist; never store client JSON without it. Snapshots sent to server actions must be
+  JSON round-tripped: ProseMirror attrs are prototype-less objects that server actions refuse.
+- **Autosave and publishing.** Saves carry a `revision`; a mismatch is a conflict, never an overwrite.
+  Drafts save into the story; live stories save into `pending_changes` until "Publish changes".
+  Scheduling is `status = 'published'` with a future `published_at` (RLS hides it until then; no cron).
+  Publish actions call `updateTag` for `stories`, `story:<handle>/<slug>`, `profile:<handle>` and
+  `topic:<slug>`. Drafts get a `draft-<id>` slug; the first publish sets the real one and it never
+  changes after that.
+- **Images.** Uploads are resized to ≤2400px WebP in the browser (strips EXIF/GPS) and stored in the
+  `story-images` bucket under `<user id>/` (storage policies enforce the folder). They're served as-is
+  (no Next image optimization yet). Unsplash images follow the rules above.
 
 ## Conventions
 
@@ -97,8 +115,14 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
 
 ## Known gaps / follow-ups
 
-- Seed stories are short essays (150–335 words). Phase 1 should add a few 1,500+ word pieces to
-  exercise table of contents and reading progress.
+- Seed stories are short essays (150–335 words); add a few 1,500+ word pieces when the table of
+  contents lands.
+- Not built yet from the spec's Writing/Reading lists: embeds, version history, series, draft
+  sharing, import, table of contents, keyboard shortcuts and listen mode (later phases).
+- Removed or replaced images stay in storage; a cleanup job for orphaned uploads is needed before
+  launch. Uploaded images skip Next's image optimizer.
+- `drizzle-kit generate --custom` can reuse a timestamp from a migration generated the same second;
+  Supabase treats equal timestamps as one version, so rename the newer file (and its journal tag).
 - `'use cache'` listings don't know about seed runs: restart `npm run dev` after `npm run db:seed`.
   Phase 1 publish actions must call `revalidateTag("stories")` and the story/profile tags.
 - Story/profile 404s inside Suspense are soft 404s (HTTP 200 + noindex). Revisit with
@@ -108,6 +132,6 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
 - Google sign-in doesn't yet save the reader's locale on first sign-in (magic links do).
 - Turnstile on sign-up, rate limits and new-account limits are not in yet (spec: Trust & safety).
   That includes a per-writer limit on photo searches; today only caching protects the Unsplash quota.
-- Unsplash is wired into the style guide only. Phase 1 must add it to the publish flow (cover) and
-  the editor (`/` → Unsplash inserts an `image` node with alt text and credit), and extend
-  `StoryBody` to render `image` nodes from allowed hosts with their credit.
+- Changing a username breaks old `/@old/...` links; add redirects from previous usernames.
+- E2E runs against `npm run dev` locally (magic links only redirect to port 3000) and against the
+  production build in CI.

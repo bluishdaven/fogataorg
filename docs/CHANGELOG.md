@@ -1,5 +1,43 @@
 # Changelog
 
+## Phase 1 — Write and read (2026-11-05)
+
+**Demo** (signed in, after `npm run dev`):
+
+1. Click **Write** in the header. Type a title, a subtitle and a few paragraphs. "Saved" appears in
+   the top bar a moment after you stop typing; reload and everything is still there.
+2. On a new line type `/` for headings, quotes, pull quotes, callouts, lists, code, dividers, an image
+   upload or an Unsplash photo. Select text to bold, italicize, link or turn it into a heading.
+3. Paste or drop a photo. It's resized in your browser, uploaded, and asks for alt text.
+4. Click **Publish**: add a cover (upload or Unsplash), up to 5 topics, the story's language, who can
+   find it, and publish now or schedule it. Search title, description and original URL live under
+   "Search and sharing details".
+5. The story opens at `/@you/your-title` and shows on the home page, your profile and its topics.
+6. Edit it again: changes stay private until **Publish changes**. **Your stories** (avatar menu) lists
+   drafts, scheduled, published and link-only stories.
+7. On any story, **Aa** sets text size, typeface, line width and theme; a thin ember bar shows
+   progress. **Settings** edits your name, username, bio and links. **Topics** (footer) lists stories
+   by topic.
+
+**What's in**
+
+- Tiptap 3 editor with figures (alt text, captions, wide or inset, Unsplash credit), pull quotes,
+  callouts, stable block IDs, Markdown shortcuts, `/` menu and selection toolbar.
+- Autosave with revision checks, local backup and retry when back online; private pending edits for
+  live stories; publish, schedule, unlist, unpublish and delete.
+- Server-side document allowlist on every save; render-time image host allowlist.
+- `story-images` storage bucket with per-writer folders.
+- Story pages: cover with credit, topic links, SEO title/description, cover as link-preview image.
+- Reader controls and progress bar; profile settings with links (`rel="me"`); topic index and pages.
+- Tests: 103 unit/component, 22 RLS (including storage), 52 Playwright (writing, publishing,
+  scheduling, live edits, settings, topics, reader controls, axe scans of signed-in pages in three
+  themes).
+
+**Fixed along the way**
+
+- Signed-in pages tripped a prerender error (session checks read the clock); they now run per request.
+- Account and language buttons now include their visible text in their accessible names.
+
 ## Unsplash photo search (2026-11-04)
 
 **Demo**: add `UNSPLASH_ACCESS_KEY` to `.env.local` (see `docs/SETUP.md`), restart `npm run dev`,

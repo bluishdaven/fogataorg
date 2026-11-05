@@ -73,7 +73,7 @@ function blockId(attrs: Record<string, unknown> | undefined): { id?: string } {
 }
 
 function boundedString(value: unknown, max: number): string {
-  return typeof value === "string" ? value.slice(0, max) : "";
+  return typeof value === "string" ? value.trim().slice(0, max) : "";
 }
 
 function positiveInt(value: unknown, max = 20_000): number | null {
@@ -197,7 +197,7 @@ function sanitizeBlock(input: unknown, ctx: Context, depth: number, allowed: Rea
       const figure: FigureAttrs = {
         ...blockId(attrs),
         src: attrs.src as string,
-        alt: boundedString(attrs?.alt, 300).trim(),
+        alt: boundedString(attrs?.alt, 300),
         caption: boundedString(attrs?.caption, 300),
         layout: attrs?.layout === "wide" ? "wide" : "inset",
         width: positiveInt(attrs?.width),

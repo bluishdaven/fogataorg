@@ -32,6 +32,7 @@ export function AccountDropdown({
   locale: string;
 }) {
   const t = useTranslations();
+  const letters = initials(displayName);
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -39,11 +40,12 @@ export function AccountDropdown({
           variant="ghost"
           size="icon"
           className="ml-1 rounded-full bg-ember-soft font-semibold text-ember-text"
-          aria-label={t("Nav.account")}
+          // Visible initials must be part of the accessible name (WCAG 2.5.3).
+          aria-label={`${t("Nav.account")}: ${letters}`}
           data-testid="account-menu"
         >
           <span aria-hidden className="text-xs">
-            {initials(displayName)}
+            {letters}
           </span>
         </Button>
       </DropdownMenuTrigger>

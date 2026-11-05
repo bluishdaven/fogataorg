@@ -60,6 +60,7 @@ tests and a runtime dependency audit, then RLS and e2e tests against a throwaway
    npx supabase link --project-ref <project-ref>
    npx supabase db push
    ```
+   Migrations also create the `story-images` storage bucket and its policies.
 3. **Authentication → URL configuration**: Site URL `https://fogata.org`; redirect URLs
    `https://fogata.org/**` and `https://*-<vercel-team>.vercel.app/**` (previews).
 4. **Authentication → Email templates**: paste `supabase/templates/magic_link.html` into *Magic
