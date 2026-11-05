@@ -207,7 +207,7 @@
     "quote": "Cita",
     "status": {
       "saved": "Guardado",
-      "savedAt": "Guardado a las {time, time, short}",
+      "savedAt": "Guardado a las {time}",
       "saving": "Guardando…",
       "unsaved": "Editando…",
       "offline": "Sin conexión. Los cambios se guardan en este dispositivo.",

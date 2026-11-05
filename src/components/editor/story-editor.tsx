@@ -93,7 +93,13 @@ export function StoryEditor({
   const subtitleInput = useRef<HTMLTextAreaElement>(null);
 
   const getSnapshot = useCallback(
-    () => ({ title: titleRef.current, subtitle: subtitleRef.current, content: editorRef.current?.getJSON() ?? story.content }),
+    () => ({
+      title: titleRef.current,
+      subtitle: subtitleRef.current,
+      // ProseMirror attrs are prototype-less objects, which server actions refuse to
+      // serialize; a JSON round-trip turns the document into plain data.
+      content: editorRef.current ? (JSON.parse(JSON.stringify(editorRef.current.getJSON())) as unknown) : story.content,
+    }),
     [story.content],
   );
   const autosave = useAutosave({ storyId: story.id, initialRevision: story.revision, getSnapshot });
@@ -232,9 +238,11 @@ export function StoryEditor({
     }
   };
   const onSubtitleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.key === "Enter") {
+    if (event.key === "Enter" && editor) {
       event.preventDefault();
-      editor?.commands.focus("start");
+      // Focus synchronously (Tiptap's focus command waits a frame, so fast typing would land here).
+      editor.view.focus();
+      editor.commands.setTextSelection(1);
     }
   };
 
@@ -380,6 +388,7 @@ export function StoryEditor({
 
 function SaveLabel({ status, savedAt }: { status: SaveStatus; savedAt: Date | null }) {
   const t = useTranslations("Editor.status");
+  const locale = useLocale();
   switch (status) {
     case "saving":
       return <>{t("saving")}</>;
@@ -392,6 +401,9 @@ function SaveLabel({ status, savedAt }: { status: SaveStatus; savedAt: Date | nu
     case "conflict":
       return <>{t("conflict")}</>;
     default:
-      return <>{savedAt ? t("savedAt", { time: savedAt }) : t("saved")}</>;
+      // The writer's own clock, not the site-wide UTC used for publish dates.
+      return (
+        <>{savedAt ? t("savedAt", { time: new Intl.DateTimeFormat(locale, { timeStyle: "short" }).format(savedAt) }) : t("saved")}</>
+      );
   }
 }

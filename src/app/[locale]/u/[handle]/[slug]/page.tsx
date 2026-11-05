@@ -4,8 +4,17 @@ import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { StoryBody } from "@/components/story-body";
+import { UnsplashCredit } from "@/components/unsplash/unsplash-credit";
+import { UnsplashImage } from "@/components/unsplash/unsplash-image";
+import { Link } from "@/i18n/navigation";
 import { getStory } from "@/lib/data/stories";
 import { profilePath, storyPath } from "@/lib/domain/handle-routes";
+import { imageCreditSchema, isUnsplashImageUrl, unsplashImageUrl } from "@/lib/domain/unsplash";
+import { allowedImagePrefixes, isAllowedStoryImage } from "@/lib/story-images";
+
+function coverImageUrl(url: string, width: number): string {
+  return isUnsplashImageUrl(url) ? unsplashImageUrl(url, { width }) : url;
+}
 
 type Props = PageProps<"/[locale]/u/[handle]/[slug]">;
 
@@ -15,9 +24,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!story) return {};
   const t = await getTranslations("Story");
   const url = storyPath(story.authorUsername, story.slug);
-  const description = story.subtitle || story.excerpt;
+  const description = story.seoDescription || story.subtitle || story.excerpt;
+  const cover = story.coverUrl && isAllowedStoryImage(story.coverUrl) ? story.coverUrl : null;
   return {
-    title: story.title,
+    title: story.seoTitle || story.title,
     description,
     authors: [{ name: story.authorDisplayName || story.authorUsername, url: profilePath(story.authorUsername) }],
     alternates: { canonical: story.canonicalUrl ?? url },
@@ -30,7 +40,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       locale: story.language === "es" ? "es_MX" : "en_US",
       publishedTime: story.publishedAt?.toISOString(),
       authors: [t("by", { name: story.authorDisplayName || story.authorUsername })],
+      images: cover ? [{ url: coverImageUrl(cover, 1200), alt: story.coverAlt }] : undefined,
     },
+    twitter: { card: cover ? "summary_large_image" : "summary" },
   };
 }
 
@@ -56,8 +68,13 @@ async function Story({ params }: Pick<Props, "params">) {
         {story.topics.length > 0 ? (
           <ul className="flex flex-wrap gap-2 text-xs font-medium" lang={locale}>
             {story.topics.map((topic) => (
-              <li key={topic.slug} className="rounded-full bg-secondary px-2.5 py-1 text-secondary-foreground">
-                {locale === "es" ? topic.nameEs : topic.nameEn}
+              <li key={topic.slug}>
+                <Link
+                  href={`/topics/${topic.slug}`}
+                  className="block rounded-full bg-secondary px-2.5 py-1 text-secondary-foreground hover:bg-accent"
+                >
+                  {locale === "es" ? topic.nameEs : topic.nameEn}
+                </Link>
               </li>
             ))}
           </ul>
@@ -86,8 +103,33 @@ async function Story({ params }: Pick<Props, "params">) {
           </span>
         </div>
       </header>
-      <StoryBody doc={story.content} lang={story.language} />
+      {story.coverUrl && isAllowedStoryImage(story.coverUrl) ? (
+        <StoryCover url={story.coverUrl} alt={story.coverAlt} credit={story.coverCredit} />
+      ) : null}
+      <StoryBody doc={story.content} lang={story.language} imagePrefixes={allowedImagePrefixes()} />
     </article>
+  );
+}
+
+function StoryCover({ url, alt, credit }: { url: string; alt: string; credit: unknown }) {
+  const parsedCredit = imageCreditSchema.safeParse(credit);
+  return (
+    <figure className="mx-auto mb-12 max-w-[1100px]" data-testid="story-cover">
+      <div className="relative aspect-[16/9] overflow-hidden rounded-xl bg-muted">
+        {isUnsplashImageUrl(url) ? (
+          <UnsplashImage rawUrl={url} alt={alt} fill priority sizes="(min-width: 1100px) 1100px, 100vw" className="object-cover" />
+        ) : (
+          // Uploaded covers are resized and re-encoded on upload.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={url} alt={alt} className="absolute inset-0 size-full object-cover" fetchPriority="high" />
+        )}
+      </div>
+      {parsedCredit.success ? (
+        <figcaption className="mt-2 text-center">
+          <UnsplashCredit credit={parsedCredit.data} />
+        </figcaption>
+      ) : null}
+    </figure>
   );
 }
 

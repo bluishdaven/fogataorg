@@ -207,7 +207,7 @@
     "quote": "Quote",
     "status": {
       "saved": "Saved",
-      "savedAt": "Saved at {time, time, short}",
+      "savedAt": "Saved at {time}",
       "saving": "Saving…",
       "unsaved": "Editing…",
       "offline": "Offline. Changes are kept on this device.",

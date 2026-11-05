@@ -74,10 +74,9 @@ export async function getLatestStories(limit = 20) {
 
 export async function getStory(handle: string, slug: string) {
   "use cache";
-  cacheLife("hours");
   cacheTag("stories", `story:${handle.toLowerCase()}/${slug}`);
 
-  return asAnon(async (tx) => {
+  const story = await asAnon(async (tx) => {
     const [row] = await tx
       .select({
         id: stories.id,
@@ -91,6 +90,11 @@ export async function getStory(handle: string, slug: string) {
         publishedAt: stories.publishedAt,
         canonicalUrl: stories.canonicalUrl,
         contentText: stories.contentText,
+        coverUrl: stories.coverUrl,
+        coverAlt: stories.coverAlt,
+        coverCredit: stories.coverCredit,
+        seoTitle: stories.seoTitle,
+        seoDescription: stories.seoDescription,
         authorUsername: profiles.username,
         authorDisplayName: profiles.displayName,
         authorBio: profiles.bio,
@@ -111,6 +115,11 @@ export async function getStory(handle: string, slug: string) {
 
     return { ...row, excerpt: excerpt(row.contentText, 160), topics: storyTopicRows };
   });
+
+  // A miss may be a scheduled story that goes live soon, so don't remember it for long.
+  if (story) cacheLife("hours");
+  else cacheLife("minutes");
+  return story;
 }
 
 export async function getProfileWithStories(handle: string) {

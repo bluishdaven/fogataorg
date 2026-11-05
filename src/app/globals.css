@@ -78,7 +78,8 @@
   /* Reading */
   --reading-size: 1.25rem; /* 20px */
   --reading-leading: 1.6;
-  --measure: 68ch;
+  /* ~65–75 characters of Source Serif at the reading size; rem so every column lines up. */
+  --measure: 42rem;
 
   /* Light: cream paper */
   --background: #faf6ee;
