@@ -105,8 +105,13 @@ Never run `npm run db:seed` against production; it refuses unless you pass `--al
    | `EMAIL_SUMMARY_DAILY_LIMIT` | optional, default `80`; raise it with a paid Resend plan |
 
    The secret key is **not** needed by the app; keep it out of Vercel until a feature needs it.
+   Add the `NEXT_PUBLIC_*` values as **Config** variables: Vercel strips the `NEXT_PUBLIC_` prefix from
+   **Secret** variables, so the app wouldn't find them (the publishable key is public by design).
+   Vercel may ask you to verify your identity by email before a redeploy from a new browser.
 3. `next build` reads published stories to prerender listings, so the build needs `DATABASE_URL`.
-4. Add the `fogata.org` domain.
+4. Add the `fogata.org` domain. Until then the site is `https://fogataorg.vercel.app`; when the
+   domain is attached, change `NEXT_PUBLIC_SITE_URL`, Supabase's Site URL and its redirect URL
+   (`https://fogata.org/**`), then redeploy. Email links are built from `NEXT_PUBLIC_SITE_URL`.
 5. `vercel.json` schedules `/api/cron/notification-emails` daily at 16:00 UTC (10:00 in Mexico City,
    17:00/18:00 in Madrid). Each run emails the readers whose summary weekday it is, so every reader
    gets at most one email a week. Hobby allows daily crons only and may run them any time within
