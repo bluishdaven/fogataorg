@@ -493,7 +493,8 @@
     },
     "savedTitle": "Leña guardada",
     "savedLede": "Historias que guardaste para después. Solo tú puedes ver esta lista.",
-    "savedEmpty": "Aún no guardas nada. Usa el marcador en cualquier historia para guardarla aquí."
+    "savedEmpty": "Aún no guardas nada. Usa el marcador en cualquier historia para guardarla aquí.",
+    "emailSettings": "Ajustes de correo"
   },
   "Circles": {
     "title": "Fogatas",
@@ -589,5 +590,46 @@
       "size": "Esa imagen pesa más de 10 MB.",
       "failed": "No se pudo subir la imagen. Vuelve a intentarlo."
     }
+  },
+  "Email": {
+    "subject": "{count, plural, one {# notificación nueva en Fogata} other {# notificaciones nuevas en Fogata}}",
+    "heading": "Novedades alrededor de tu fogata",
+    "intro": "{count, plural, one {Tienes una notificación que aún no has visto.} other {Tienes # notificaciones que aún no has visto.}}",
+    "more": "{count, plural, one {Y # más.} other {Y # más.}}",
+    "cta": "Abrir notificaciones",
+    "whyDaily": "Recibes este resumen como máximo una vez al día, solo cuando hay algo nuevo.",
+    "whyWeekly": "Recibes este resumen como máximo una vez a la semana, solo cuando hay algo nuevo.",
+    "settings": "Ajustes de correo",
+    "unsubscribe": "Darte de baja"
+  },
+  "EmailSettings": {
+    "title": "Notificaciones por correo",
+    "lede": "Elige cada cuánto Fogata te envía un resumen de chispas, respuestas, seguidores y novedades de tus fogatas.",
+    "frequency": "Correos de resumen",
+    "off": "Desactivados",
+    "offHint": "Sin correos. Las notificaciones siguen apareciendo en la campana.",
+    "daily": "Diario",
+    "dailyHint": "Como máximo un correo al día, solo cuando hay algo nuevo.",
+    "weekly": "Semanal",
+    "weeklyHint": "Como máximo un correo a la semana.",
+    "save": "Guardar",
+    "saving": "Guardando…",
+    "saved": "Ajustes de correo guardados.",
+    "error": "No se pudo guardar. Inténtalo de nuevo.",
+    "unauthorized": "Tu sesión terminó. Vuelve a entrar.",
+    "nav": "Secciones de ajustes",
+    "profileTab": "Perfil",
+    "notificationsTab": "Correo"
+  },
+  "Unsubscribe": {
+    "title": "¿Dejar de recibir resúmenes?",
+    "lede": "Dejarás de recibir los resúmenes de actividad de Fogata. Las notificaciones siguen apareciendo en la campana cuando entras.",
+    "confirm": "Darme de baja",
+    "working": "Dando de baja…",
+    "doneTitle": "Te diste de baja",
+    "done": "Ya no te enviaremos resúmenes de actividad. Puedes volver a activarlos en tus ajustes cuando quieras.",
+    "settings": "Ajustes de correo",
+    "invalidTitle": "Este enlace no funciona",
+    "invalid": "El enlace para darte de baja está incompleto o fue modificado. Entra y desactiva los correos en tus ajustes."
   }
 }

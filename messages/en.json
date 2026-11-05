@@ -493,7 +493,8 @@
     },
     "savedTitle": "Saved",
     "savedLede": "Stories you've kept for later. Only you can see this list.",
-    "savedEmpty": "Nothing saved yet. Use the bookmark on any story to keep it here."
+    "savedEmpty": "Nothing saved yet. Use the bookmark on any story to keep it here.",
+    "emailSettings": "Email settings"
   },
   "Circles": {
     "title": "Circles",
@@ -589,5 +590,46 @@
       "size": "That image is larger than 10 MB.",
       "failed": "The image couldn't be uploaded. Try again."
     }
+  },
+  "Email": {
+    "subject": "{count, plural, one {# new notification on Fogata} other {# new notifications on Fogata}}",
+    "heading": "What's new around your fire",
+    "intro": "{count, plural, one {You have one notification you haven't seen yet.} other {You have # notifications you haven't seen yet.}}",
+    "more": "{count, plural, one {And # more.} other {And # more.}}",
+    "cta": "Open notifications",
+    "whyDaily": "You get this summary at most once a day, only when something new happens.",
+    "whyWeekly": "You get this summary at most once a week, only when something new happens.",
+    "settings": "Email settings",
+    "unsubscribe": "Unsubscribe"
+  },
+  "EmailSettings": {
+    "title": "Email notifications",
+    "lede": "Choose how often Fogata emails you a summary of sparks, responses, follows and circle news.",
+    "frequency": "Summary emails",
+    "off": "Off",
+    "offHint": "No emails. Notifications still appear in the bell.",
+    "daily": "Daily",
+    "dailyHint": "At most one email a day, only when something new happens.",
+    "weekly": "Weekly",
+    "weeklyHint": "At most one email a week.",
+    "save": "Save",
+    "saving": "Saving…",
+    "saved": "Email settings saved.",
+    "error": "That couldn't be saved. Try again.",
+    "unauthorized": "Your session ended. Sign in again.",
+    "nav": "Settings sections",
+    "profileTab": "Profile",
+    "notificationsTab": "Email"
+  },
+  "Unsubscribe": {
+    "title": "Stop summary emails?",
+    "lede": "You'll stop getting Fogata's activity summaries. Notifications still appear in the bell when you sign in.",
+    "confirm": "Unsubscribe",
+    "working": "Unsubscribing…",
+    "doneTitle": "You're unsubscribed",
+    "done": "We won't email you activity summaries anymore. You can turn them back on in your settings at any time.",
+    "settings": "Email settings",
+    "invalidTitle": "This link doesn't work",
+    "invalid": "The unsubscribe link is incomplete or was changed. Sign in and turn emails off in your settings instead."
   }
 }
