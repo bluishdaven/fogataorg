@@ -32,8 +32,8 @@ export function BadgeChips({ badges, name, className }: { badges: BadgeData; nam
           <li data-badge="donor">
             <button type="button" className={CHIP} onClick={() => setShown("donor")} data-testid="badge-chip">
               <DonorIcon className="h-4 w-auto" />
-              <span>{t("donor")}</span>
-              <span className="sr-only">: {t("donorLabel", { name: t("donor") })}</span>
+              <span aria-hidden>{t("donor")}</span>
+              <span className="sr-only">{t("donorLabel", { name: t("donor") })}</span>
             </button>
           </li>
         ) : null}
@@ -41,8 +41,8 @@ export function BadgeChips({ badges, name, className }: { badges: BadgeData; nam
           <li data-badge={tier.key}>
             <button type="button" className={CHIP} onClick={() => setShown(tier.key)} data-testid="badge-chip">
               <TierIcon tier={tier.key} className="h-4 w-auto" />
-              <span>{t(`tiers.${tier.key}`)}</span>
-              <span className="sr-only">: {t("tierLabel", { name: t(`tiers.${tier.key}`), count: tier.min })}</span>
+              <span aria-hidden>{t(`tiers.${tier.key}`)}</span>
+              <span className="sr-only">{t("tierLabel", { name: t(`tiers.${tier.key}`), count: tier.min })}</span>
             </button>
           </li>
         ) : null}
