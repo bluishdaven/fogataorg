@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, Bookmark, BookOpenText, HandHeart, LogOut, Settings, ShieldAlert, UserRound } from "lucide-react";
+import { Bell, Bookmark, BookOpenText, Coffee, HandHeart, LogOut, Settings, ShieldAlert, UserRound } from "lucide-react";
 import NextLink from "next/link";
 import { useTranslations } from "next-intl";
 import { signOut } from "@/app/actions/auth";
@@ -19,6 +19,7 @@ import { UserBadges } from "@/components/badges/user-badges";
 import { initials } from "@/lib/domain/avatars";
 import type { BadgeData } from "@/lib/domain/badges";
 import { profilePath } from "@/lib/domain/handle-routes";
+import { SUPPORT_URL } from "@/lib/domain/links";
 
 export function AccountDropdown({
   displayName,
@@ -107,6 +108,13 @@ export function AccountDropdown({
           </DropdownMenuItem>
         ) : null}
         <DropdownMenuSeparator />
+        {/* Donations keep Fogata free (there is no paid tier). */}
+        <DropdownMenuItem asChild>
+          <a href={SUPPORT_URL} target="_blank" rel="noopener noreferrer" data-testid="donate-link">
+            <Coffee />
+            {t("Nav.donate")}
+          </a>
+        </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <form action={signOut} className="w-full">
             <input type="hidden" name="locale" value={locale} />

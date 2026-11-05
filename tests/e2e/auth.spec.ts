@@ -17,6 +17,10 @@ test("signs in with a magic link and signs out again", async ({ page }) => {
   await page.getByTestId("account-menu").click();
   // New accounts get a username derived from the email.
   await expect(page.getByText(/@e2e\d+/)).toBeVisible();
+  // Donations open Buy Me a Coffee in a new tab.
+  const donate = page.getByRole("menuitem", { name: "Donar" });
+  await expect(donate).toHaveAttribute("href", "https://buymeacoffee.com/fogataorg");
+  await expect(donate).toHaveAttribute("target", "_blank");
   await page.getByTestId("sign-out").click();
   await expect(page.getByTestId("sign-in-link")).toBeVisible();
 });
