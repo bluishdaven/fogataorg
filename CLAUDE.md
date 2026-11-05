@@ -151,8 +151,11 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   mark types, and only renders images from `allowedImagePrefixes()`. Never use
   `dangerouslySetInnerHTML` for user content.
 - **Writing** (`src/components/editor/`, `src/app/actions/stories.ts`). Tiptap 3 editor (client-only,
-  `immediatelyRender: false`) with custom `figure`, `callout` and `pullQuote` nodes, a `/` menu and a
-  selection toolbar. Every save goes through `sanitizeStoryDoc()` (`src/lib/domain/story-doc.ts`), the
+  `immediatelyRender: false`) with custom `figure`, `callout` and `pullQuote` nodes, a `/` menu, a
+  photo button in the editor bar (upload or Unsplash; `/` is awkward on phone keyboards) and a
+  selection toolbar that shows only for focused, non-empty text selections (a fresh editor can start
+  with everything selected). `insertFigure` never replaces a selected block. Tiptap's `BubbleMenu`
+  doesn't forward `data-*` props to its floating element: put test ids on an inner element. Every save goes through `sanitizeStoryDoc()` (`src/lib/domain/story-doc.ts`), the
   server-side allowlist; never store client JSON without it. Snapshots sent to server actions must be
   JSON round-tripped: ProseMirror attrs are prototype-less objects that server actions refuse.
 - **Autosave and publishing.** Saves carry a `revision`; a mismatch is a conflict, never an overwrite.
