@@ -11,6 +11,12 @@ test.describe("Spanish browser", () => {
     await expect(page.locator("html")).toHaveAttribute("lang", "es");
     expect(es.Home.headlines).toContain(await page.getByRole("heading", { level: 1 }).innerText());
   });
+
+  test("toasts are announced from a region named in Spanish", async ({ page }) => {
+    await page.goto("/@lucia_ortega/el-mole-de-mi-abuela-no-tiene-receta");
+    await expect(page.getByRole("region", { name: /^Avisos\b/ })).toHaveAttribute("aria-live", "polite");
+    await expect(page.getByRole("region", { name: /^Notifications\b/ })).toHaveCount(0);
+  });
 });
 
 test("English browsers land on the English home page", async ({ page }) => {
