@@ -2,6 +2,7 @@ import { useTranslations } from "next-intl";
 import { FlameLogo } from "@/components/flame-logo";
 import { Link } from "@/i18n/navigation";
 import { isPublicSite } from "@/lib/deployment";
+import { SUPPORT_URL } from "@/lib/domain/links";
 
 export function SiteFooter() {
   const t = useTranslations();
@@ -13,7 +14,20 @@ export function SiteFooter() {
           <div className="space-y-1">
             <p className="text-foreground">{t("Footer.tagline")}</p>
             <p>{t("Footer.rights")}</p>
-            <p>{t("Footer.support")}</p>
+            <p>
+              {t.rich("Footer.support", {
+                link: (chunks) => (
+                  <a
+                    href={SUPPORT_URL}
+                    rel="noopener"
+                    className="font-medium text-ember-text underline underline-offset-2 hover:text-foreground"
+                    data-testid="support-link"
+                  >
+                    {chunks}
+                  </a>
+                ),
+              })}
+            </p>
           </div>
         </div>
         <nav className="flex gap-4" aria-label={t("Nav.footer")}>

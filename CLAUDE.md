@@ -152,8 +152,8 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   Weekly sends are phased by a per-reader weekday so each day carries a seventh of them, which keeps
   Resend's free tier (100/day, shared with sign-in links) usable for longer; the daily cron fits
   Vercel Hobby.
-- **No "Pro" tier anywhere**: everyone gets everything. Donations will be an external link once the
-  platform is picked (Open Collective, GitHub Sponsors or Ko-fi).
+- **No "Pro" tier anywhere**: everyone gets everything. Donations go through Buy Me a Coffee
+  (`SUPPORT_URL` in `src/lib/domain/links.ts`, linked from the footer).
 - **Dates render in UTC** until readers can choose a time zone (Phase 3 onboarding).
 - **Reading speed** 238 wpm (EN) / 218 wpm (ES).
 - **Unsplash hotlinking over privacy-maximal re-hosting**: Unsplash requires it. Readers' browsers
