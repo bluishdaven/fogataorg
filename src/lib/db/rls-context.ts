@@ -1,10 +1,17 @@
 import { sql } from "drizzle-orm";
-import type { PgTransaction } from "drizzle-orm/pg-core";
+import type { PgDatabase, PgTransaction } from "drizzle-orm/pg-core";
 import type { PostgresJsQueryResultHKT } from "drizzle-orm/postgres-js";
 import type { ExtractTablesWithRelations } from "drizzle-orm";
 import type * as schema from "./schema";
 
 export type RlsTransaction = PgTransaction<
+  PostgresJsQueryResultHKT,
+  typeof schema,
+  ExtractTablesWithRelations<typeof schema>
+>;
+
+/** Anything that can run queries: the owner `db`, a transaction, or a savepoint. */
+export type DbExecutor = PgDatabase<
   PostgresJsQueryResultHKT,
   typeof schema,
   ExtractTablesWithRelations<typeof schema>
