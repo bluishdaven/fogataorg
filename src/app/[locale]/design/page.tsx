@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+import { notFound } from "next/navigation";
 import { FlameLogo } from "@/components/flame-logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { UnsplashDemo } from "@/components/unsplash/unsplash-demo";
+import { isPublicSite } from "@/lib/deployment";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("Design");
@@ -32,7 +34,9 @@ const TYPE_SCALE = [
 
 const VOCABULARY = ["sparks", "circle", "ember", "saved", "burningNow", "weeklySpark"] as const;
 
+/** Internal style guide: available locally, in CI and on previews, never on the public site. */
 export default async function DesignPage() {
+  if (isPublicSite) notFound();
   const [t, tv] = await Promise.all([getTranslations("Design"), getTranslations("Vocabulary")]);
 
   return (

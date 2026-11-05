@@ -94,6 +94,10 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   `getViewer()` (`src/lib/auth.ts`) is the only way to get the signed-in user. Magic links use the
   token-hash flow (`/auth/confirm`) so they work across browsers; Google uses PKCE (`/auth/callback`).
   Post-login redirects go through `safeNextPath()`.
+- **Public site vs. everything else.** `isPublicSite` (`src/lib/deployment.ts`) is true only on Vercel
+  production (`VERCEL_ENV`, read at build time). Internal pages like the style guide (`/design`) 404
+  there and drop out of the footer; local, CI and preview builds keep them because e2e tests use them.
+  User-facing copy never mentions dev commands.
 - **Domain rules** (`src/lib/domain/`) are pure TypeScript with unit tests: locales, routes, slugs,
   reading time, content text, redirects, Zod schemas. UI and data layers import from here.
 - **Unsplash photos** (`src/lib/domain/unsplash.ts`, `src/lib/unsplash/`, `src/components/unsplash/`).

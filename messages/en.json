@@ -54,7 +54,7 @@
     "title": "Pull up a seat. Someone is telling a story.",
     "lede": "Fogata is a warm home for long-form writing. No ads, no feeds built to keep you scrolling, just stories and the people who tell them.",
     "latest": "Fresh from the fire",
-    "empty": "No stories yet. Run npm run db:seed to light the first fire."
+    "empty": "No stories yet. The fire has just been lit, and yours could be the first."
   },
   "StoryCard": {
     "byline": "{name}",

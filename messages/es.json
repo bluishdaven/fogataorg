@@ -54,7 +54,7 @@
     "title": "Acércate. Alguien está contando una historia.",
     "lede": "Fogata es un hogar cálido para la escritura larga. Sin anuncios, sin feeds hechos para que no dejes de deslizar: solo historias y la gente que las cuenta.",
     "latest": "Recién salidas del fuego",
-    "empty": "Todavía no hay historias. Ejecuta npm run db:seed para encender la primera fogata."
+    "empty": "Todavía no hay historias. La fogata acaba de encenderse y la tuya puede ser la primera."
   },
   "StoryCard": {
     "byline": "{name}",

@@ -1,6 +1,7 @@
 import { useTranslations } from "next-intl";
 import { FlameLogo } from "@/components/flame-logo";
 import { Link } from "@/i18n/navigation";
+import { isPublicSite } from "@/lib/deployment";
 
 export function SiteFooter() {
   const t = useTranslations();
@@ -22,9 +23,11 @@ export function SiteFooter() {
           <Link href="/circles" className="underline-offset-4 hover:text-foreground hover:underline">
             {t("Nav.circles")}
           </Link>
-          <Link href="/design" className="underline-offset-4 hover:text-foreground hover:underline">
-            {t("Nav.design")}
-          </Link>
+          {isPublicSite ? null : (
+            <Link href="/design" className="underline-offset-4 hover:text-foreground hover:underline">
+              {t("Nav.design")}
+            </Link>
+          )}
         </nav>
       </div>
     </footer>
