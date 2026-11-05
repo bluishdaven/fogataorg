@@ -35,6 +35,7 @@ const timestamps = {
 const everyone = [anonRole, authenticatedRole];
 
 export const localeCode = pgEnum("locale_code", ["en", "es"]);
+export const emailFrequency = pgEnum("email_frequency", ["off", "daily", "weekly"]);
 export const storyStatus = pgEnum("story_status", ["draft", "scheduled", "published", "unlisted"]);
 
 export type ProfileLink = { label: string; url: string };
@@ -52,6 +53,9 @@ export const profiles = pgTable(
     links: jsonb("links").$type<ProfileLink[]>().notNull().default(sql`'[]'::jsonb`),
     locale: localeCode("locale").notNull().default("en"),
     isVerified: boolean("is_verified").notNull().default(false),
+    // Activity summary emails: batched, never one per event. Default daily; one click turns them off.
+    emailFrequency: emailFrequency("email_frequency").notNull().default("daily"),
+    emailLastSentAt: timestamp("email_last_sent_at", { withTimezone: true }),
     ...timestamps,
   },
   (t) => [
@@ -400,10 +404,13 @@ export const notifications = pgTable(
     actorIds: uuid("actor_ids").array().notNull().default(sql`'{}'::uuid[]`),
     actorCount: integer("actor_count").notNull().default(1),
     readAt: timestamp("read_at", { withTimezone: true }),
+    // Set once the notification has been included in a summary email.
+    emailedAt: timestamp("emailed_at", { withTimezone: true }),
     ...timestamps,
   },
   (t) => [
     index("notifications_user_idx").on(t.userId, t.updatedAt.desc()),
+    index("notifications_unemailed_idx").on(t.userId).where(sql`${t.readAt} is null and ${t.emailedAt} is null`),
     uniqueIndex("notifications_unread_group_key")
       .on(
         t.userId,
