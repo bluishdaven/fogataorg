@@ -399,5 +399,21 @@
     "count": "{count, plural, =0 {Todavía no hay historias} one {# historia} other {# historias}}",
     "empty": "Todavía no hay historias sobre {name}. La tuya podría ser la primera.",
     "topicLede": "Historias sobre {name} en Fogata."
+  },
+  "Search": {
+    "title": "Buscar",
+    "open": "Buscar",
+    "openWithShortcut": "Buscar (presiona /)",
+    "label": "Busca historias, personas y temas",
+    "placeholder": "Busca historias, personas y temas",
+    "submit": "Buscar",
+    "languageFilter": "Idioma de la historia",
+    "allLanguages": "Todos los idiomas",
+    "hint": "Busca por título, palabras de una historia, el nombre de quien escribe o un tema. No importan los acentos ni los errores pequeños.",
+    "empty": "Nada coincide con «{q}». Prueba con menos palabras o con otras.",
+    "summary": "{stories, plural, one {# historia} other {# historias}}, {people, plural, one {# persona} other {# personas}}, {topics, plural, one {# tema} other {# temas}}",
+    "stories": "Historias",
+    "people": "Personas",
+    "topics": "Temas"
   }
 }

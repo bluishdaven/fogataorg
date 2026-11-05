@@ -399,5 +399,21 @@
     "count": "{count, plural, =0 {No stories yet} one {# story} other {# stories}}",
     "empty": "No stories about {name} yet. Yours could be the first.",
     "topicLede": "Stories about {name} on Fogata."
+  },
+  "Search": {
+    "title": "Search",
+    "open": "Search",
+    "openWithShortcut": "Search (press /)",
+    "label": "Search stories, people and topics",
+    "placeholder": "Search stories, people and topics",
+    "submit": "Search",
+    "languageFilter": "Story language",
+    "allLanguages": "All languages",
+    "hint": "Search by title, words in a story, a writer's name or a topic. Accents and small typos are fine.",
+    "empty": "Nothing matched “{q}”. Try fewer or different words.",
+    "summary": "{stories, plural, one {# story} other {# stories}}, {people, plural, one {# person} other {# people}}, {topics, plural, one {# topic} other {# topics}}",
+    "stories": "Stories",
+    "people": "People",
+    "topics": "Topics"
   }
 }
