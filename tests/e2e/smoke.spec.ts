@@ -25,3 +25,12 @@ test("the footer links to donations in both languages", async ({ page }) => {
     "Mantén viva la fogata en Buy Me a Coffee",
   );
 });
+
+test("the footer shows merch as coming soon, not clickable", async ({ page }) => {
+  await page.goto("/en");
+  const merch = page.getByRole("contentinfo").getByTestId("merch-soon");
+  await expect(merch).toHaveText(/Merch\s*Coming soon/);
+  await expect(merch).toBeDisabled();
+  await page.goto("/es");
+  await expect(page.getByRole("contentinfo").getByTestId("merch-soon")).toHaveText(/Merch\s*Próximamente/);
+});

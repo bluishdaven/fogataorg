@@ -30,10 +30,22 @@ export function SiteFooter() {
             </p>
           </div>
         </div>
-        <nav className="flex gap-4" aria-label={t("Nav.footer")}>
+        <nav className="flex flex-wrap items-center gap-x-4 gap-y-2" aria-label={t("Nav.footer")}>
           <Link href="/topics" className="underline-offset-4 hover:text-foreground hover:underline">
             {t("Nav.topics")}
           </Link>
+          {/* Placeholder until the shop opens: disabled, so it can't be activated and reads as unavailable. */}
+          <button
+            type="button"
+            disabled
+            className="inline-flex cursor-not-allowed items-center gap-1.5 text-muted-foreground/60"
+            data-testid="merch-soon"
+          >
+            {t("Nav.merch")}
+            <span className="rounded-full border border-border px-1.5 py-px text-[0.65rem] font-medium tracking-wide uppercase">
+              {t("Nav.comingSoon")}
+            </span>
+          </button>
           <Link href="/circles" className="underline-offset-4 hover:text-foreground hover:underline">
             {t("Nav.circles")}
           </Link>

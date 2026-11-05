@@ -34,7 +34,9 @@
     "footer": "Footer",
     "saved": "Saved",
     "notifications": "Notifications",
-    "circles": "Circles"
+    "circles": "Circles",
+    "merch": "Merch",
+    "comingSoon": "Coming soon"
   },
   "Theme": {
     "label": "Theme",
