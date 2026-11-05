@@ -208,7 +208,16 @@ export const storyTopics = pgTable(
 const LIVE_STORY = (storyId: AnyPgColumn) =>
   sql`exists (select 1 from public.stories s where s.id = ${storyId} and s.deleted_at is null and s.status in ('published', 'unlisted') and s.published_at <= now())`;
 
-export const notificationType = pgEnum("notification_type", ["spark", "response", "reply", "mention", "follow"]);
+export const notificationType = pgEnum("notification_type", [
+  "spark",
+  "response",
+  "reply",
+  "mention",
+  "follow",
+  "submission",
+  "accepted",
+  "declined",
+]);
 
 /** A reader following a writer or a topic (circles later). Exactly one target is set. */
 export const follows = pgTable(
@@ -220,15 +229,18 @@ export const follows = pgTable(
       .references(() => profiles.id, { onDelete: "cascade" }),
     followedUserId: uuid("followed_user_id").references(() => profiles.id, { onDelete: "cascade" }),
     followedTopicId: uuid("followed_topic_id").references(() => topics.id, { onDelete: "cascade" }),
+    followedCircleId: uuid("followed_circle_id").references((): AnyPgColumn => circles.id, { onDelete: "cascade" }),
     ...timestamps,
   },
   (t) => [
-    check("follows_one_target", sql`num_nonnulls(${t.followedUserId}, ${t.followedTopicId}) = 1`),
+    check("follows_one_target", sql`num_nonnulls(${t.followedUserId}, ${t.followedTopicId}, ${t.followedCircleId}) = 1`),
     check("follows_not_self", sql`${t.followedUserId} is distinct from ${t.followerId}`),
     uniqueIndex("follows_user_key").on(t.followerId, t.followedUserId).where(sql`${t.followedUserId} is not null`),
     uniqueIndex("follows_topic_key").on(t.followerId, t.followedTopicId).where(sql`${t.followedTopicId} is not null`),
+    uniqueIndex("follows_circle_key").on(t.followerId, t.followedCircleId).where(sql`${t.followedCircleId} is not null`),
     index("follows_followed_user_idx").on(t.followedUserId),
     index("follows_followed_topic_idx").on(t.followedTopicId),
+    index("follows_followed_circle_idx").on(t.followedCircleId),
     pgPolicy("follows_select_public", { for: "select", to: everyone, using: sql`true` }),
     pgPolicy("follows_insert_own", { for: "insert", to: authenticatedRole, withCheck: sql`${t.followerId} = ${authUid}` }),
     pgPolicy("follows_delete_own", { for: "delete", to: authenticatedRole, using: sql`${t.followerId} = ${authUid}` }),
@@ -384,6 +396,7 @@ export const notifications = pgTable(
     type: notificationType("type").notNull(),
     storyId: uuid("story_id").references(() => stories.id, { onDelete: "cascade" }),
     responseId: uuid("response_id").references(() => responses.id, { onDelete: "cascade" }),
+    circleId: uuid("circle_id").references((): AnyPgColumn => circles.id, { onDelete: "cascade" }),
     actorIds: uuid("actor_ids").array().notNull().default(sql`'{}'::uuid[]`),
     actorCount: integer("actor_count").notNull().default(1),
     readAt: timestamp("read_at", { withTimezone: true }),
@@ -410,6 +423,135 @@ export const notifications = pgTable(
   ],
 );
 
+// ---------------------------------------------------------------------------
+// Phase 2: circles (community publications)
+// ---------------------------------------------------------------------------
+
+export const circleRole = pgEnum("circle_role", ["owner", "editor", "writer"]);
+export const submissionStatus = pgEnum("submission_status", ["pending", "accepted", "declined"]);
+
+/** Owners and editors may change a circle and decide on submissions. */
+const CIRCLE_EDITOR = (circleId: AnyPgColumn) =>
+  sql`exists (select 1 from public.circle_members m where m.circle_id = ${circleId} and m.user_id = ${authUid} and m.role in ('owner', 'editor'))`;
+
+export const circles = pgTable(
+  "circles",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    slug: text("slug").notNull(),
+    name: text("name").notNull(),
+    description: text("description").notNull().default(""),
+    accentColor: text("accent_color").notNull().default("#c2410c"),
+    headerUrl: text("header_url"),
+    headerAlt: text("header_alt").notNull().default(""),
+    headerCredit: jsonb("header_credit").$type<ImageCredit>(),
+    ownerId: uuid("owner_id")
+      .notNull()
+      .references(() => profiles.id, { onDelete: "cascade" }),
+    ...timestamps,
+  },
+  (t) => [
+    uniqueIndex("circles_slug_key").on(sql`lower(${t.slug})`),
+    check("circles_slug_format", sql`${t.slug} ~ '^[a-z0-9]+(-[a-z0-9]+)*$' and char_length(${t.slug}) between 3 and 40`),
+    check("circles_name_length", sql`char_length(btrim(${t.name})) between 2 and 60`),
+    check("circles_description_length", sql`char_length(${t.description}) <= 280`),
+    check("circles_accent_format", sql`${t.accentColor} ~ '^#[0-9a-fA-F]{6}$'`),
+    check("circles_header_alt_length", sql`char_length(${t.headerAlt}) <= 300`),
+    pgPolicy("circles_select_public", { for: "select", to: everyone, using: sql`true` }),
+    pgPolicy("circles_insert_own", { for: "insert", to: authenticatedRole, withCheck: sql`${t.ownerId} = ${authUid}` }),
+    pgPolicy("circles_update_editors", {
+      for: "update",
+      to: authenticatedRole,
+      using: CIRCLE_EDITOR(t.id),
+      withCheck: CIRCLE_EDITOR(t.id),
+    }),
+  ],
+);
+
+/** Owner (one, created by trigger), editors, and writers whose submissions skip review. */
+export const circleMembers = pgTable(
+  "circle_members",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    circleId: uuid("circle_id")
+      .notNull()
+      .references(() => circles.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => profiles.id, { onDelete: "cascade" }),
+    role: circleRole("role").notNull().default("editor"),
+    ...timestamps,
+  },
+  (t) => [
+    uniqueIndex("circle_members_circle_user_key").on(t.circleId, t.userId),
+    index("circle_members_user_idx").on(t.userId),
+    pgPolicy("circle_members_select_public", { for: "select", to: everyone, using: sql`true` }),
+    // Only the owner adds people, and never another owner.
+    pgPolicy("circle_members_insert_owner", {
+      for: "insert",
+      to: authenticatedRole,
+      withCheck: sql`${t.role} <> 'owner' and exists (select 1 from public.circle_members m where m.circle_id = ${t.circleId} and m.user_id = ${authUid} and m.role = 'owner')`,
+    }),
+    // Members can leave; the owner can remove anyone except themselves.
+    pgPolicy("circle_members_delete", {
+      for: "delete",
+      to: authenticatedRole,
+      using: sql`${t.role} <> 'owner' and (${t.userId} = ${authUid} or exists (select 1 from public.circle_members m where m.circle_id = ${t.circleId} and m.user_id = ${authUid} and m.role = 'owner'))`,
+    }),
+  ],
+);
+
+/** A writer's story offered to a circle; editors accept or decline. One active circle per story. */
+export const circleSubmissions = pgTable(
+  "circle_submissions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    circleId: uuid("circle_id")
+      .notNull()
+      .references(() => circles.id, { onDelete: "cascade" }),
+    storyId: uuid("story_id")
+      .notNull()
+      .references(() => stories.id, { onDelete: "cascade" }),
+    submittedBy: uuid("submitted_by")
+      .notNull()
+      .references(() => profiles.id, { onDelete: "cascade" }),
+    status: submissionStatus("status").notNull().default("pending"),
+    decidedBy: uuid("decided_by").references(() => profiles.id, { onDelete: "set null" }),
+    decidedAt: timestamp("decided_at", { withTimezone: true }),
+    ...timestamps,
+  },
+  (t) => [
+    uniqueIndex("circle_submissions_active_story_key")
+      .on(t.storyId)
+      .where(sql`${t.status} in ('pending', 'accepted')`),
+    index("circle_submissions_circle_idx").on(t.circleId, t.status, t.updatedAt.desc()),
+    pgPolicy("circle_submissions_select_accepted", { for: "select", to: everyone, using: sql`${t.status} = 'accepted'` }),
+    pgPolicy("circle_submissions_select_involved", {
+      for: "select",
+      to: authenticatedRole,
+      using: sql`${t.submittedBy} = ${authUid} or ${CIRCLE_EDITOR(t.circleId)}`,
+    }),
+    pgPolicy("circle_submissions_insert_author", {
+      for: "insert",
+      to: authenticatedRole,
+      withCheck: sql`${t.submittedBy} = ${authUid} and ${t.status} = 'pending' and ${t.decidedBy} is null and exists (select 1 from public.stories s where s.id = ${t.storyId} and s.author_id = ${authUid} and s.deleted_at is null and s.status in ('published', 'unlisted') and s.published_at <= now())`,
+    }),
+    pgPolicy("circle_submissions_update_editors", {
+      for: "update",
+      to: authenticatedRole,
+      using: CIRCLE_EDITOR(t.circleId),
+      withCheck: CIRCLE_EDITOR(t.circleId),
+    }),
+    // Writers can withdraw; editors can remove a story from their circle.
+    pgPolicy("circle_submissions_delete", {
+      for: "delete",
+      to: authenticatedRole,
+      using: sql`${t.submittedBy} = ${authUid} or ${CIRCLE_EDITOR(t.circleId)}`,
+    }),
+  ],
+);
+
+export type Circle = typeof circles.$inferSelect;
 export type Profile = typeof profiles.$inferSelect;
 export type Topic = typeof topics.$inferSelect;
 export type Story = typeof stories.$inferSelect;
