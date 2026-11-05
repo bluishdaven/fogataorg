@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import { getUnreadNotificationCount } from "@/app/actions/social";
 import { buttonVariants } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
-import { supabaseBrowser } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
 /**
@@ -18,24 +17,30 @@ export function NotificationBell({ userId, initialCount }: { userId: string; ini
   const [count, setCount] = useState(initialCount);
 
   useEffect(() => {
-    const supabase = supabaseBrowser();
     let active = true;
+    let unsubscribe = () => {};
     const refresh = async () => {
       const next = await getUnreadNotificationCount();
       if (active) setCount(next);
     };
-    const channel = supabase
-      .channel(`notifications:${userId}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "notifications", filter: `user_id=eq.${userId}` }, () => {
-        void refresh();
-      })
-      .subscribe();
+    // The Supabase client is ~70 KB of JS that no page needs to render; load it after hydration.
+    void import("@/lib/supabase/client").then(({ supabaseBrowser }) => {
+      if (!active) return;
+      const supabase = supabaseBrowser();
+      const channel = supabase
+        .channel(`notifications:${userId}`)
+        .on("postgres_changes", { event: "*", schema: "public", table: "notifications", filter: `user_id=eq.${userId}` }, () => {
+          void refresh();
+        })
+        .subscribe();
+      unsubscribe = () => void supabase.removeChannel(channel);
+    });
     const onFocus = () => void refresh();
     window.addEventListener("focus", onFocus);
     return () => {
       active = false;
       window.removeEventListener("focus", onFocus);
-      void supabase.removeChannel(channel);
+      unsubscribe();
     };
   }, [userId]);
 
