@@ -4,11 +4,13 @@ import { and, eq, sql } from "drizzle-orm";
 import { updateTag } from "next/cache";
 import { getViewer } from "@/lib/auth";
 import { withRls } from "@/lib/db/rls";
-import { circleMembers, circles, circleSubmissions, profiles, stories } from "@/lib/db/schema";
+import { circleJoinRequests, circleMembers, circles, circleSubmissions, profiles, stories } from "@/lib/db/schema";
 import {
   addMemberSchema,
   createCircleSchema,
   decisionSchema,
+  joinDecisionSchema,
+  joinRequestSchema,
   submissionSchema,
   updateCircleSchema,
   type CircleErrorKey,
@@ -44,7 +46,7 @@ export async function createCircle(input: CreateCircleInput): Promise<Result<{ s
   if (!viewer) return { ok: false, errors: ["unauthorized"] };
   const parsed = createCircleSchema.safeParse(input);
   if (!parsed.success) return { ok: false, errors: zodErrors(parsed.error.issues) };
-  const { name, slug, description, accentColor, header } = parsed.data;
+  const { name, slug, description, accentColor, header, isPrivate } = parsed.data;
   if (header && !isAllowedStoryImage(header.url)) return { ok: false, errors: ["unsafeImage"] };
 
   try {
@@ -58,6 +60,7 @@ export async function createCircle(input: CreateCircleInput): Promise<Result<{ s
         headerUrl: header?.url ?? null,
         headerAlt: header?.alt ?? "",
         headerCredit: header?.credit ?? null,
+        isPrivate,
       }),
     );
   } catch (error) {
@@ -73,7 +76,7 @@ export async function updateCircle(input: UpdateCircleInput): Promise<Result<{ s
   if (!viewer) return { ok: false, errors: ["unauthorized"] };
   const parsed = updateCircleSchema.safeParse(input);
   if (!parsed.success) return { ok: false, errors: zodErrors(parsed.error.issues) };
-  const { circleId, name, description, accentColor, header } = parsed.data;
+  const { circleId, name, description, accentColor, header, isPrivate } = parsed.data;
   if (header && !isAllowedStoryImage(header.url)) return { ok: false, errors: ["unsafeImage"] };
 
   const [row] = await withRls(viewer.claims, (tx) =>
@@ -86,6 +89,7 @@ export async function updateCircle(input: UpdateCircleInput): Promise<Result<{ s
         headerUrl: header?.url ?? null,
         headerAlt: header?.alt ?? "",
         headerCredit: header?.credit ?? null,
+        isPrivate,
       })
       .where(eq(circles.id, circleId))
       .returning({ slug: circles.slug }),
@@ -222,4 +226,58 @@ async function invalidateForSubmission(circleId: string, storyId: string) {
       .where(eq(stories.id, storyId)),
   );
   if (story) updateTag(`story:${story.username.toLowerCase()}/${story.slug}`);
+}
+
+/** Ask to join a private circle. */
+export async function requestToJoin(input: unknown): Promise<Result> {
+  const viewer = await getViewer();
+  if (!viewer) return { ok: false, errors: ["unauthorized"] };
+  const parsed = joinRequestSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, errors: ["invalid"] };
+  try {
+    await withRls(viewer.claims, (tx) => tx.insert(circleJoinRequests).values({ circleId: parsed.data.circleId, userId: viewer.id }));
+  } catch (error) {
+    if (pgCode(error) === "23505") return { ok: false, errors: ["alreadyRequested"] };
+    // Public circle, or already a member.
+    if (pgCode(error) === "42501") return { ok: false, errors: ["not_allowed"] };
+    throw error;
+  }
+  return { ok: true };
+}
+
+/** Take back a request that's still waiting. */
+export async function withdrawJoinRequest(input: unknown): Promise<Result> {
+  const viewer = await getViewer();
+  if (!viewer) return { ok: false, errors: ["unauthorized"] };
+  const parsed = joinRequestSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, errors: ["invalid"] };
+  const rows = await withRls(viewer.claims, (tx) =>
+    tx
+      .delete(circleJoinRequests)
+      .where(and(eq(circleJoinRequests.circleId, parsed.data.circleId), eq(circleJoinRequests.userId, viewer.id)))
+      .returning({ id: circleJoinRequests.id }),
+  );
+  return rows.length ? { ok: true } : { ok: false, errors: ["not_allowed"] };
+}
+
+/** Owners and editors let someone in (as a writer) or turn them down. */
+export async function decideJoinRequest(input: unknown): Promise<Result> {
+  const viewer = await getViewer();
+  if (!viewer) return { ok: false, errors: ["unauthorized"] };
+  const parsed = joinDecisionSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, errors: ["invalid"] };
+  let slug: string | null;
+  try {
+    slug = await withRls(viewer.claims, async (tx) => {
+      const rows = await tx.execute<{ slug: string | null }>(
+        sql`select public.decide_join_request(${parsed.data.requestId}::uuid, ${parsed.data.accept}) as slug`,
+      );
+      return rows[0]?.slug ?? null;
+    });
+  } catch (error) {
+    if (pgCode(error) === "42501" || pgCode(error) === "55000") return { ok: false, errors: ["not_allowed"] };
+    throw error;
+  }
+  if (slug) invalidateCircle(slug);
+  return { ok: true };
 }

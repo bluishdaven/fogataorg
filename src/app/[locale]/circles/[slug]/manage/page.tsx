@@ -3,7 +3,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
 import { CircleForm } from "@/components/circles/circle-form";
-import { MembersManager, SubmissionQueue } from "@/components/circles/manage-circle";
+import { JoinRequests, MembersManager, SubmissionQueue } from "@/components/circles/manage-circle";
 import { Toaster } from "@/components/ui/sonner";
 import { Link } from "@/i18n/navigation";
 import { getViewer } from "@/lib/auth";
@@ -44,6 +44,7 @@ async function Manage({ params }: Pick<Props, "params">) {
         </Link>
         <h1 className="mt-2 font-serif text-4xl font-semibold">{t("manageTitle", { name: circle.name })}</h1>
       </div>
+      {circle.isPrivate || circle.joinRequests.length ? <JoinRequests requests={circle.joinRequests} /> : null}
       <SubmissionQueue pending={circle.pending} accepted={circle.accepted} />
       <MembersManager circleId={circle.id} members={circle.members} isOwner={circle.role === "owner"} />
       <section aria-labelledby="details-heading" className="flex flex-col gap-4">
@@ -59,6 +60,7 @@ async function Manage({ params }: Pick<Props, "params">) {
             description: circle.description,
             accentColor: circle.accentColor,
             header: circle.header,
+            isPrivate: circle.isPrivate,
           }}
         />
       </section>

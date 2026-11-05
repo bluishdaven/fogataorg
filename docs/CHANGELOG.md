@@ -1,5 +1,28 @@
 # Changelog
 
+## Private circles, badge explainer and badge notifications (2026-11-05)
+
+**Demo**: start a circle and choose **Private** under "Who can publish" (or switch it in Manage →
+Details). From another account, open it: it's still listed and readable, marked "Private circle",
+with **Request to join** instead of "Submit a story". The owner gets a bell notification and accepts
+or declines under **Requests to join** on the manage page. On any profile, tap a badge chip.
+
+- **Circle owners**: the creator is the owner, with every editor power plus adding and removing
+  people. Owners and editors decide on join requests and can switch a circle between public and
+  private.
+- **Private circles**: only members submit (enforced by RLS). Accepted people join as writers, so
+  their stories go straight in. People can cancel a waiting request; a declined request can't be
+  sent again (the owner can still add the person by username). Requests to the same circle group in
+  the bell ("Ana and 2 others asked to join…").
+- **Badge explainer**: tapping a badge on a profile explains it and lists all ten writing tiers and
+  the donor badge, marking the ones earned and how many stories the next tier takes.
+- **Badge notifications**: a new writing tier or a donor grant rings the bell (and is in the weekly
+  summary). Each tier is announced once; scheduled stories are covered by the daily job. The donor
+  badge is now a heart in flames.
+- Tests: 170 unit, 73 RLS (private submissions, request/decide rules, grouping per circle, tier
+  announcements), Playwright for the private-circle flow, the badge dialog in three themes and the
+  first-badge notification.
+
 ## Story moderation, and two-month donor badges (2026-11-05)
 
 **Demo** (as an admin): open any story → the **Moderation** bar under the header → **Mark NSFW** or

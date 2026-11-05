@@ -527,7 +527,9 @@
       "accepted": "{others, plural, =0 {{actor} aceptó «{title}» en {circle}} one {{actor} aceptó «{title}» en {circle}} other {{actor} aceptó «{title}» en {circle}}}",
       "declined": "{others, plural, =0 {{actor} rechazó «{title}» para {circle}} one {{actor} rechazó «{title}» para {circle}} other {{actor} rechazó «{title}» para {circle}}}",
       "badge": "Ganaste la insignia {badge, select, kindling {Yesca} candle {Vela} flame {Llama} torch {Antorcha} hearth {Hogar} bonfire {Hoguera} beacon {Faro} star {Estrella} sun {Sol} phoenix {Fénix} other {nueva}}: {count, plural, one {tu primera historia publicada} other {# historias publicadas}}. ¡Que no se apague el fuego!",
-      "donor": "¡Ya eres Mecenas! Gracias por apoyar a Fogata con una donación."
+      "donor": "¡Ya eres Mecenas! Gracias por apoyar a Fogata con una donación.",
+      "join_request": "{others, plural, =0 {{actor} pidió unirse a {circle}} one {{actor} y # persona más pidieron unirse a {circle}} other {{actor} y # personas más pidieron unirse a {circle}}}",
+      "join_accepted": "{actor} te aceptó en {circle}. Ahora tus historias entran directo."
     },
     "savedTitle": "Leña guardada",
     "savedLede": "Historias que guardaste para después. Solo tú puedes ver esta lista.",
@@ -575,6 +577,7 @@
     "savedToast": "Fogata actualizada.",
     "stories": "Historias",
     "noStories": "Todavía no hay historias aquí. Quien escribe puede enviar la suya desde esta página.",
+    "noStoriesPrivate": "Todavía no hay historias aquí. Sus miembros pueden publicar las suyas desde esta página.",
     "editors": "Editores",
     "roles": {
       "owner": "Administra",
@@ -617,6 +620,24 @@
     "removeMember": "Quitar",
     "removeMemberConfirm": "¿Quitar a esta persona de la fogata?",
     "close": "Cerrar",
+    "privacy": "Quién puede publicar",
+    "public": "Pública",
+    "publicHint": "Cualquiera puede enviar una historia. Los editores la revisan, salvo que quien escribe ya sea parte de la fogata.",
+    "private": "Privada",
+    "privateHint": "Solo publican sus miembros. Cualquiera puede leerla, y otras personas pueden pedir unirse: tú y tus editores deciden.",
+    "privateLabel": "Fogata privada",
+    "privateNote": "Cualquiera puede leer. Solo sus miembros publican aquí.",
+    "requestToJoin": "Pedir unirme",
+    "requestSent": "Solicitud enviada",
+    "requestSentToast": "Solicitud enviada. Los editores de {circle} decidirán.",
+    "cancelRequest": "Cancelar solicitud",
+    "requestCanceledToast": "Solicitud cancelada.",
+    "requestDeclined": "Tu solicitud para unirte no fue aceptada.",
+    "joinRequests": "{count, plural, =0 {Solicitudes para unirse} other {Solicitudes para unirse (#)}}",
+    "joinRequestsEmpty": "Nadie está esperando para unirse.",
+    "joinRequestsHint": "Quienes aceptes se suman con el rol Escribe: sus historias entran directo a la fogata.",
+    "joinAcceptedToast": "Aceptada. {name} ya puede publicar aquí.",
+    "joinDeclinedToast": "Solicitud rechazada.",
     "errors": {
       "unauthorized": "Tu sesión terminó. Vuelve a entrar.",
       "not_allowed": "No puedes hacer eso en esta fogata.",
@@ -631,7 +652,8 @@
       "userNotFound": "Nadie tiene ese nombre de usuario.",
       "alreadyMember": "Esa persona ya está en la fogata.",
       "alreadySubmitted": "Esa historia ya está en una fogata (o esperando revisión).",
-      "invalid": "Algo no está bien. Vuelve a intentarlo."
+      "invalid": "Algo no está bien. Vuelve a intentarlo.",
+      "alreadyRequested": "Ya pediste unirte a esta fogata."
     },
     "uploadErrors": {
       "type": "Ese tipo de archivo no es compatible. Usa JPEG, PNG, WebP, GIF o AVIF.",

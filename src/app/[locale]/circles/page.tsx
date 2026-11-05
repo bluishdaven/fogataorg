@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+import { Lock } from "lucide-react";
 import { Suspense } from "react";
 import { buttonVariants } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
@@ -32,8 +33,17 @@ export default async function CirclesPage() {
           {circles.map((circle) => (
             <li key={circle.id}>
               <Link href={`/circles/${circle.slug}`} className="block h-full overflow-hidden rounded-xl border border-border hover:shadow-md">
-                <div className="px-4 py-3 font-serif text-lg font-semibold" style={{ backgroundColor: circle.accentColor, color: readableTextOn(circle.accentColor) }}>
-                  {circle.name}
+                <div
+                  className="flex items-start justify-between gap-3 px-4 py-3"
+                  style={{ backgroundColor: circle.accentColor, color: readableTextOn(circle.accentColor) }}
+                >
+                  <span className="font-serif text-lg font-semibold">{circle.name}</span>
+                  {circle.isPrivate ? (
+                    <span className="mt-1 inline-flex shrink-0 items-center gap-1 text-xs font-medium" data-testid="circle-private">
+                      <Lock className="size-3.5" aria-hidden />
+                      {t("private")}
+                    </span>
+                  ) : null}
                 </div>
                 <div className="flex flex-col gap-2 px-4 py-3 text-sm">
                   {circle.description ? <p className="line-clamp-2 text-pretty">{circle.description}</p> : null}

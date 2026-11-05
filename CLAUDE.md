@@ -36,15 +36,24 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
 - **Social** (`src/lib/data/social.ts`, `src/app/actions/social.ts`, `src/components/social/`). Follows,
   sparks (one row per reader per story, 1–50), bookmarks, responses (one reply level, optional
   `block_id` paragraph anchor) and response sparks. Notifications are written only by database
-  triggers (`public.notify`), grouped per recipient/type/target while unread, and pushed to the bell
+  triggers (`public.notify`), grouped per recipient/type/story/response/circle while unread (the
+  `ON CONFLICT` targets in `notify()` and `notify_badge()` must list exactly the
+  `notifications_unread_group_key` expressions; change all three together), and pushed to the bell
   through Supabase Realtime. Per-reader data on story pages loads in its own `<Suspense>` so the cached
   story text never waits for it. Pinning goes through `public.set_response_pinned()`.
 - **Circles** (`src/lib/data/circles.ts`, `src/app/actions/circles.ts`, `src/components/circles/`).
   `circles` (accent color, optional header), `circle_members` (one owner created by trigger, editors,
   writers) and `circle_submissions` (pending → accepted/declined; one active circle per story; members'
   submissions are auto-accepted by an AFTER INSERT trigger because RLS checks run after BEFORE
-  triggers). Editors decide; `decided_by/at` are stamped by trigger. Text on an accent always uses
-  `readableTextOn()` (white or pure black, ≥ 4.58:1). Circle pages live at `/{locale}/circles/{slug}`.
+  triggers). Editors decide; `decided_by/at` are stamped by trigger. The creator is the owner: an
+  editor who also adds and removes people. Text on an accent always uses `readableTextOn()` (white
+  or pure black, ≥ 4.58:1). Circle pages live at `/{locale}/circles/{slug}`.
+  **Private circles** (`circles.is_private`) stay listed and readable; only members can submit (the
+  submissions insert policy checks it). Others ask to join (`circle_join_requests`: pending or
+  declined, one per person and circle; declined rows stay so people can't ask again). Owners and
+  editors decide through `decide_join_request()`, which adds a writer, deletes the request and sends
+  `join_accepted`; a new request sends `join_request` to the owner and editors. Adding a member any
+  other way clears their request (trigger).
 - **Email** (`src/lib/email/`, `src/emails/`, `src/app/api/cron/notification-emails`). Fogata sends
   only sign-in links (Supabase Auth) and a weekly activity summary, never one email per event.
   `profiles.email_frequency` is `weekly` (default) or `off`; `profiles.email_weekday` (random 0–6 at
@@ -125,6 +134,8 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   (`app_metadata.role = "admin"`, set in the Supabase dashboard) grant or remove it, through
   `grant_donor_badge` / `remove_donor_badge` on `/admin/donors`, with a private `donor_grants` log.
   Show badges with `<UserBadges>` right after a person's name; new screens that name people must too.
+  Profiles use `<BadgeChips>` (`badge-guide.tsx`) instead: tapping a chip explains it and lists every
+  badge, marking the ones earned.
   New badges ring the bell: `check_writing_badge()` (stories/moderation triggers, plus
   `check_due_writing_badges()` in the daily cron for scheduled stories, so those arrive within a day)
   announces a tier only above `profiles.badge_tier_notified`, and `grant_donor_badge` notifies the

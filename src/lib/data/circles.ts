@@ -3,7 +3,7 @@ import { and, count, desc, eq, inArray, isNull, lte, notInArray, sql } from "dri
 import { cacheLife, cacheTag } from "next/cache";
 import type { Viewer } from "@/lib/auth";
 import { asAnon, withRls } from "@/lib/db/rls";
-import { circleMembers, circles, circleSubmissions, follows, profiles, stories } from "@/lib/db/schema";
+import { circleJoinRequests, circleMembers, circles, circleSubmissions, follows, profiles, stories } from "@/lib/db/schema";
 import { badgeData } from "@/lib/domain/badges";
 import { excerpt } from "@/lib/domain/content";
 import { imageCreditSchema } from "@/lib/domain/unsplash";
@@ -36,6 +36,7 @@ export async function listCircles() {
         name: circles.name,
         description: circles.description,
         accentColor: circles.accentColor,
+        isPrivate: circles.isPrivate,
         stories: sql<number>`(select count(*)::int from public.circle_submissions cs join public.stories s on s.id = cs.story_id where cs.circle_id = "circles"."id" and cs.status = 'accepted' and s.status = 'published' and s.deleted_at is null and s.published_at <= now())`,
         followers: sql<number>`(select count(*)::int from public.follows f where f.followed_circle_id = "circles"."id")`,
       })
@@ -98,6 +99,7 @@ export async function getCircle(slug: string) {
       name: circle.name,
       description: circle.description,
       accentColor: circle.accentColor,
+      isPrivate: circle.isPrivate,
       header: header(circle),
       createdAt: circle.createdAt,
       members: members.map(({ publishedCount, donorActive, ...m }) => ({
@@ -129,11 +131,11 @@ export async function getCircle(slug: string) {
   return result;
 }
 
-/** The reader's relationship to a circle (role, following) plus follower count. */
+/** The reader's relationship to a circle (role, following, join request) plus follower count. */
 export async function getCircleViewerState(viewer: Viewer | null, circleId: string) {
   return withRls(viewer?.claims ?? null, async (tx) => {
     const [followers] = await tx.select({ value: count() }).from(follows).where(eq(follows.followedCircleId, circleId));
-    if (!viewer) return { followers: followers?.value ?? 0, following: false, role: null, signedIn: false };
+    if (!viewer) return { followers: followers?.value ?? 0, following: false, role: null, joinRequest: null, signedIn: false };
     const [membership] = await tx
       .select({ role: circleMembers.role })
       .from(circleMembers)
@@ -142,7 +144,17 @@ export async function getCircleViewerState(viewer: Viewer | null, circleId: stri
       .select({ id: follows.id })
       .from(follows)
       .where(and(eq(follows.followerId, viewer.id), eq(follows.followedCircleId, circleId)));
-    return { followers: followers?.value ?? 0, following: Boolean(follow), role: membership?.role ?? null, signedIn: true };
+    const [request] = await tx
+      .select({ status: circleJoinRequests.status })
+      .from(circleJoinRequests)
+      .where(and(eq(circleJoinRequests.circleId, circleId), eq(circleJoinRequests.userId, viewer.id)));
+    return {
+      followers: followers?.value ?? 0,
+      following: Boolean(follow),
+      role: membership?.role ?? null,
+      joinRequest: request?.status ?? null,
+      signedIn: true,
+    };
   });
 }
 
@@ -216,17 +228,38 @@ export async function getCircleForManage(viewer: Viewer, slug: string) {
       .orderBy(desc(circleSubmissions.updatedAt))
       .limit(200);
 
+    const joinRequests = await tx
+      .select({
+        id: circleJoinRequests.id,
+        createdAt: circleJoinRequests.createdAt,
+        username: profiles.username,
+        displayName: profiles.displayName,
+        publishedCount: publishedCountSql(),
+        donorActive: donorActiveSql(),
+      })
+      .from(circleJoinRequests)
+      .innerJoin(profiles, eq(profiles.id, circleJoinRequests.userId))
+      .where(and(eq(circleJoinRequests.circleId, circle.id), eq(circleJoinRequests.status, "pending")))
+      .orderBy(circleJoinRequests.createdAt)
+      .limit(200);
+
     return {
       id: circle.id,
       slug: circle.slug,
       name: circle.name,
       description: circle.description,
       accentColor: circle.accentColor,
+      isPrivate: circle.isPrivate,
       header: header(circle),
       role: membership.role,
       members: members.map(({ publishedCount, donorActive, ...m }) => ({
         ...m,
         displayName: m.displayName || m.username,
+        badges: badgeData({ publishedCount, donorActive }),
+      })),
+      joinRequests: joinRequests.map(({ publishedCount, donorActive, ...r }) => ({
+        ...r,
+        displayName: r.displayName || r.username,
         badges: badgeData({ publishedCount, donorActive }),
       })),
       pending: submissions.filter((s) => s.status === "pending"),

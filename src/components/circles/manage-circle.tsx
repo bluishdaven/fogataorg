@@ -5,7 +5,7 @@ import { useFormatter, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
-import { addCircleMember, decideSubmission, removeCircleMember, removeSubmission } from "@/app/actions/circles";
+import { addCircleMember, decideJoinRequest, decideSubmission, removeCircleMember, removeSubmission } from "@/app/actions/circles";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -105,6 +105,65 @@ export function SubmissionQueue({ pending, accepted }: { pending: Submission[]; 
         )}
       </section>
     </div>
+  );
+}
+
+type JoinRequest = { id: string; createdAt: Date; username: string; displayName: string; badges?: BadgeData };
+
+/** People asking to join a private circle; owners and editors let them in as writers or decline. */
+export function JoinRequests({ requests }: { requests: JoinRequest[] }) {
+  const t = useTranslations("Circles");
+  const format = useFormatter();
+  const router = useRouter();
+  const [busy, setBusy] = useState<string | null>(null);
+
+  const decide = async (request: JoinRequest, accept: boolean) => {
+    setBusy(request.id);
+    const result = await decideJoinRequest({ requestId: request.id, accept });
+    setBusy(null);
+    if (!result.ok) {
+      toast.error(t("errors.not_allowed"));
+      router.refresh();
+      return;
+    }
+    toast(accept ? t("joinAcceptedToast", { name: request.displayName }) : t("joinDeclinedToast"));
+    router.refresh();
+  };
+
+  return (
+    <section aria-labelledby="join-requests-heading" className="flex flex-col gap-2" data-testid="join-requests">
+      <h2 id="join-requests-heading" className="font-serif text-2xl font-semibold">
+        {t("joinRequests", { count: requests.length })}
+      </h2>
+      <p className="text-sm text-muted-foreground">{t("joinRequestsHint")}</p>
+      {requests.length === 0 ? (
+        <p className="text-sm text-muted-foreground">{t("joinRequestsEmpty")}</p>
+      ) : (
+        <ul className="divide-y divide-border">
+          {requests.map((request) => (
+            <li key={request.id} className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between" data-testid="join-request">
+              <span className="min-w-0">
+                <NextLink href={profilePath(request.username)} className="font-medium hover:text-ember-text">
+                  {request.displayName}
+                </NextLink>{" "}
+                <UserBadges badges={request.badges} />{" "}
+                <span className="text-xs text-muted-foreground">
+                  @{request.username} · {format.dateTime(request.createdAt, { dateStyle: "medium" })}
+                </span>
+              </span>
+              <span className="flex shrink-0 gap-1">
+                <Button size="sm" disabled={busy === request.id} onClick={() => void decide(request, true)}>
+                  {t("accept")}
+                </Button>
+                <Button size="sm" variant="outline" disabled={busy === request.id} onClick={() => void decide(request, false)}>
+                  {t("decline")}
+                </Button>
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }
 

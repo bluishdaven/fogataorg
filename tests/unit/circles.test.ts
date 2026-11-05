@@ -1,12 +1,19 @@
+import { createTranslator } from "next-intl";
 import { describe, expect, it } from "vitest";
+import en from "../../messages/en.json";
+import es from "../../messages/es.json";
 import {
   ACCENT_PRESETS,
   addMemberSchema,
   contrastRatio,
   createCircleSchema,
+  joinDecisionSchema,
+  joinRequestSchema,
   readableTextOn,
   relativeLuminance,
+  updateCircleSchema,
 } from "@/lib/domain/circles";
+import { notificationMessage, notificationPath, type NotificationItem, type SocialTranslator } from "@/lib/domain/notification-text";
 
 describe("accent contrast", () => {
   it("computes WCAG luminance and contrast", () => {
@@ -56,5 +63,54 @@ describe("addMemberSchema", () => {
     expect(addMemberSchema.parse({ circleId: id, username: "@lucia_ortega", role: "editor" }).username).toBe("lucia_ortega");
     expect(addMemberSchema.safeParse({ circleId: id, username: "x", role: "editor" }).success).toBe(false);
     expect(addMemberSchema.safeParse({ circleId: id, username: "lucia", role: "owner" }).success).toBe(false);
+  });
+});
+
+describe("private circles", () => {
+  const base = { name: "Lake Notes", description: "", accentColor: "#0F766E", header: null };
+  const id = "6f1d2c3b-4a5e-4f60-8a7b-9c0d1e2f3a4b";
+
+  it("are public unless the owner picks private", () => {
+    expect(createCircleSchema.parse(base).isPrivate).toBe(false);
+    expect(createCircleSchema.parse({ ...base, isPrivate: true }).isPrivate).toBe(true);
+    expect(updateCircleSchema.parse({ ...base, circleId: id, isPrivate: true }).isPrivate).toBe(true);
+    expect(createCircleSchema.safeParse({ ...base, isPrivate: "yes" }).success).toBe(false);
+  });
+
+  it("validate join requests and decisions", () => {
+    expect(joinRequestSchema.safeParse({ circleId: id }).success).toBe(true);
+    expect(joinRequestSchema.safeParse({ circleId: "lake-notes" }).success).toBe(false);
+    expect(joinDecisionSchema.safeParse({ requestId: id, accept: true }).success).toBe(true);
+    expect(joinDecisionSchema.safeParse({ requestId: id, accept: "yes" }).success).toBe(false);
+  });
+});
+
+describe("join notifications", () => {
+  function translator(messages: typeof en | typeof es, locale: "en" | "es"): SocialTranslator {
+    const t = createTranslator({ locale, messages, namespace: "Social" });
+    return (key, values) => (t as unknown as SocialTranslator)(key, values);
+  }
+  const item = (type: "join_request" | "join_accepted", others = 0): NotificationItem => ({
+    type,
+    actor: { username: "ana", name: "Ana" },
+    others,
+    story: null,
+    responseExcerpt: null,
+    circle: { slug: "lake-notes", name: "Lake Notes" },
+  });
+
+  it("say who asked or who let you in, in both languages", () => {
+    expect(notificationMessage(translator(en, "en"), item("join_request"))).toBe("Ana asked to join Lake Notes");
+    expect(notificationMessage(translator(en, "en"), item("join_request", 2))).toBe("Ana and 2 others asked to join Lake Notes");
+    expect(notificationMessage(translator(es, "es"), item("join_request", 1))).toBe("Ana y 1 persona más pidieron unirse a Lake Notes");
+    expect(notificationMessage(translator(en, "en"), item("join_accepted"))).toBe(
+      "Ana accepted you into Lake Notes. Your stories go straight in now.",
+    );
+    expect(notificationMessage(translator(es, "es"), item("join_accepted"))).toBe("Ana te aceptó en Lake Notes. Ahora tus historias entran directo.");
+  });
+
+  it("open the requests for editors and the circle for new members", () => {
+    expect(notificationPath(item("join_request"), "en")).toBe("/en/circles/lake-notes/manage");
+    expect(notificationPath(item("join_accepted"), "es")).toBe("/es/circles/lake-notes");
   });
 });

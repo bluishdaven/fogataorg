@@ -527,7 +527,9 @@
       "accepted": "{others, plural, =0 {{actor} accepted “{title}” into {circle}} one {{actor} accepted “{title}” into {circle}} other {{actor} accepted “{title}” into {circle}}}",
       "declined": "{others, plural, =0 {{actor} declined “{title}” for {circle}} one {{actor} declined “{title}” for {circle}} other {{actor} declined “{title}” for {circle}}}",
       "badge": "You earned the {badge, select, kindling {Kindling} candle {Candle} flame {Flame} torch {Torch} hearth {Hearth} bonfire {Bonfire} beacon {Beacon} star {Star} sun {Sun} phoenix {Phoenix} other {new}} badge: {count, plural, one {your first published story} other {# published stories}}. Keep the fire going!",
-      "donor": "You're a Firekeeper! Thank you for supporting Fogata with a donation."
+      "donor": "You're a Firekeeper! Thank you for supporting Fogata with a donation.",
+      "join_request": "{others, plural, =0 {{actor} asked to join {circle}} one {{actor} and # other asked to join {circle}} other {{actor} and # others asked to join {circle}}}",
+      "join_accepted": "{actor} accepted you into {circle}. Your stories go straight in now."
     },
     "savedTitle": "Saved",
     "savedLede": "Stories you've kept for later. Only you can see this list.",
@@ -575,6 +577,7 @@
     "savedToast": "Circle updated.",
     "stories": "Stories",
     "noStories": "No stories here yet. Writers can submit theirs from this page.",
+    "noStoriesPrivate": "No stories here yet. Members can publish theirs from this page.",
     "editors": "Editors",
     "roles": {
       "owner": "Owner",
@@ -617,6 +620,24 @@
     "removeMember": "Remove",
     "removeMemberConfirm": "Remove this person from the circle?",
     "close": "Close",
+    "privacy": "Who can publish",
+    "public": "Public",
+    "publicHint": "Anyone can submit a story. Editors review it unless the writer is a member.",
+    "private": "Private",
+    "privateHint": "Only members publish. Anyone can still read it, and others can ask to join: you and your editors decide.",
+    "privateLabel": "Private circle",
+    "privateNote": "Anyone can read. Only members publish here.",
+    "requestToJoin": "Request to join",
+    "requestSent": "Request sent",
+    "requestSentToast": "Request sent. {circle}'s editors will decide.",
+    "cancelRequest": "Cancel request",
+    "requestCanceledToast": "Request canceled.",
+    "requestDeclined": "Your request to join wasn't accepted.",
+    "joinRequests": "{count, plural, =0 {Requests to join} other {Requests to join (#)}}",
+    "joinRequestsEmpty": "No one is waiting to join.",
+    "joinRequestsHint": "People you accept join as writers: their stories go straight into the circle.",
+    "joinAcceptedToast": "Accepted. {name} can publish here now.",
+    "joinDeclinedToast": "Request declined.",
     "errors": {
       "unauthorized": "Your session ended. Sign in again.",
       "not_allowed": "You can't do that in this circle.",
@@ -631,7 +652,8 @@
       "userNotFound": "No one has that username.",
       "alreadyMember": "That person is already in the circle.",
       "alreadySubmitted": "That story is already in (or waiting for) a circle.",
-      "invalid": "Something's not right. Try again."
+      "invalid": "Something's not right. Try again.",
+      "alreadyRequested": "You've already asked to join this circle."
     },
     "uploadErrors": {
       "type": "That file type isn't supported. Use JPEG, PNG, WebP, GIF or AVIF.",

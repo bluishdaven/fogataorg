@@ -62,6 +62,8 @@ const circleFields = {
     .regex(HEX, { message: "accent" })
     .transform((value) => value.toLowerCase()),
   header: headerSchema,
+  /** Private: only members publish; everyone else can ask to join. Anyone can still read. */
+  isPrivate: z.boolean().default(false),
 };
 
 export const createCircleSchema = z
@@ -94,6 +96,8 @@ export const addMemberSchema = z.object({
 
 export const submissionSchema = z.object({ circleId: z.uuid(), storyId: z.uuid() });
 export const decisionSchema = z.object({ submissionId: z.uuid(), status: z.enum(["accepted", "declined"]) });
+export const joinRequestSchema = z.object({ circleId: z.uuid() });
+export const joinDecisionSchema = z.object({ requestId: z.uuid(), accept: z.boolean() });
 
 export type CircleErrorKey =
   | "unauthorized"
@@ -109,4 +113,5 @@ export type CircleErrorKey =
   | "userNotFound"
   | "alreadyMember"
   | "alreadySubmitted"
+  | "alreadyRequested"
   | "invalid";

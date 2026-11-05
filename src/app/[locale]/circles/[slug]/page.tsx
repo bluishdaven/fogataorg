@@ -5,6 +5,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { CircleHeader } from "@/components/circles/circle-header";
+import { JoinCircleButton } from "@/components/circles/join-circle-button";
 import { SubmitStoryDialog } from "@/components/circles/submit-story-dialog";
 import { FollowButton } from "@/components/social/toggle-buttons";
 import { StoryCard } from "@/components/story-card";
@@ -44,9 +45,16 @@ async function Circle({ params }: Pick<Props, "params">) {
 
   return (
     <>
-      <CircleHeader name={circle.name} description={circle.description} accentColor={circle.accentColor} header={circle.header}>
+      <CircleHeader
+        name={circle.name}
+        description={circle.description}
+        accentColor={circle.accentColor}
+        header={circle.header}
+        privateLabel={circle.isPrivate ? t("privateLabel") : null}
+        privateNote={circle.isPrivate ? t("privateNote") : null}
+      >
         <Suspense fallback={<div className="h-8 w-40 animate-pulse rounded bg-black/10" aria-hidden />}>
-          <CircleActions circleId={circle.id} slug={circle.slug} name={circle.name} />
+          <CircleActions circleId={circle.id} slug={circle.slug} name={circle.name} isPrivate={circle.isPrivate} />
         </Suspense>
       </CircleHeader>
       <div className="mt-10 grid gap-10 md:grid-cols-[minmax(0,1fr)_14rem]">
@@ -55,7 +63,7 @@ async function Circle({ params }: Pick<Props, "params">) {
             {t("stories")}
           </h2>
           {circle.stories.length === 0 ? (
-            <p className="py-8 text-muted-foreground">{t("noStories")}</p>
+            <p className="py-8 text-muted-foreground">{t(circle.isPrivate ? "noStoriesPrivate" : "noStories")}</p>
           ) : (
             <div data-testid="circle-stories">
               {circle.stories.map((story) => (
@@ -85,11 +93,14 @@ async function Circle({ params }: Pick<Props, "params">) {
   );
 }
 
-async function CircleActions({ circleId, slug, name }: { circleId: string; slug: string; name: string }) {
+async function CircleActions({ circleId, slug, name, isPrivate }: { circleId: string; slug: string; name: string; isPrivate: boolean }) {
   const viewer = await getViewer();
   const [state, t, locale] = await Promise.all([getCircleViewerState(viewer, circleId), getTranslations("Circles"), getLocale()]);
-  const submittable = viewer ? await listSubmittableStories(viewer) : [];
+  // Private circles take stories from members only; everyone else asks to join first.
+  const canSubmit = Boolean(viewer) && (!isPrivate || state.role !== null);
+  const submittable = canSubmit && viewer ? await listSubmittableStories(viewer) : [];
   const canManage = state.role === "owner" || state.role === "editor";
+  const loginHref = `/${locale}/login?next=${encodeURIComponent(`/${locale}/circles/${slug}`)}`;
   return (
     <div className="flex flex-wrap items-center gap-3 text-sm">
       <span className="opacity-90" data-testid="circle-followers">
@@ -100,9 +111,18 @@ async function CircleActions({ circleId, slug, name }: { circleId: string; slug:
         id={circleId}
         initialFollowing={state.following}
         signedIn={state.signedIn}
-        loginHref={`/${locale}/login?next=${encodeURIComponent(`/${locale}/circles/${slug}`)}`}
+        loginHref={loginHref}
       />
-      {viewer ? <SubmitStoryDialog circleId={circleId} circleName={name} stories={submittable} /> : null}
+      {canSubmit ? <SubmitStoryDialog circleId={circleId} circleName={name} stories={submittable} /> : null}
+      {isPrivate && state.role === null ? (
+        <JoinCircleButton
+          circleId={circleId}
+          circleName={name}
+          initialRequest={state.joinRequest}
+          signedIn={state.signedIn}
+          loginHref={loginHref}
+        />
+      ) : null}
       {canManage ? (
         <Link href={`/circles/${slug}/manage`} className={buttonVariants({ variant: "secondary", size: "sm" })} data-testid="manage-circle">
           {t("manage")}

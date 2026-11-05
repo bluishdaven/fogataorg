@@ -25,7 +25,7 @@ export function CircleForm({
 }: {
   userId: string;
   /** Present when editing an existing circle. */
-  initial?: { circleId: string; slug: string; name: string; description: string; accentColor: string; header: Header };
+  initial?: { circleId: string; slug: string; name: string; description: string; accentColor: string; header: Header; isPrivate: boolean };
 }) {
   const t = useTranslations("Circles");
   const locale = useLocale();
@@ -36,6 +36,7 @@ export function CircleForm({
   const [description, setDescription] = useState(initial?.description ?? "");
   const [accent, setAccent] = useState(initial?.accentColor ?? ACCENT_PRESETS[0]);
   const [header, setHeader] = useState<Header>(initial?.header ?? null);
+  const [isPrivate, setIsPrivate] = useState(initial?.isPrivate ?? false);
   const [errors, setErrors] = useState<CircleErrorKey[]>([]);
   const [pending, setPending] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -62,8 +63,8 @@ export function CircleForm({
     setPending(true);
     setErrors([]);
     const result = initial
-      ? await updateCircle({ circleId: initial.circleId, name, description, accentColor: accent, header })
-      : await createCircle({ name, slug: shownSlug, description, accentColor: accent, header });
+      ? await updateCircle({ circleId: initial.circleId, name, description, accentColor: accent, header, isPrivate })
+      : await createCircle({ name, slug: shownSlug, description, accentColor: accent, header, isPrivate });
     setPending(false);
     if (!result.ok) {
       setErrors(result.errors);
@@ -145,6 +146,32 @@ export function CircleForm({
           className="rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
         />
       </div>
+
+      <fieldset className="flex flex-col gap-2">
+        <legend className="mb-1 text-sm font-medium">{t("privacy")}</legend>
+        {([false, true] as const).map((value) => (
+          <label
+            key={String(value)}
+            className={cn(
+              "flex cursor-pointer gap-3 rounded-lg border p-3 has-focus-visible:ring-3 has-focus-visible:ring-ring/50",
+              isPrivate === value ? "border-primary bg-ember-soft/40" : "border-border",
+            )}
+          >
+            <input
+              type="radio"
+              name="circle-privacy"
+              value={value ? "private" : "public"}
+              checked={isPrivate === value}
+              onChange={() => setIsPrivate(value)}
+              className="mt-1 size-4 accent-primary"
+            />
+            <span className="flex flex-col gap-0.5">
+              <span className="text-sm font-medium">{value ? t("private") : t("public")}</span>
+              <span className="text-xs text-muted-foreground">{value ? t("privateHint") : t("publicHint")}</span>
+            </span>
+          </label>
+        ))}
+      </fieldset>
 
       <fieldset className="flex flex-col gap-2">
         <legend className="mb-1 text-sm font-medium">{t("accent")}</legend>
