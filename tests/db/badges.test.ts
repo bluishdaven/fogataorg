@@ -1,7 +1,8 @@
-import { eq, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { afterAll, describe, expect, it } from "vitest";
 import { donorActiveSql, publishedCountSql } from "@/lib/data/badge-sql";
-import { donorGrants, profiles, stories } from "@/lib/db/schema";
+import { donorGrants, notifications, profiles, stories } from "@/lib/db/schema";
+import { WRITING_TIERS } from "@/lib/domain/badges";
 import { closeDb, expectPgError, PG, scenario, type Harness } from "./harness";
 
 afterAll(closeDb);
@@ -155,6 +156,111 @@ describe("writing tier count", () => {
         tx.select({ count: publishedCountSql() }).from(profiles).where(eq(profiles.id, writer)),
       );
       expect(row?.count).toBe(2);
+    });
+  });
+});
+
+describe("badge notifications", () => {
+  const story = (authorId: string, overrides: Partial<typeof stories.$inferInsert> = {}) => ({
+    authorId,
+    title: "T",
+    language: "es" as const,
+    slug: `b-${Math.random().toString(36).slice(2, 9)}`,
+    status: "published" as const,
+    publishedAt: new Date(Date.now() - HOUR),
+    ...overrides,
+  });
+  const badgeNotices = (h: Harness, id: string) =>
+    h.tx
+      .select({ type: notifications.type, badge: notifications.badge, readAt: notifications.readAt })
+      .from(notifications)
+      .where(and(eq(notifications.userId, id), inArray(notifications.type, ["badge", "donor"])));
+
+  it("use the same tiers as the app", async () => {
+    await scenario(async (h) => {
+      let previous = 0;
+      for (const tier of WRITING_TIERS) {
+        const [row] = await h.tx.execute<{ at: number; below: number; key: string }>(
+          sql`select public.writing_tier_min(${tier.min}) as at, public.writing_tier_min(${tier.min - 1}) as below, public.writing_tier_key(${tier.min}) as key`,
+        );
+        expect(row).toEqual({ at: tier.min, below: previous, key: tier.key });
+        previous = tier.min;
+      }
+    });
+  });
+
+  it("tell a writer once about each new tier, even if stories come and go", async () => {
+    await scenario(async (h) => {
+      const writer = await h.createUser();
+      const [first] = await h.tx.insert(stories).values(story(writer)).returning({ id: stories.id });
+      expect(await badgeNotices(h, writer)).toEqual([{ type: "badge", badge: "kindling", readAt: null }]);
+
+      // Stories 2–4 reach no new tier; the 5th does, and the unread notice moves up to it.
+      await h.tx.insert(stories).values([story(writer), story(writer), story(writer)]);
+      expect((await badgeNotices(h, writer)).map((n) => n.badge)).toEqual(["kindling"]);
+      await h.tx.insert(stories).values(story(writer));
+      expect((await badgeNotices(h, writer)).map((n) => n.badge)).toEqual(["candle"]);
+
+      // Read it, drop below Candle and come back: no second notice.
+      await h.tx.update(notifications).set({ readAt: new Date() }).where(eq(notifications.userId, writer));
+      await h.tx.update(stories).set({ status: "draft" }).where(eq(stories.id, first!.id));
+      await h.tx.update(stories).set({ status: "published" }).where(eq(stories.id, first!.id));
+      expect(await badgeNotices(h, writer)).toHaveLength(1);
+
+      // Drafts, unlisted and scheduled stories don't count.
+      const other = await h.createUser();
+      await h.tx.insert(stories).values([
+        story(other, { status: "draft", publishedAt: null }),
+        story(other, { status: "unlisted" }),
+        story(other, { publishedAt: new Date(Date.now() + 24 * HOUR) }),
+      ]);
+      expect(await badgeNotices(h, other)).toHaveLength(0);
+    });
+  });
+
+  it("reach writers whose scheduled story went live, when the daily job runs", async () => {
+    await scenario(async (h) => {
+      const writer = await h.createUser();
+      // A scheduled story going live changes no row, so no trigger runs: simulate that.
+      await h.tx.execute(sql`alter table public.stories disable trigger stories_check_writing_badge`);
+      await h.tx.insert(stories).values(story(writer));
+      await h.tx.execute(sql`alter table public.stories enable trigger stories_check_writing_badge`);
+      expect(await badgeNotices(h, writer)).toHaveLength(0);
+
+      await h.tx.execute(sql`select public.check_due_writing_badges()`);
+      expect((await badgeNotices(h, writer)).map((n) => n.badge)).toEqual(["kindling"]);
+      await h.tx.execute(sql`select public.check_due_writing_badges()`);
+      expect(await badgeNotices(h, writer)).toHaveLength(1);
+    });
+  });
+
+  it("thank donors when an admin grants the badge", async () => {
+    await scenario(async (h) => {
+      const owner = await h.createUser();
+      const donor = await h.createUser();
+      await grant(h, adminClaims(h, owner), donor);
+      expect(await badgeNotices(h, donor)).toEqual([{ type: "donor", badge: "donor", readAt: null }]);
+      // The donor sees it under RLS like any other notification.
+      const own = await h.as(h.claimsFor(donor), (tx) => tx.select({ type: notifications.type }).from(notifications));
+      expect(own.map((n) => n.type)).toContain("donor");
+    });
+  });
+
+  it("can't be sent or faked by readers", async () => {
+    await scenario(async (h) => {
+      const someone = await h.createUser();
+      await expectPgError(
+        h.as(h.claimsFor(someone), (tx) => tx.execute(sql`select public.notify_badge(${someone}::uuid, 'donor', 'donor')`)),
+        PG.insufficientPrivilege,
+      );
+      await expectPgError(
+        h.as(h.claimsFor(someone), (tx) => tx.execute(sql`select public.check_due_writing_badges()`)),
+        PG.insufficientPrivilege,
+      );
+      await expectPgError(
+        h.as(h.claimsFor(someone), (tx) => tx.update(profiles).set({ badgeTierNotified: 0 }).where(eq(profiles.id, someone))),
+        PG.insufficientPrivilege,
+      );
     });
   });
 });

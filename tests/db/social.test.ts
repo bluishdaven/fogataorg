@@ -1,4 +1,4 @@
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, notInArray, sql } from "drizzle-orm";
 import { afterAll, describe, expect, it } from "vitest";
 import { bookmarks, follows, notifications, responses, responseSparks, sparks, stories, topics } from "@/lib/db/schema";
 import { closeDb, expectPgError, PG, scenario, type Harness } from "./harness";
@@ -23,8 +23,12 @@ async function makeStory(h: Harness, authorId: string, overrides: Partial<typeof
   return row!;
 }
 
+/** Social notifications (publishing also earns badge notices; tests/db/badges.test.ts covers those). */
 async function notificationsFor(h: Harness, userId: string) {
-  return h.tx.select().from(notifications).where(eq(notifications.userId, userId));
+  return h.tx
+    .select()
+    .from(notifications)
+    .where(and(eq(notifications.userId, userId), notInArray(notifications.type, ["badge", "donor"])));
 }
 
 describe("follows", () => {

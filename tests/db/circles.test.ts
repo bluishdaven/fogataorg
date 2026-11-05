@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, notInArray } from "drizzle-orm";
 import { afterAll, describe, expect, it } from "vitest";
 import { circleMembers, circles, circleSubmissions, follows, notifications, stories } from "@/lib/db/schema";
 import { closeDb, expectPgError, PG, scenario, type Harness } from "./harness";
@@ -142,7 +142,10 @@ describe("circle submissions", () => {
       expect(decided).toMatchObject({ status: "accepted", decidedBy: editor });
       expect(decided?.decidedAt).toBeInstanceOf(Date);
 
-      const [notice] = await h.tx.select().from(notifications).where(eq(notifications.userId, writer));
+      const [notice] = await h.tx
+        .select()
+        .from(notifications)
+        .where(and(eq(notifications.userId, writer), notInArray(notifications.type, ["badge", "donor"])));
       expect(notice).toMatchObject({ type: "accepted", circleId: circle.id, actorIds: [editor] });
 
       const nowPublic = await h.as(null, (tx) => tx.select().from(circleSubmissions).where(eq(circleSubmissions.id, submission!.id)));

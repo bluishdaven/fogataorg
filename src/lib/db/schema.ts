@@ -62,6 +62,9 @@ export const profiles = pgTable(
     // Donor badge (grant_donor_badge, owner only): first grant, and when the current two months end.
     donorSince: timestamp("donor_since", { withTimezone: true }),
     donorUntil: timestamp("donor_until", { withTimezone: true }),
+    // Highest writing tier (its minimum story count) the writer was notified about, so a tier is
+    // announced once even if stories are unpublished and published again. Set by trigger only.
+    badgeTierNotified: integer("badge_tier_notified").notNull().default(0),
     ...timestamps,
   },
   (t) => [
@@ -234,6 +237,9 @@ export const notificationType = pgEnum("notification_type", [
   "submission",
   "accepted",
   "declined",
+  // A new writing tier (notifications.badge holds its key) or the donor badge being granted.
+  "badge",
+  "donor",
 ]);
 
 /** A reader following a writer or a topic (circles later). Exactly one target is set. */
@@ -414,6 +420,8 @@ export const notifications = pgTable(
     storyId: uuid("story_id").references(() => stories.id, { onDelete: "cascade" }),
     responseId: uuid("response_id").references(() => responses.id, { onDelete: "cascade" }),
     circleId: uuid("circle_id").references((): AnyPgColumn => circles.id, { onDelete: "cascade" }),
+    // Badge notifications: the writing tier key ("candle"…) or "donor". They have no actors.
+    badge: text("badge"),
     actorIds: uuid("actor_ids").array().notNull().default(sql`'{}'::uuid[]`),
     actorCount: integer("actor_count").notNull().default(1),
     readAt: timestamp("read_at", { withTimezone: true }),

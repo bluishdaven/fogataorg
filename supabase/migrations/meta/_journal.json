@@ -183,6 +183,20 @@
       "when": 1793887644487,
       "tag": "20261105140724_moderation_functions",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1793900806950,
+      "tag": "20261105174646_badge_notifications",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1793900812536,
+      "tag": "20261105174652_badge_notification_functions",
+      "breakpoints": true
     }
   ]
 }
