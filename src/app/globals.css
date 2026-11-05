@@ -193,6 +193,10 @@ html[data-reader-font="sans"] .prose-fogata {
     /* Keeps anchors and keyboard-focused elements clear of the sticky header (WCAG 2.4.11). */
     scroll-padding-top: 5rem;
   }
+  /* Story pages also have the 48px StoryTitleBar under the header (112px together on phones). */
+  html:has(#story) {
+    scroll-padding-top: 8rem;
+  }
   body {
     @apply bg-background text-foreground antialiased;
     text-rendering: optimizeLegibility;

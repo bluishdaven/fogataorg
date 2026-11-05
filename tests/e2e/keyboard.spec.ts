@@ -61,6 +61,28 @@ test("focused elements never hide under the sticky header when tabbing backwards
   }
 });
 
+test("on a story, focus also stays clear of the title bar under the header", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 700 });
+  await page.goto("/@lucia_ortega/el-mole-de-mi-abuela-no-tiene-receta");
+  await page.getByRole("contentinfo").getByRole("link").last().focus();
+  for (let i = 0; i < 15; i++) {
+    await page.keyboard.press("Shift+Tab");
+    // Let the bar finish sliding in or out before measuring.
+    await page.waitForTimeout(250);
+    const { top, covered } = await page.evaluate(() => {
+      const el = document.activeElement;
+      const header = document.querySelector("[data-site-header]")!.getBoundingClientRect().bottom;
+      const bar = document.querySelector<HTMLElement>("[data-testid=story-title-bar]");
+      const barBottom = bar?.dataset.shown === "true" ? bar.getBoundingClientRect().bottom : 0;
+      return {
+        top: el && !el.closest("header, [data-testid=story-title-bar]") ? el.getBoundingClientRect().top : null,
+        covered: Math.max(header, barBottom),
+      };
+    });
+    if (top !== null) expect(top).toBeGreaterThanOrEqual(covered);
+  }
+});
+
 test("closing the badge guide puts focus back on the badge that opened it", async ({ page }) => {
   await page.goto("/@danawrites");
   const chip = page.getByTestId("badge-chip").first();

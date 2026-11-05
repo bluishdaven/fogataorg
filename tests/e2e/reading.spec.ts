@@ -41,3 +41,23 @@ test("unknown pages show the localized not-found page", async ({ page }) => {
   await page.goto("/es/no-existe");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Aquí se pierde el rastro");
 });
+
+test("the title and writer stay in a slim bar while reading, and leave at the top", async ({ page }) => {
+  await page.goto("/@lucia_ortega/el-mole-de-mi-abuela-no-tiene-receta");
+  const bar = page.getByTestId("story-title-bar");
+  await expect(bar).toHaveAttribute("data-shown", "false");
+  await expect(bar).toBeHidden();
+
+  // Past the byline, the bar slides in under the site header with both.
+  await page.locator("#story-body").scrollIntoViewIfNeeded();
+  await page.mouse.wheel(0, 400);
+  await expect(bar).toHaveAttribute("data-shown", "true");
+  await expect(bar).toBeVisible();
+  await expect(bar).toContainText("El mole de mi abuela no tiene receta");
+  await expect(bar).toContainText("Lucía Ortega");
+  // It repeats the page's own header, so assistive tech skips it.
+  await expect(bar).toHaveAttribute("aria-hidden", "true");
+
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await expect(bar).toHaveAttribute("data-shown", "false");
+});

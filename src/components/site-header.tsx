@@ -10,7 +10,7 @@ import { Link } from "@/i18n/navigation";
 export function SiteHeader() {
   const t = useTranslations("Nav");
   return (
-    <header className="group/header sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/70">
+    <header data-site-header className="group/header sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/70">
       <div className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-2 px-4 sm:h-14 sm:gap-4">
         <Link
           href="/"

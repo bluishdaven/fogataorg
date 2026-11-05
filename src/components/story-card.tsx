@@ -51,6 +51,12 @@ export function StoryCard({ story }: { story: StoryCardData }) {
             {story.subtitle}
           </p>
         ) : null}
+        {/* A taste of the opening; NSFW stories keep their text behind the warning. */}
+        {story.excerpt && !story.nsfw ? (
+          <p className="line-clamp-2 text-sm leading-relaxed text-pretty text-muted-foreground sm:text-[0.9375rem]" lang={story.language} data-testid="story-preview">
+            {story.excerpt}
+          </p>
+        ) : null}
         <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
           <span
             className="rounded-full border border-border px-2 py-px text-xs font-semibold tracking-wide"

@@ -47,6 +47,22 @@ describe("StoryCard", () => {
     expect(screen.getByRole("heading", { level: 3 })).toHaveAttribute("lang", "en");
   });
 
+  it("previews the opening of the story, in its own language", () => {
+    renderIn("es");
+    const preview = screen.getByTestId("story-preview");
+    expect(preview).toHaveTextContent("There is a great blue heron…");
+    expect(preview).toHaveAttribute("lang", "en");
+  });
+
+  it("keeps the text of NSFW stories out of lists", () => {
+    render(
+      <NextIntlClientProvider locale="en" messages={en} timeZone="UTC">
+        <StoryCard story={{ ...story, nsfw: true }} />
+      </NextIntlClientProvider>,
+    );
+    expect(screen.queryByTestId("story-preview")).not.toBeInTheDocument();
+  });
+
   it("shows a decorative thumbnail when the story has an image", () => {
     render(
       <NextIntlClientProvider locale="en" messages={en} timeZone="UTC">

@@ -10,6 +10,7 @@ import { RemovedNotice } from "@/components/moderation/removed-notice";
 import { UserBadges } from "@/components/badges/user-badges";
 import { ReaderControls } from "@/components/reader-controls";
 import { ReadingProgress } from "@/components/reading-progress";
+import { StoryTitleBar } from "@/components/story-title-bar";
 import { StoryBody } from "@/components/story-body";
 import { StoryResponses } from "@/components/social/story-responses";
 import { StorySocial } from "@/components/social/story-social";
@@ -101,7 +102,15 @@ async function Story({ params }: Pick<Props, "params">) {
   return (
     <article id="story" className="px-4 py-12 sm:py-16" lang={story.language}>
       <ReadingProgress targetId="story" />
-      <header className="mx-auto mb-10 flex max-w-[var(--measure)] flex-col gap-4">
+      <StoryTitleBar
+        headerId="story-header"
+        storyId="story"
+        title={story.title}
+        authorName={authorName}
+        avatarUrl={story.authorAvatarUrl}
+        lang={story.language}
+      />
+      <header id="story-header" className="mx-auto mb-10 flex max-w-[var(--measure)] flex-col gap-4">
         {story.circle ? (
           <Link
             href={`/circles/${story.circle.slug}`}

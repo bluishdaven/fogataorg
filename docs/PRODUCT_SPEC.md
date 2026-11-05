@@ -30,7 +30,7 @@ You are a senior full-stack engineer and product designer building **Fogata.org*
 | Concept | Fogata term (ES) | English UI |
 | --- | --- | --- |
 | Applause / like | Chispas | Sparks |
-| Community / publication | Fogata (círculo) | Circle |
+| Community / publication | Círculo | Circle |
 | Saved highlight | Brasa | Ember |
 | Reading list | Leña guardada | Saved |
 | Trending | Lo que arde | Burning now |
