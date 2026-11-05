@@ -1,5 +1,22 @@
 # Changelog
 
+## Phase 2, part 3 — Email summaries (2026-11-05)
+
+**Demo** (signed in): avatar menu → **Settings** → **Email** shows Daily / Weekly / Off (Daily by
+default). Get a follow or a spark from a second account, wait 10 minutes (or age the notification),
+then run the job: `curl -H "Authorization: Bearer $CRON_SECRET" localhost:3000/api/cron/notification-emails`.
+The summary arrives in Mailpit (http://127.0.0.1:54324) in your language, with links to each story
+and an **Unsubscribe** link that asks for confirmation.
+
+- Resend in production, Mailpit locally; React Email template sharing the notification wording with
+  the in-app list.
+- `profiles.email_frequency` / `email_last_sent_at`, `notifications.emailed_at`. A group that gets a new
+  actor after being emailed is due again; marking notifications read or emailed no longer changes
+  the time shown on the notifications page (that was a bug: opening the page re-dated everything).
+- Daily Vercel Cron (`vercel.json`), protected by `CRON_SECRET`; one-click unsubscribe headers.
+- Tests: 122 unit, 47 RLS/trigger/job, 61 Playwright (cron → Mailpit → unsubscribe, one-click POST,
+  tampered tokens). Also fixed two e2e flakes (same-millisecond circle names, `/` before hydration).
+
 ## Phase 2, part 2 — Circles (2026-11-05)
 
 **Demo** (signed in): footer → **Circles** → **Start a circle**. Pick a name, an accent color (text

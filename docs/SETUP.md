@@ -13,6 +13,9 @@ npm run dev       # http://localhost:3000
 - Sign in at `/en/login` with any address; the magic link lands in Mailpit at
   http://127.0.0.1:54324. Seeded writers use `*@fogata.test` addresses.
 - Supabase Studio: http://127.0.0.1:54323.
+- Activity summary emails also land in Mailpit (no Resend key needed locally). Send them now with
+  `curl -H "Authorization: Bearer $CRON_SECRET" localhost:3000/api/cron/notification-emails`
+  (the secret is in `.env.local`). Notifications younger than 10 minutes wait for the next run.
 - Stop the stack with `npm run db:stop`. `npm run setup` is safe to re-run.
 - After re-seeding, restart `npm run dev` (cached listings don't know about seed runs).
 
@@ -67,7 +70,8 @@ tests and a runtime dependency audit, then RLS and e2e tests against a throwaway
    Link* and `supabase/templates/confirmation.html` into *Confirm signup* (subjects are in
    `supabase/config.toml`). They link to `/auth/confirm` with a token hash.
 5. **Authentication → SMTP**: Supabase's built-in mailer is for testing only (a few emails per
-   hour). Configure a real SMTP provider before inviting anyone.
+   hour). Point it at Resend (step 4 below): host `smtp.resend.com`, port `465`, user `resend`,
+   password = a Resend API key, sender = the same address as `EMAIL_FROM`.
 6. **Google provider**: enable it with your Google client; add
    `https://<project-ref>.supabase.co/auth/v1/callback` as an authorized redirect URI in Google.
 7. Copy the **publishable key**, **secret key** and the **transaction pooler** connection string
@@ -89,15 +93,46 @@ Never run `npm run db:seed` against production; it refuses unless you pass `--al
    | `DATABASE_URL` | transaction pooler URL (port 6543) |
    | `UNSPLASH_ACCESS_KEY` | Unsplash access key (optional) |
    | `UNSPLASH_LANG_BETA` | `true` once Unsplash enables the `lang` beta |
+   | `RESEND_API_KEY` | Resend API key with sending access (step 4) |
+   | `EMAIL_FROM` | `Fogata <hola@fogata.org>` (a verified Resend domain) |
+   | `EMAIL_SIGNING_SECRET` | `openssl rand -base64 32`; signs unsubscribe links, keep it stable |
+   | `CRON_SECRET` | `openssl rand -base64 32`; Vercel Cron sends it to the summary route |
 
    The secret key is **not** needed by the app; keep it out of Vercel until a feature needs it.
 3. `next build` reads published stories to prerender listings, so the build needs `DATABASE_URL`.
 4. Add the `fogata.org` domain.
+5. `vercel.json` schedules `/api/cron/notification-emails` daily at 16:00 UTC (10:00 in Mexico City,
+   17:00/18:00 in Madrid). Hobby allows daily crons only and may run them any time within that
+   hour, which the job tolerates. Vercel adds the `CRON_SECRET` bearer header itself.
+
+### 4. Email (Resend)
+
+Fogata sends one kind of email itself: a batched activity summary (at most one a day by default,
+or weekly, or off, chosen in **Settings → Email**). Magic links come from Supabase Auth, which can
+use Resend's SMTP (step 2.5 above).
+
+1. Create a Resend account and add the `fogata.org` domain. Add the DNS records it shows (SPF and
+   DKIM) and a DMARC record, e.g. `v=DMARC1; p=none; rua=mailto:<you>`. Wait until it's verified.
+2. Create an API key with **sending access** only, for that domain. Put it in Vercel as
+   `RESEND_API_KEY`, and set `EMAIL_FROM`, `EMAIL_SIGNING_SECRET` and `CRON_SECRET` (table above).
+3. Trigger a run by hand to check it:
+   `curl -H "Authorization: Bearer <CRON_SECRET>" https://fogata.org/api/cron/notification-emails`
+   returns `{"sent":…,"failed":…,"skipped":…}`; failures are logged in Vercel with the user id.
+4. Every summary carries `List-Unsubscribe` and `List-Unsubscribe-Post` (one-click, RFC 8058),
+   which Gmail and Yahoo require of bulk senders. The footer link opens a confirm page instead,
+   because mail scanners prefetch links.
+
+Previews share production's Resend key only if you add it to the Preview environment; leave it out
+so preview deploys never email real readers (their cron doesn't run anyway).
 
 ### Cost notes
 
 - Supabase Free pauses projects after 7 days without activity and has no image transformations;
   expect Supabase Pro for launch.
 - Supabase's built-in email is rate-limited to a few messages per hour; production needs SMTP
-  (Resend is in the spec; its free tier allows 100 emails/day).
+  (Resend, step 4).
+- Resend's free tier allows 3,000 emails a month and 100 a day, shared by magic links and summaries.
+  Summaries go out in one daily run, so once more than ~80 readers have something new on the same
+  day, that run hits the daily cap (the rest are retried the next day). Plan on Resend Pro then;
+  it's a paid service, so decide before launch.
 - Vercel Hobby is for non-commercial use; confirm a donation-funded .org qualifies before launch.

@@ -8,7 +8,7 @@ whole story or to one paragraph) and get grouped notifications that never spam.
 Done: follows, sparks, saved, responses (threads, paragraph anchors, mentions, pinning, sparks),
 in-app notifications with Realtime. Also shipped alongside: list thumbnails and search.
 Circles shipped the same day (members, submission queue, follows, notifications, search).
-Remaining: email notifications (provider decision pending).
+Email notifications shipped last (Resend): batched daily/weekly summaries with one-click unsubscribe.
 
 ## Order
 
@@ -33,7 +33,8 @@ Remaining: email notifications (provider decision pending).
 | Pinning | Security-definer SQL function that checks the caller wrote the story | RLS can't let story authors change only `pinned_at` on someone else's row. |
 | Notifications | Created by database triggers, grouped per (recipient, type, story/response) while unread | "12 people sparked your story" for free; no app code path can forget to notify. |
 | Realtime | Supabase Realtime `postgres_changes` on `notifications`, RLS-filtered to the recipient | Live badge without polling. |
-| Email | Not in this pass | Needs an email provider decision (Resend in the spec has a free tier but needs an account and key); notifications are stored so email digests can batch them later. |
+| Email | Resend; one batched summary per reader per day (default) or week, or off; never one email per event | Quiet by design. A daily Vercel Cron (Hobby allows daily only) runs the job; it claims each reader before sending so overlapping runs can't double-send, and gives the claim back on failure. Locally it delivers to Mailpit. |
+| Unsubscribe | HMAC-signed token per reader; RFC 8058 one-click POST plus a confirm page for the footer link | Works signed out, can't be forged, and link scanners that prefetch GET URLs can't unsubscribe anyone. |
 
 ## Tables
 

@@ -45,6 +45,18 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   submissions are auto-accepted by an AFTER INSERT trigger because RLS checks run after BEFORE
   triggers). Editors decide; `decided_by/at` are stamped by trigger. Text on an accent always uses
   `readableTextOn()` (white or pure black, ≥ 4.58:1). Circle pages live at `/{locale}/circles/{slug}`.
+- **Email** (`src/lib/email/`, `src/emails/`, `src/app/api/cron/notification-emails`). Batched activity
+  summaries only, never one email per event: `profiles.email_frequency` (daily default, weekly, off),
+  sent by a daily Vercel Cron (`vercel.json`, Bearer `CRON_SECRET`). The job claims a reader by
+  stamping `email_last_sent_at` before sending (gives it back on failure) and marks covered
+  notifications `emailed_at`; `notify()` clears `emailed_at` when a new actor joins a group. Resend
+  when `RESEND_API_KEY` is set, else Mailpit (`MAILPIT_URL`). Wording and links come from
+  `src/lib/domain/notification-text.ts`, shared with the notifications page. Unsubscribe tokens are
+  HMAC-signed (`EMAIL_SIGNING_SECRET`); POST `/api/email/unsubscribe` is RFC 8058 one-click, and the
+  footer link opens a confirm page because scanners prefetch GET links. The job and token unsubscribe
+  are the only app code that uses the owner `db` (addresses live in `auth.users`; no session).
+- **Notification times:** `notifications.updated_at` means "last new activity". Its trigger fires only
+  on `actor_ids`/`actor_count` changes, so marking read or emailed never re-dates a group.
 - **Raw SQL inside Drizzle selects:** on single-table queries Drizzle renders `${table.column}` unqualified,
   which breaks correlated subqueries (`"id"` resolves to the subquery's table). Write the qualified name
   (`"circles"."id"`) in those subqueries.
@@ -129,6 +141,8 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
 - **English fallback, browser detection first**: spec says English-first with Spanish as an equal.
 - **Campfire vocabulary per locale**: ES UI says Chispas / Lo que arde; EN UI says Sparks /
   Burning now.
+- **Summaries, not alerts**: email is one batched summary a day (or week, or off). A daily cron fits
+  Vercel Hobby and keeps Fogata quiet; real-time email can come later if readers ask.
 - **No "Pro" tier anywhere**: everyone gets everything. Donations will be an external link once the
   platform is picked (Open Collective, GitHub Sponsors or Ko-fi).
 - **Dates render in UTC** until readers can choose a time zone (Phase 3 onboarding).
@@ -157,12 +171,16 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
 - Turnstile on sign-up, rate limits and new-account limits are not in yet (spec: Trust & safety).
   That includes a per-writer limit on photo searches; today only caching protects the Unsplash quota.
 - Changing a username breaks old `/@old/...` links; add redirects from previous usernames.
-- Phase 2 still to do: email notifications/digests (needs an email provider; Resend in the spec).
-  Also open: reading lists beyond one "Saved" list, undoing sparks, editing responses, blocking and
+- Phase 2 leftovers: reading lists beyond one "Saved" list, undoing sparks, editing responses, blocking and
   muting, rate limits, deleting or transferring circles, a decline note for writers, and circle RSS.
 - Unsplash thumbnails in lists show without a credit line (the credit is on the story page). Check
   this is acceptable when applying for Unsplash production access.
 - A long-running `next dev` can lose track of routes after many new route folders are added (all
   `/@…` pages 404 with no error). Restart the dev server if that happens.
+- Resend's free tier caps sends at 100/day (magic links included). The summary job sends up to 300
+  readers per run, so past ~80 active readers a day the free tier fails the rest until the next run
+  (logged, retried). Resend Pro is a paid service: ask before switching.
+- Summary emails list stories by title only; no story images in email (would need hosted copies of
+  Unsplash images or hotlinks that some clients block).
 - E2E runs against `npm run dev` locally (magic links only redirect to port 3000) and against the
   production build in CI.
