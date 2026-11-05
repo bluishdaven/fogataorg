@@ -405,7 +405,7 @@ function Composer({
         maxLength={RESPONSE_MAX}
         rows={compact ? 2 : 3}
         autoFocus={autoFocus}
-        className="field-sizing-content min-h-20 resize-none rounded-lg border border-input bg-transparent px-3 py-2 text-[0.95rem] outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+        className="field-sizing-content min-h-20 resize-none rounded-lg border border-input bg-transparent px-3 py-2 text-[0.95rem] focus-visible:border-ring"
       />
       {error ? (
         <p role="alert" className="text-sm text-destructive">

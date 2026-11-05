@@ -106,7 +106,7 @@ export function CircleForm({
       {initial ? null : (
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="circle-slug">{t("slug")}</Label>
-          <div className="flex items-center rounded-lg border border-input focus-within:ring-3 focus-within:ring-ring/50">
+          <div className="flex items-center rounded-lg border border-input focus-within:border-ring focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-ring">
             <span className="pl-2.5 text-sm text-muted-foreground" aria-hidden>
               /circles/
             </span>
@@ -143,7 +143,7 @@ export function CircleForm({
           rows={3}
           onChange={(e) => setDescription(e.target.value)}
           placeholder={t("descriptionPlaceholder")}
-          className="rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+          className="rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm focus-visible:border-ring"
         />
       </div>
 
@@ -153,7 +153,7 @@ export function CircleForm({
           <label
             key={String(value)}
             className={cn(
-              "flex cursor-pointer gap-3 rounded-lg border p-3 has-focus-visible:ring-3 has-focus-visible:ring-ring/50",
+              "flex cursor-pointer gap-3 rounded-lg border p-3 has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ring",
               isPrivate === value ? "border-primary bg-ember-soft/40" : "border-border",
             )}
           >

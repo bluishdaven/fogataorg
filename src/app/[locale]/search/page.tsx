@@ -62,7 +62,7 @@ async function SearchForm({ searchParams }: Pick<Props, "searchParams">) {
           autoFocus={!q}
           maxLength={100}
           enterKeyHint="search"
-          className="h-12 min-w-0 flex-1 rounded-xl border border-input bg-transparent px-4 text-lg outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+          className="h-12 min-w-0 flex-1 rounded-xl border border-input bg-transparent px-4 text-lg focus-visible:border-ring"
           data-testid="search-input"
         />
         {lang !== "all" ? <input type="hidden" name="lang" value={lang} /> : null}
@@ -166,7 +166,7 @@ async function Results({ searchParams }: Pick<Props, "searchParams">) {
                   <Avatar name={person.displayName || person.username} url={person.avatarUrl} className="size-11 text-sm" />
                   <span className="flex min-w-0 flex-col">
                     <span className="flex items-center gap-1.5">
-                      <span className="font-medium group-hover:text-ember-text">{person.displayName || person.username}</span>
+                      <span className="font-medium group-hover:text-ember-text group-focus-visible:text-ember-text">{person.displayName || person.username}</span>
                       <UserBadges badges={person.badges} />
                     </span>
                     <span className="text-sm text-muted-foreground">@{person.username}</span>

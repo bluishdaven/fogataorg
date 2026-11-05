@@ -13,7 +13,7 @@ import { DonorIcon, TierIcon } from "./badge-icons";
 type Shown = WritingTierKey | "donor";
 
 const CHIP =
-  "relative inline-flex min-h-8 items-center gap-2 rounded-full border border-border px-3 text-sm hover:bg-accent focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none after:absolute after:inset-x-0 after:-inset-y-1.5 sm:after:hidden";
+  "relative inline-flex min-h-8 items-center gap-2 rounded-full border border-border px-3 text-sm hover:bg-accent after:absolute after:inset-x-0 after:-inset-y-1.5 sm:after:hidden";
 
 /**
  * A person's badges on their profile, as chips. Tapping one explains it and shows every badge

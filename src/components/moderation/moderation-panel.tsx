@@ -82,7 +82,7 @@ export function ModerationPanel({
             maxLength={MODERATION_REASON_MAX}
             rows={2}
             autoFocus
-            className="min-h-11 rounded-xl border border-input bg-transparent px-3.5 py-2 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 sm:text-sm"
+            className="min-h-11 rounded-xl border border-input bg-transparent px-3.5 py-2 text-base focus-visible:border-ring sm:text-sm"
           />
           <div className="flex flex-wrap gap-2">
             <Button type="submit" size="sm" disabled={pending} data-testid="moderation-apply">

@@ -78,7 +78,7 @@ export function ProfileForm({
 
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="username">{t("username")}</Label>
-        <div className="flex items-center rounded-lg border border-input focus-within:ring-3 focus-within:ring-ring/50">
+        <div className="flex items-center rounded-lg border border-input focus-within:border-ring focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-ring">
           <span className="pl-2.5 text-muted-foreground" aria-hidden>
             fogata.org/@
           </span>
@@ -113,7 +113,7 @@ export function ProfileForm({
           rows={3}
           onChange={(event) => setBio(event.target.value)}
           aria-invalid={has("bio") || undefined}
-          className="rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+          className="rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm focus-visible:border-ring"
         />
       </div>
 
