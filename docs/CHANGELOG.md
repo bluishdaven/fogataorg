@@ -1,5 +1,15 @@
 # Changelog
 
+## Topics in production, a share button and photo search (2026-11-05)
+
+- **Topics**: a 39-topic catalog (EN + ES) now ships as a migration, so the publish dialog has topics
+  in production too (it used to depend on the demo seed). Topic chips are touch-sized.
+- **Share**: a share button in the story's floating bar. Phones get the system share sheet; desktops
+  get copy link and WhatsApp, X, Facebook, LinkedIn, Threads, Telegram and email. Stories without a
+  cover now use their first picture in link previews.
+- **Photo search**: production needed `UNSPLASH_ACCESS_KEY` in Vercel (no code change).
+- Tests: 133 unit, 54 RLS/storage/job, 69 Playwright (copy link, network links, Spanish menu).
+
 ## Profile photos and a touch-friendly refresh (2026-11-05)
 
 **Demo** (signed in): **Settings → Profile** → **Upload photo**. Any photo is cropped to a square

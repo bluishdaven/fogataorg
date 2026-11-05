@@ -101,6 +101,12 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   user's own folder are accepted, and a DB check (`profiles_avatar_url_own_folder`) enforces it even
   through the Data API. Replacing or removing a photo deletes the old file. Render avatars only with
   `<Avatar>`, which shows initials unless the URL is in our bucket; author queries carry `avatarUrl`.
+- **Topics** come from a catalog migration (`*_topics_catalog.sql`, EN + ES names, upsert by slug).
+  Add or rename topics with a new migration; the seed only references slugs that exist there.
+- **Sharing** (`src/components/social/share-button.tsx`, `src/lib/domain/share.ts`). In the story action
+  bar: phones (coarse pointer) open the native share sheet; desktops get copy link plus one-tap
+  WhatsApp, X, Facebook, LinkedIn, Threads, Telegram and email. Links use the unprefixed share URL on
+  `NEXT_PUBLIC_SITE_URL`. Share previews use the cover, else the story's first picture.
 - **Touch targets.** Buttons and inputs are 44px on phones and compact from `sm:` up (sizes in
   `components/ui/button.tsx` / `input.tsx`). Custom controls follow the same rule (`min-h-11` /
   `min-h-10 … sm:min-h-8`), or get an invisible `after:` hit area when they must stay small visually.
