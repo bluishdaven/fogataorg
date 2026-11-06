@@ -483,7 +483,7 @@
     "submit": "Search",
     "languageFilter": "Story language",
     "allLanguages": "All languages",
-    "hint": "Search by title, words in a story, a writer's name or a topic. Accents and small typos are fine.",
+    "hint": "Search by title, words in a story, a writer's name, a topic, or a book, film, musician or idea people list among their influences. Accents and small typos are fine.",
     "empty": "Nothing matched “{q}”. Try fewer or different words.",
     "summary": "{stories, plural, one {# story} other {# stories}}, {people, plural, one {# person} other {# people}}, {topics, plural, one {# topic} other {# topics}}",
     "stories": "Stories",

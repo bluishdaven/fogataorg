@@ -483,7 +483,7 @@
     "submit": "Buscar",
     "languageFilter": "Idioma de la historia",
     "allLanguages": "Todos los idiomas",
-    "hint": "Busca por título, palabras de una historia, el nombre de quien escribe o un tema. No importan los acentos ni los errores pequeños.",
+    "hint": "Busca por título, palabras de una historia, el nombre de quien escribe, un tema, o un libro, película, artista o idea que alguien tenga en sus referencias. Los acentos y pequeños errores no importan.",
     "empty": "Nada coincide con «{q}». Prueba con menos palabras o con otras.",
     "summary": "{stories, plural, one {# historia} other {# historias}}, {people, plural, one {# persona} other {# personas}}, {topics, plural, one {# tema} other {# temas}}",
     "stories": "Historias",

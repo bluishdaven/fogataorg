@@ -90,9 +90,10 @@ async function SearchForm({ searchParams }: Pick<Props, "searchParams">) {
 }
 
 async function Results({ searchParams }: Pick<Props, "searchParams">) {
-  const [{ q, lang }, t, locale] = await Promise.all([
+  const [{ q, lang }, t, p, locale] = await Promise.all([
     searchParams.then(parseSearchParams),
     getTranslations("Search"),
+    getTranslations("Profile"),
     getLocale(),
   ]);
   if (!q) return <p className="mt-8 text-muted-foreground">{t("hint")}</p>;
@@ -169,7 +170,16 @@ async function Results({ searchParams }: Pick<Props, "searchParams">) {
                       <span className="font-medium group-hover:text-ember-text">{person.displayName || person.username}</span>
                       <UserBadges badges={person.badges} />
                     </span>
-                    <span className="text-sm text-muted-foreground">@{person.username}</span>
+                    <span className="text-sm text-muted-foreground">
+                      @{person.username}
+                      {person.pronouns ? ` · ${person.pronouns}` : ""}
+                    </span>
+                    {person.influence ? (
+                      <span className="mt-1 text-sm" data-testid="search-influence">
+                        <span className="text-muted-foreground">{p(`influenceKinds.${person.influence.kind}`)}:</span>{" "}
+                        <mark className="rounded bg-ember-soft px-1 text-foreground">{person.influence.item}</mark>
+                      </span>
+                    ) : null}
                     {person.bio ? <span className="mt-1 line-clamp-2 text-sm text-muted-foreground">{person.bio}</span> : null}
                   </span>
                 </NextLink>
