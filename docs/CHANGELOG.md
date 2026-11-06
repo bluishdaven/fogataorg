@@ -1,5 +1,25 @@
 # Changelog
 
+## Protecting writers from scrapers (2026-11-06)
+
+**Demo**: `fogata.org/robots.txt` now names the AI training crawlers it turns away; every story ends
+with "© 2026 Writer. All rights reserved."; `fogata.org/.well-known/tdmrep.json` exists.
+
+- **Closed the bulk-download hole**: Supabase's public table API (REST and GraphQL) answered anyone
+  holding the publishable key, which ships in the site's code, so every published story could be
+  downloaded in one request. It now refuses every request (403). Sign-in, photo uploads and the live
+  bell use other Supabase services and keep working.
+- **AI training crawlers turned away** in robots.txt (OpenAI's GPTBot, Anthropic's ClaudeBot,
+  Google-Extended, Common Crawl, Applebot-Extended, Meta, ByteDance and others). Google and Bing
+  search, link previews and AI search tools that link back are still allowed.
+- **Rights reserved, machine-readably**: the W3C TDM Reservation Protocol on every response, page and
+  `tdmrep.json` (the opt-out EU copyright law recognizes), plus `noai, noimageai`.
+- **Copyright line** under every story and in its structured data.
+- **Fix**: a first story's badge notice could slip to the next day when the web server's clock ran
+  ahead of the database's; immediate publishes now use the database's clock.
+- Tests: 189 unit, 76 RLS, Playwright for the headers, tdmrep.json, the copyright line and the
+  closed REST/GraphQL APIs.
+
 ## Circle previews and SEO (2026-11-06)
 
 **Demo**: share a circle link: it previews with the circle's header image, or a card with its name

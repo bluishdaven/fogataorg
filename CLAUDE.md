@@ -145,6 +145,17 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   (Article), profiles (ProfilePage) and the home page (WebSite + Organization) carry JSON-LD via
   `<JsonLd>`, the one sanctioned `dangerouslySetInnerHTML`: `jsonLd()` escapes `<`, `>`, `&` and
   line separators so user text stays data.
+- **Writers' rights / scrapers.** Supabase's Data API (PostgREST, `/rest/v1`, `/graphql/v1`) is
+  closed by a pre-request hook (`public.block_data_api`, `*_close_data_api.sql`): every request
+  except `service_role` gets 403, because the publishable key ships in the browser and would
+  otherwise let anyone download every story. Nothing in the app uses it (pages read through the
+  server; the browser only uses Auth, Storage and Realtime). New browser features must go through
+  server actions, not `supabase.from(...)`. robots.txt turns away AI training crawlers
+  (`AI_TRAINING_CRAWLERS` in `seo.ts`) but not search engines, link previews or AI search; every
+  response carries the TDM opt-out (`tdm-reservation: 1`, `X-Robots-Tag: noai, noimageai`, the
+  `tdm-reservation` meta tag, `/.well-known/tdmrep.json`); stories show "© year Writer. All rights
+  reserved." with matching JSON-LD. Immediate publishes stamp `published_at` with the database's
+  `now()` so triggers comparing against `now()` agree despite clock skew.
 - **Topics** come from a catalog migration (`*_topics_catalog.sql`, EN + ES names, upsert by slug).
   Add or rename topics with a new migration; the seed only references slugs that exist there.
 - **Sharing** (`src/components/social/share-button.tsx`, `src/lib/domain/share.ts`). A menu in the story

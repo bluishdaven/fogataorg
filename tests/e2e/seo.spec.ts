@@ -56,3 +56,26 @@ test("a profile without stories stays out of search results until the first one"
   await page.goto(`/@${username}`);
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
 });
+
+test("writers' rights: the TDM opt-out, a copyright line, and no bulk download through the Data API", async ({ page, request }) => {
+  const response = await page.goto("/@lucia_ortega/el-mole-de-mi-abuela-no-tiene-receta");
+  expect(response?.headers()["tdm-reservation"]).toBe("1");
+  expect(response?.headers()["x-robots-tag"]).toBe("noai, noimageai");
+  await expect(page.locator('meta[name="tdm-reservation"]')).toHaveAttribute("content", "1");
+  await expect(page.getByTestId("story-copyright")).toHaveText(/^© \d{4} Lucía Ortega\. All rights reserved\.$/);
+
+  const tdmrep = await request.get("/.well-known/tdmrep.json");
+  expect(await tdmrep.json()).toEqual([{ location: "/", "tdm-reservation": 1 }]);
+
+  // The publishable key ships in the browser bundle; it must not open the tables in bulk.
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  test.skip(!supabaseUrl || !anonKey, "Supabase env not loaded");
+  const rest = await request.get(`${supabaseUrl}/rest/v1/stories?select=title,content_text&limit=1`, { headers: { apikey: anonKey! } });
+  expect(rest.status()).toBe(403);
+  const graphql = await request.post(`${supabaseUrl}/graphql/v1`, {
+    headers: { apikey: anonKey!, "Content-Type": "application/json" },
+    data: { query: "{ storiesCollection(first: 1) { edges { node { title } } } }" },
+  });
+  expect(graphql.status()).toBe(403);
+});
