@@ -115,6 +115,26 @@ describe("StoryBody", () => {
     expect(container.querySelector("aside.callout")?.textContent).toBe("Nota");
   });
 
+  it("sizes pictures as the writer chose, never taller than the screen", () => {
+    const doc: TiptapDoc = {
+      type: "doc",
+      content: ["small", "medium", "inset"].map((layout) => ({
+        type: "figure",
+        attrs: { src: `${PREFIXES[1]}u/${layout}.webp`, alt: layout, width: 720, height: 1027, layout },
+      })),
+    };
+    const { container } = render(
+      <NextIntlClientProvider locale="en" messages={en} timeZone="UTC">
+        <StoryBody doc={doc} lang="en" imagePrefixes={PREFIXES} />
+      </NextIntlClientProvider>,
+    );
+    const figures = [...container.querySelectorAll("figure")];
+    expect(figures.map((f) => f.className)).toEqual(["figure figure-small", "figure figure-medium", "figure"]);
+    // 720×1027 is tall: narrowed so it stays within 85% of the screen height.
+    // (jsdom simplifies the calc: 85vh × 0.7011 = 59.59vh.)
+    for (const img of container.querySelectorAll("img")) expect(img.style.maxWidth).toMatch(/^min\(100%, (calc\(85vh \* 0\.7011\)|59\.59\d*vh)\)$/);
+  });
+
   it("renders no images when no hosts are allowed", () => {
     const doc: TiptapDoc = {
       type: "doc",

@@ -3,11 +3,18 @@
 import { mergeAttributes, Node, type CommandProps } from "@tiptap/core";
 import { AllSelection, NodeSelection } from "@tiptap/pm/state";
 import { NodeViewWrapper, ReactNodeViewRenderer, type ReactNodeViewProps } from "@tiptap/react";
-import { Maximize2, Minimize2, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { UnsplashCredit } from "@/components/unsplash/unsplash-credit";
-import type { FigureAttrs } from "@/lib/domain/story-doc";
+import {
+  defaultImageLayout,
+  figureMaxWidth,
+  figureSizeClass,
+  IMAGE_LAYOUTS,
+  type FigureAttrs,
+  type ImageLayout,
+} from "@/lib/domain/story-doc";
 import { isUnsplashImageUrl, unsplashImageUrl } from "@/lib/domain/unsplash";
 import { cn } from "@/lib/utils";
 
@@ -24,18 +31,27 @@ export function editorImageSrc(src: string): string {
   return isUnsplashImageUrl(src) ? unsplashImageUrl(src, { width: 1600 }) : src;
 }
 
+const SIZE_LABEL: Record<ImageLayout, "sizeSmall" | "sizeMedium" | "sizeLarge" | "sizeWide"> = {
+  small: "sizeSmall",
+  medium: "sizeMedium",
+  inset: "sizeLarge",
+  wide: "sizeWide",
+};
+
 function FigureView({ node, updateAttributes, deleteNode, selected }: ReactNodeViewProps) {
   const t = useTranslations("Editor");
   const attrs = node.attrs as FigureAttrs;
   const missingAlt = !attrs.alt?.trim();
+  const layout: ImageLayout = (IMAGE_LAYOUTS as readonly string[]).includes(attrs.layout) ? attrs.layout : "inset";
 
   return (
-    <NodeViewWrapper
-      as="figure"
-      data-figure=""
-      className={cn("figure not-prose", attrs.layout === "wide" && "figure-wide")}
-    >
-      <div className={cn("relative overflow-hidden rounded-lg bg-muted", selected && "ring-3 ring-ring")} data-drag-handle>
+    <NodeViewWrapper as="figure" data-figure="" className={cn("figure not-prose", figureSizeClass(layout))}>
+      {/* Same sizing as the published story; the controls sit on the picture's own corner. */}
+      <div
+        className={cn("relative mx-auto overflow-hidden rounded-lg bg-muted", selected && "ring-3 ring-ring")}
+        style={{ maxWidth: figureMaxWidth(attrs.width, attrs.height) }}
+        data-drag-handle
+      >
         {/* Plain <img>: editor previews show the stored file as-is. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -47,15 +63,25 @@ function FigureView({ node, updateAttributes, deleteNode, selected }: ReactNodeV
           draggable={false}
         />
         <div contentEditable={false} className="absolute top-2 right-2 flex gap-1 rounded-lg bg-background/90 p-1 shadow-sm">
-          <Button
-            type="button"
-            size="icon-xs"
-            variant="ghost"
-            aria-label={attrs.layout === "wide" ? t("layoutInset") : t("layoutWide")}
-            onClick={() => updateAttributes({ layout: attrs.layout === "wide" ? "inset" : "wide" })}
-          >
-            {attrs.layout === "wide" ? <Minimize2 /> : <Maximize2 />}
-          </Button>
+          <div role="group" aria-label={t("sizeLabel")} className="flex gap-0.5" data-testid="figure-size">
+            {IMAGE_LAYOUTS.map((option) => (
+              <button
+                key={option}
+                type="button"
+                aria-label={t(SIZE_LABEL[option])}
+                aria-pressed={layout === option}
+                title={t(SIZE_LABEL[option])}
+                onClick={() => updateAttributes({ layout: option })}
+                className={cn(
+                  "relative flex size-7 items-center justify-center rounded-md text-xs font-semibold hover:bg-accent after:absolute after:-inset-1.5 sm:after:hidden",
+                  layout === option && "bg-ember-soft text-ember-text",
+                )}
+              >
+                {t(`${SIZE_LABEL[option]}Short`)}
+              </button>
+            ))}
+          </div>
+          <span className="mx-0.5 w-px self-stretch bg-border" aria-hidden />
           <Button type="button" size="icon-xs" variant="ghost" aria-label={t("removeImage")} onClick={() => deleteNode()}>
             <Trash2 />
           </Button>
@@ -129,7 +155,10 @@ export const Figure = Node.create({
         (attrs) =>
         ({ commands, state }: CommandProps) => {
           const content = [
-            { type: this.name, attrs: { alt: "", caption: "", layout: "inset", credit: null, ...attrs } },
+            {
+              type: this.name,
+              attrs: { alt: "", caption: "", layout: defaultImageLayout(attrs.width, attrs.height), credit: null, ...attrs },
+            },
             { type: "paragraph" },
           ];
           // A photo goes at the cursor, but never replaces a selected block or the whole story

@@ -1,5 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { figuresOf, headingsOf, safeHref, sanitizeStoryDoc, StoryDocError, STORY_DOC_LIMITS } from "@/lib/domain/story-doc";
+import {
+  defaultImageLayout,
+  figureMaxWidth,
+  figureSizeClass,
+  figuresOf,
+  headingsOf,
+  safeHref,
+  sanitizeStoryDoc,
+  StoryDocError,
+  STORY_DOC_LIMITS,
+} from "@/lib/domain/story-doc";
 
 const PREFIXES = ["https://images.unsplash.com/", "http://127.0.0.1:54321/storage/v1/object/public/story-images/"];
 const ID = "0b9f6a52-8f0e-4c55-9d7a-2f4b1c3d5e6f";
@@ -86,6 +96,25 @@ describe("sanitizeStoryDoc", () => {
     expect(first).toMatchObject({ id: ID, src: UPLOAD, caption: "Pie", layout: "wide", width: 1200, height: 800, credit });
     expect(first?.alt).toHaveLength(300);
     expect(second).toMatchObject({ layout: "inset", credit: null, width: null });
+  });
+
+  it("keep the picture sizes writers pick (small, medium, large, wide) and nothing else", () => {
+    const layouts = ["small", "medium", "inset", "wide", "huge", 3];
+    const result = sanitizeStoryDoc(doc(...layouts.map((layout) => ({ type: "figure", attrs: { src: UPLOAD, alt: "x", layout } }))), PREFIXES);
+    expect(figuresOf(result).map((f) => f.layout)).toEqual(["small", "medium", "inset", "wide", "inset", "inset"]);
+    expect(["small", "medium", "inset", "wide"].map(figureSizeClass)).toEqual(["figure-small", "figure-medium", false, "figure-wide"]);
+  });
+
+  it("cap tall pictures at the screen height by narrowing them", () => {
+    expect(figureMaxWidth(720, 1027)).toBe("min(100%, calc(85vh * 0.7011))");
+    expect(figureMaxWidth(null, 400)).toBeUndefined();
+  });
+
+  it("start tall pictures at Medium and everything else at Large", () => {
+    expect(defaultImageLayout(720, 1027)).toBe("medium");
+    expect(defaultImageLayout(720, 480)).toBe("inset");
+    expect(defaultImageLayout(800, 820)).toBe("inset");
+    expect(defaultImageLayout(null, null)).toBe("inset");
   });
 
   it("rejects images from any other host", () => {

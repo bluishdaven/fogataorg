@@ -303,6 +303,15 @@ html[data-reader-font="sans"] .prose-fogata {
     text-align: center;
     color: var(--muted-foreground);
   }
+  /* Picture sizes (the editor's S / M / L / W): small and medium sit centered in the column. */
+  .prose-fogata .figure-small {
+    max-width: min(100%, 22rem);
+    margin-inline: auto;
+  }
+  .prose-fogata .figure-medium {
+    max-width: min(100%, 32rem);
+    margin-inline: auto;
+  }
   .prose-fogata .figure-wide {
     position: relative;
     left: 50%;

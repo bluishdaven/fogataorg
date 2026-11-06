@@ -29,7 +29,28 @@ export function safeHref(value: unknown): string | null {
   }
 }
 
-export type ImageLayout = "inset" | "wide";
+/** Picture sizes: small and medium sit centered in the column, "inset" fills it (Large), "wide" breaks out. */
+export const IMAGE_LAYOUTS = ["small", "medium", "inset", "wide"] as const;
+export type ImageLayout = (typeof IMAGE_LAYOUTS)[number];
+
+/** CSS class for a picture size (globals.css); Large ("inset") is the plain column width. */
+export function figureSizeClass(layout: unknown): string | false {
+  return layout === "wide" ? "figure-wide" : layout === "small" ? "figure-small" : layout === "medium" ? "figure-medium" : false;
+}
+
+/**
+ * Width cap that keeps a picture no taller than 85% of the screen while it still fills its size:
+ * only tall pictures get narrower (centered). Unknown dimensions: no cap.
+ */
+export function figureMaxWidth(width: number | null | undefined, height: number | null | undefined): string | undefined {
+  if (!width || !height || width <= 0 || height <= 0) return undefined;
+  return `min(100%, calc(85vh * ${Number((width / height).toFixed(4))}))`;
+}
+
+/** Tall pictures start at Medium so a portrait doesn't fill the whole screen. */
+export function defaultImageLayout(width: number | null | undefined, height: number | null | undefined): ImageLayout {
+  return width && height && height > width * 1.15 ? "medium" : "inset";
+}
 
 export type FigureAttrs = {
   id?: string;
@@ -199,7 +220,7 @@ function sanitizeBlock(input: unknown, ctx: Context, depth: number, allowed: Rea
         src: attrs.src as string,
         alt: boundedString(attrs?.alt, 300),
         caption: boundedString(attrs?.caption, 300),
-        layout: attrs?.layout === "wide" ? "wide" : "inset",
+        layout: (IMAGE_LAYOUTS as readonly unknown[]).includes(attrs?.layout) ? (attrs.layout as ImageLayout) : "inset",
         width: positiveInt(attrs?.width),
         height: positiveInt(attrs?.height),
         credit: credit.success ? credit.data : null,

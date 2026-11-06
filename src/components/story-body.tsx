@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { UnsplashCredit } from "@/components/unsplash/unsplash-credit";
 import { UnsplashImage } from "@/components/unsplash/unsplash-image";
 import type { TiptapMark, TiptapNode } from "@/lib/domain/content";
-import { safeHref, type FigureAttrs } from "@/lib/domain/story-doc";
+import { figureMaxWidth, figureSizeClass, safeHref, type FigureAttrs } from "@/lib/domain/story-doc";
 import { imageCreditSchema, isUnsplashImageUrl, unsplashImageUrl } from "@/lib/domain/unsplash";
 import { cn } from "@/lib/utils";
 
@@ -65,12 +65,24 @@ function FigureBlock({ node, ctx }: { node: TiptapNode; ctx: RenderContext }) {
   const credit = imageCreditSchema.safeParse(attrs?.credit);
   const width = typeof attrs?.width === "number" ? attrs.width : null;
   const height = typeof attrs?.height === "number" ? attrs.height : null;
-  const wide = attrs?.layout === "wide";
-  const sizes = wide ? "(min-width: 1100px) 1100px, 100vw" : "(min-width: 768px) 720px, 100vw";
+  const layout = attrs?.layout;
+  const wide = layout === "wide";
+  const sizes = wide
+    ? "(min-width: 1100px) 1100px, 100vw"
+    : layout === "small"
+      ? "(min-width: 768px) 360px, 60vw"
+      : layout === "medium"
+        ? "(min-width: 768px) 520px, 90vw"
+        : "(min-width: 768px) 720px, 100vw";
+  // Pictures fill their size, but tall ones narrow (centered) so they never outgrow the screen.
+  const imageClass = "mx-auto block h-auto w-full rounded-lg";
+  const imageStyle = { maxWidth: figureMaxWidth(width, height) };
 
   let image: ReactNode;
   if (isUnsplashImageUrl(src) && width && height) {
-    image = <UnsplashImage rawUrl={src} alt={alt} width={width} height={height} sizes={sizes} className="h-auto w-full rounded-lg" />;
+    image = (
+      <UnsplashImage rawUrl={src} alt={alt} width={width} height={height} sizes={sizes} className={imageClass} style={imageStyle} />
+    );
   } else {
     image = (
       // Uploaded images are already resized and re-encoded on upload.
@@ -82,13 +94,14 @@ function FigureBlock({ node, ctx }: { node: TiptapNode; ctx: RenderContext }) {
         height={height ?? undefined}
         loading="lazy"
         decoding="async"
-        className="h-auto w-full rounded-lg"
+        className={imageClass}
+        style={imageStyle}
       />
     );
   }
 
   return (
-    <figure className={cn("figure", wide && "figure-wide")} {...blockProps(node)}>
+    <figure className={cn("figure", figureSizeClass(layout))} {...blockProps(node)}>
       {image}
       {caption || credit.success ? (
         <figcaption>

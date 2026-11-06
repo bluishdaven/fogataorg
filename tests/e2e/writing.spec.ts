@@ -40,6 +40,11 @@ test("write, autosave, add an image, publish, then delete", async ({ page }) => 
   await page.getByRole("button", { name: "Cancel" }).click();
 
   await page.getByTestId("figure-alt").fill("A small orange square");
+  // Pictures come in four sizes; a landscape one starts at Large.
+  const sizes = page.getByTestId("figure-size");
+  await expect(sizes.getByRole("button", { name: "Large" })).toHaveAttribute("aria-pressed", "true");
+  await sizes.getByRole("button", { name: "Small" }).click();
+  await expect(sizes.getByRole("button", { name: "Small" })).toHaveAttribute("aria-pressed", "true");
   await waitSaved(page);
   await page.getByTestId("open-publish").click();
   await page.getByTestId("publish-submit").click();
@@ -48,6 +53,7 @@ test("write, autosave, add an image, publish, then delete", async ({ page }) => 
   const storyUrl = page.url();
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(title);
   await expect(page.locator("article figure img")).toHaveAttribute("alt", "A small orange square");
+  await expect(page.locator("article figure")).toHaveClass(/figure-small/);
   await expect(page.getByRole("link", { name: "Nature" })).toBeVisible();
 
   // Its share preview is the uploaded picture, re-encoded as a JPEG link previews accept.
