@@ -218,7 +218,10 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   `immediatelyRender: false`) with custom `figure`, `callout` and `pullQuote` nodes, a `/` menu, a
   photo button in the editor bar (upload or Unsplash; `/` is awkward on phone keyboards) and a
   selection toolbar that shows only for focused, non-empty text selections (a fresh editor can start
-  with everything selected). `insertFigure` never replaces a selected block. Tiptap's `BubbleMenu`
+  with everything selected). `insertFigure` never replaces a selected block. Figures have four
+  sizes (`layout`: `small`, `medium`, `inset` = Large, `wide`; `figureSizeClass()` in `story-doc.ts`),
+  tall pictures start at Medium, and `figureMaxWidth()` narrows tall pictures so none is taller
+  than 85vh (editor and reader share both). Tiptap's `BubbleMenu`
   doesn't forward `data-*` props to its floating element: put test ids on an inner element. Every save goes through `sanitizeStoryDoc()` (`src/lib/domain/story-doc.ts`), the
   server-side allowlist; never store client JSON without it. Snapshots sent to server actions must be
   JSON round-tripped: ProseMirror attrs are prototype-less objects that server actions refuse.

@@ -1,5 +1,16 @@
 # Changelog
 
+## Picture sizes (2026-11-06)
+
+**Demo**: in the editor, every picture has **S / M / L / W** buttons on its corner (Small, Medium,
+Large, Wide; P / M / G / A in Spanish). Pick one and the published story matches.
+
+- Small and Medium sit centered in the column; Large fills it (what every picture did before);
+  Wide breaks out of it.
+- Tall pictures start at Medium, and no picture is ever taller than 85% of the screen: tall ones
+  narrow instead of filling the column.
+- Existing stories keep their pictures at Large until the writer picks another size.
+
 ## Protecting writers from scrapers (2026-11-06)
 
 **Demo**: `fogata.org/robots.txt` now names the AI training crawlers it turns away; every story ends
