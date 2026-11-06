@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
+import { RIGHTS_RESERVED_HEADERS } from "./src/lib/domain/seo";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
@@ -9,6 +10,8 @@ const securityHeaders = [
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), browsing-topics=()" },
   // Story embeds (Phase 4) will opt specific routes back in to framing.
   { key: "X-Frame-Options", value: "SAMEORIGIN" },
+  // Writers' work isn't for AI training: the TDM opt-out on every response (see seo.ts).
+  ...RIGHTS_RESERVED_HEADERS,
 ];
 
 const nextConfig: NextConfig = {

@@ -44,6 +44,8 @@ export async function generateMetadata(): Promise<Metadata> {
       images: [{ url: ogPaths.site(locale === "es" ? "es" : "en"), ...OG_SIZE, alt: "Fogata" }],
     },
     twitter: { card: "summary_large_image" },
+    // Same text-and-data-mining opt-out as the response headers, for crawlers that read the page.
+    other: { "tdm-reservation": "1" },
   };
 }
 
