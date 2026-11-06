@@ -16,6 +16,10 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   poweredByHeader: false,
+  // Share-preview routes read their fonts and the flame from disk; make sure serverless bundles carry them.
+  outputFileTracingIncludes: {
+    "/api/og/**": ["./src/assets/fonts/*.woff", "./public/brand/fogata-flame.svg"],
+  },
   turbopack: {
     rules: {
       "*.css": {
