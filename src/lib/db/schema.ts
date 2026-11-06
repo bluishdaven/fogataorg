@@ -18,6 +18,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { anonRole, authenticatedRole, authUid, authUsers } from "drizzle-orm/supabase";
 import type { TiptapDoc } from "@/lib/domain/content";
+import type { Influences } from "@/lib/domain/profile";
 import type { PendingChanges } from "@/lib/domain/stories";
 import type { ImageCredit } from "@/lib/domain/unsplash";
 
@@ -41,6 +42,9 @@ export const storyStatus = pgEnum("story_status", ["draft", "scheduled", "publis
 
 export type ProfileLink = { label: string; url: string };
 
+/** What a person's "Now" line is about. */
+export const nowFocus = pgEnum("now_focus", ["reading", "watching", "listening"]);
+
 export const profiles = pgTable(
   "profiles",
   {
@@ -52,6 +56,12 @@ export const profiles = pgTable(
     bio: text("bio").notNull().default(""),
     avatarUrl: text("avatar_url"),
     links: jsonb("links").$type<ProfileLink[]>().notNull().default(sql`'[]'::jsonb`),
+    // Optional, free text ("she/her", "they/them", "él/elle"…).
+    pronouns: text("pronouns").notNull().default(""),
+    // "Now reading / watching / listening to …"; hidden while now_text is empty.
+    nowFocus: nowFocus("now_focus").notNull().default("reading"),
+    nowText: text("now_text").notNull().default(""),
+    influences: jsonb("influences").$type<Influences>().notNull().default(sql`'{}'::jsonb`),
     locale: localeCode("locale").notNull().default("en"),
     isVerified: boolean("is_verified").notNull().default(false),
     // Activity summary emails: one a week at most, on a weekday fixed per reader; one click turns them off.
@@ -72,6 +82,9 @@ export const profiles = pgTable(
     check("profiles_username_format", sql`${t.username} ~ '^[A-Za-z0-9_]{3,30}$'`),
     check("profiles_display_name_length", sql`char_length(${t.displayName}) <= 80`),
     check("profiles_bio_length", sql`char_length(${t.bio}) <= 280`),
+    check("profiles_pronouns_length", sql`char_length(${t.pronouns}) <= 40`),
+    check("profiles_now_text_length", sql`char_length(${t.nowText}) <= 120`),
+    check("profiles_influences_shape", sql`jsonb_typeof(${t.influences}) = 'object' and octet_length(${t.influences}::text) <= 4000`),
     check("profiles_email_weekday_range", sql`${t.emailWeekday} between 0 and 6`),
     // Profile photos may only point into the owner's own folder of the avatars bucket (uploaded as
     // <user id>/<uuid>.webp), so no one can set an outside image or tracking pixel via the Data API.

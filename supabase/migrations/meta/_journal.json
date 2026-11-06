@@ -211,6 +211,20 @@
       "when": 1793909212692,
       "tag": "20261105200652_private_circle_functions",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1793982468518,
+      "tag": "20261106162748_profile_extras",
+      "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1793982474609,
+      "tag": "20261106162754_word_count_and_profile_grants",
+      "breakpoints": true
     }
   ]
 }
