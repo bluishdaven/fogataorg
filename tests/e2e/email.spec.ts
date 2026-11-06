@@ -94,8 +94,10 @@ test("writers get a summary email and can unsubscribe from it", async ({ browser
   expect((await run.json()).sent).toBeGreaterThanOrEqual(1);
 
   const message = await waitForSummary(writerEmail);
-  expect(message.Subject).toBe("1 new notification on Fogata");
+  // The new follower, plus the Kindling badge the writer's first story earned.
+  expect(message.Subject).toBe("2 new notifications on Fogata");
   expect(message.Text).toContain("started following you");
+  expect(message.Text).toContain("You earned the Kindling badge");
   expect(message.Text).toContain("once a week at most");
   const headers = (await (await fetch(`${MAILPIT}/api/v1/message/${message.ID}/headers`)).json()) as Record<string, string[]>;
   expect(headers["List-Unsubscribe-Post"]?.[0]).toBe("List-Unsubscribe=One-Click");
