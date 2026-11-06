@@ -168,6 +168,10 @@ export async function publishStory(input: PublishInput): Promise<PublishResult> 
     // Keep the original date when republishing; "now" replaces a date that hasn't arrived yet.
     const publishedAt =
       publishAt ?? (story.publishedAt && story.publishedAt.getTime() <= now.getTime() ? story.publishedAt : now);
+    // Publishing right now is stamped with the database's clock, so triggers that check
+    // `published_at <= now()` (badge announcements, visibility) agree even if this server's clock
+    // runs a little ahead of the database's.
+    const publishingNow = publishedAt === now;
 
     await tx
       .update(stories)
@@ -179,7 +183,7 @@ export async function publishStory(input: PublishInput): Promise<PublishResult> 
         readingTime: readingTimeMinutes(text, data.language),
         language: data.language,
         status: data.visibility === "unlisted" ? "unlisted" : "published",
-        publishedAt,
+        publishedAt: publishingNow ? sql`now()` : publishedAt,
         slug,
         coverUrl: data.cover?.url ?? null,
         coverAlt: data.cover?.alt ?? "",
