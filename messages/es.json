@@ -82,7 +82,8 @@
     "publishedOn": "Publicada el {date}",
     "writtenIn": "Escrita en {language}",
     "notFoundTitle": "Historia no encontrada",
-    "moreFrom": "Más de {name}"
+    "moreFrom": "Más de {name}",
+    "copyright": "© {year} {name}. Todos los derechos reservados."
   },
   "Profile": {
     "stories": "Historias",

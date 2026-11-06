@@ -139,6 +139,9 @@ async function Story({ params }: Pick<Props, "params">) {
             inLanguage: story.language,
             wordCount: story.wordCount,
             isAccessibleForFree: true,
+            copyrightYear: story.publishedAt?.getUTCFullYear(),
+            copyrightHolder: { "@type": "Person", name: authorName, url: absolute(profilePath(story.authorUsername)) },
+            copyrightNotice: story.publishedAt ? `© ${story.publishedAt.getUTCFullYear()} ${authorName}. All rights reserved.` : undefined,
             keywords: story.topics.map((topic) => (story.language === "es" ? topic.nameEs : topic.nameEn)).join(", ") || undefined,
             mainEntityOfPage: { "@type": "WebPage", "@id": story.canonicalUrl ?? absolute(storyPath(story.authorUsername, story.slug)) },
             author: { "@type": "Person", name: authorName, url: absolute(profilePath(story.authorUsername)) },
@@ -243,6 +246,12 @@ async function Story({ params }: Pick<Props, "params">) {
         );
         return nsfw ? <NsfwGate reason={story.moderationReason ?? ""}>{content}</NsfwGate> : content;
       })()}
+      {/* The writer owns their work; say so plainly (and in the structured data above). */}
+      {story.publishedAt ? (
+        <p className="mx-auto mt-10 max-w-[var(--measure)] text-sm text-muted-foreground" lang={locale} data-testid="story-copyright">
+          {t("Story.copyright", { year: String(story.publishedAt.getUTCFullYear()), name: authorName })}
+        </p>
+      ) : null}
       <Suspense fallback={<div className="mx-auto mt-12 h-12 w-56 animate-pulse rounded-full bg-muted" aria-hidden />}>
         <StorySocial
           storyId={story.id}
