@@ -225,6 +225,13 @@
       "when": 1793982474609,
       "tag": "20261106162754_word_count_and_profile_grants",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1793988296475,
+      "tag": "20261106180456_close_data_api",
+      "breakpoints": true
     }
   ]
 }
