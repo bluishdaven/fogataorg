@@ -1,5 +1,24 @@
 # Changelog
 
+## Circle previews and SEO (2026-11-06)
+
+**Demo**: share a circle link: it previews with the circle's header image, or a card with its name
+on its accent color. Open `fogata.org/sitemap.xml` and `fogata.org/robots.txt`.
+
+- **Circle previews**: Unsplash headers are hotlinked as a JPEG crop; uploaded headers are converted
+  to JPEG; no header gets a circle card with the flame and fogata.org.
+- **Sitemap and robots**: every public story, writer, topic and circle with stories, with Spanish and
+  English versions of the localized pages. Private areas and APIs stay out (share images stay
+  reachable); preview deployments ask crawlers to stay away entirely.
+- **Canonical and language links** on the home, topics and circles pages, so Google shows the right
+  language version.
+- **Structured data**: stories as articles (headline, writer, date, picture, language, word count,
+  topics), profiles as profile pages, and the site name and logo on the home page.
+- **Thin pages stay out of results** until they have something to show: profiles, topics and circles
+  without stories are noindex (links on them are still followed).
+- Tests: 187 unit, 76 RLS, Playwright for robots/sitemap, language links, structured data, empty
+  profiles and the circle preview.
+
 ## Profile extras and share previews (2026-11-06)
 
 **Demo**: Settings → Profile now has **Pronouns**, **Now** (Reading / Watching / Listening to, plus

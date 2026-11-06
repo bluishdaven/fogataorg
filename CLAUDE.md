@@ -129,12 +129,22 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   `search_vector`; read it as `"stories"."word_count"`.
 - **Share previews** (`src/lib/domain/og.ts`, `src/lib/og/`, `src/app/api/og/`). `next/og` cards
   (1200×630) for the site (default for every page, set in the root layout), stories without a usable
-  picture (or NSFW) and profiles; fonts are bundled woff files in `src/assets/fonts/` (OFL). Unsplash
+  picture (or NSFW), circles without a header (name on the accent color) and profiles; fonts are bundled woff files in `src/assets/fonts/` (OFL). Unsplash
   pictures are hotlinked as a JPEG crop (`unsplashShareImageUrl`), never proxied; uploaded story
-  pictures are re-encoded to JPEG by the story route and profile photos to PNG (the renderer can't
+  pictures and circle headers are re-encoded to JPEG by their routes and profile photos to PNG (the renderer can't
   draw WebP), both with `sharp`. Image URLs carry `?v=previewVersion(…)` of what they show, so edits
   reach new shares. Pages that set their own `openGraph` must repeat `siteName` (Next replaces the
   whole object). Card text follows the story's language or the person's own locale.
+- **SEO** (`src/lib/domain/seo.ts`, `src/app/sitemap.ts`, `src/app/robots.ts`, `src/lib/data/sitemap.ts`).
+  `robots.txt` lets crawlers into the public site except private areas and `/api/` (but not
+  `/api/og/`: X honors robots.txt when fetching share images); every other build disallows
+  everything. `sitemap.xml` lists live public stories (no unlisted, moderated or outside-canonical
+  ones), the profiles that list them, topics and circles with stories, and the localized pages with
+  their hreflang versions. Localized pages set `alternates: localeAlternates(locale, path)`; share
+  URLs keep one canonical. Empty profiles, topics and circles are `noindex, follow`. Stories
+  (Article), profiles (ProfilePage) and the home page (WebSite + Organization) carry JSON-LD via
+  `<JsonLd>`, the one sanctioned `dangerouslySetInnerHTML`: `jsonLd()` escapes `<`, `>`, `&` and
+  line separators so user text stays data.
 - **Topics** come from a catalog migration (`*_topics_catalog.sql`, EN + ES names, upsert by slug).
   Add or rename topics with a new migration; the seed only references slugs that exist there.
 - **Sharing** (`src/components/social/share-button.tsx`, `src/lib/domain/share.ts`). A menu in the story
@@ -192,7 +202,7 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   (`stories.cover_credit`; inline images will carry it as a node attr).
 - **Rendering stored content.** `StoryBody` renders Tiptap JSON through an allowlist of node and
   mark types, and only renders images from `allowedImagePrefixes()`. Never use
-  `dangerouslySetInnerHTML` for user content.
+  `dangerouslySetInnerHTML` for user content (the only exception is `<JsonLd>`, which escapes it).
 - **Writing** (`src/components/editor/`, `src/app/actions/stories.ts`). Tiptap 3 editor (client-only,
   `immediatelyRender: false`) with custom `figure`, `callout` and `pullQuote` nodes, a `/` menu, a
   photo button in the editor bar (upload or Unsplash; `/` is awkward on phone keyboards) and a
