@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { listTopicsWithCounts } from "@/lib/data/stories";
+import { localeAlternates } from "@/lib/domain/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("Topics");
-  return { title: t("title"), description: t("lede") };
+  const [t, locale] = await Promise.all([getTranslations("Topics"), getLocale()]);
+  return { title: t("title"), description: t("lede"), alternates: localeAlternates(locale, "/topics") };
 }
 
 export default async function TopicsPage() {

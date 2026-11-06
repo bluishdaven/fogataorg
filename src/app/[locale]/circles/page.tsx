@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Lock } from "lucide-react";
 import { Suspense } from "react";
 import { buttonVariants } from "@/components/ui/button";
@@ -7,10 +7,11 @@ import { Link } from "@/i18n/navigation";
 import { getViewer } from "@/lib/auth";
 import { listCircles } from "@/lib/data/circles";
 import { readableTextOn } from "@/lib/domain/circles";
+import { localeAlternates } from "@/lib/domain/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("Circles");
-  return { title: t("title"), description: t("lede") };
+  const [t, locale] = await Promise.all([getTranslations("Circles"), getLocale()]);
+  return { title: t("title"), description: t("lede"), alternates: localeAlternates(locale, "/circles") };
 }
 
 export default async function CirclesPage() {

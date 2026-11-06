@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { Avatar } from "@/components/avatar";
 import { BadgeChips } from "@/components/badges/badge-guide";
+import { JsonLd } from "@/components/json-ld";
 import { NowLine } from "@/components/profile/now-line";
 import { StoryCard } from "@/components/story-card";
 import { StoryListSkeleton } from "@/components/story-list-skeleton";
@@ -13,7 +14,9 @@ import { getFollowState } from "@/lib/data/social";
 import { badgeData } from "@/lib/domain/badges";
 import { getProfileWithStories } from "@/lib/data/stories";
 import { profilePath } from "@/lib/domain/handle-routes";
+import { isAvatarUrl } from "@/lib/domain/avatars";
 import { OG_SIZE, ogPaths, previewVersion } from "@/lib/domain/og";
+import { publicEnv } from "@/lib/env";
 import { INFLUENCE_KINDS } from "@/lib/domain/profile";
 import { safeHref } from "@/lib/domain/story-doc";
 
@@ -45,6 +48,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: `${name} (@${profile.username})`,
     description,
     alternates: { canonical: profilePath(profile.username) },
+    // A profile with no stories yet is thin; it becomes findable with the first one.
+    robots: profile.storyCount ? undefined : { index: false, follow: true },
     openGraph: {
       type: "profile",
       siteName: "Fogata",
@@ -83,8 +88,30 @@ async function Profile({ params }: Pick<Props, "params">) {
   const [t, format] = await Promise.all([getTranslations("Profile"), getFormatter()]);
   const name = profile.displayName || profile.username;
 
+  const site = publicEnv.NEXT_PUBLIC_SITE_URL.replace(/\/$/, "");
+  const sameAs = profile.links.flatMap((link) => {
+    const href = safeHref(link.url);
+    return href && /^https?:/.test(href) ? [href] : [];
+  });
+
   return (
     <>
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "ProfilePage",
+          dateCreated: profile.createdAt.toISOString(),
+          mainEntity: {
+            "@type": "Person",
+            name,
+            alternateName: `@${profile.username}`,
+            description: profile.bio || undefined,
+            image: isAvatarUrl(profile.avatarUrl, publicEnv.NEXT_PUBLIC_SUPABASE_URL) ? profile.avatarUrl : undefined,
+            url: `${site}${profilePath(profile.username)}`,
+            sameAs: sameAs.length ? sameAs : undefined,
+          },
+        }}
+      />
       <header className="mb-8 flex flex-col gap-2 border-b border-border pb-8">
         <Avatar name={name} url={profile.avatarUrl} className="mb-3 size-24 text-3xl ring-4 ring-card shadow-sm sm:size-28" />
         <h1 className="font-serif text-4xl font-semibold">{name}</h1>

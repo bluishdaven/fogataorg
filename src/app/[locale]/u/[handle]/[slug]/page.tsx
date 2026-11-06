@@ -4,6 +4,7 @@ import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { Avatar } from "@/components/avatar";
+import { JsonLd } from "@/components/json-ld";
 import { AdminModeration } from "@/components/moderation/admin-moderation";
 import { NsfwGate } from "@/components/moderation/nsfw-gate";
 import { RemovedNotice } from "@/components/moderation/removed-notice";
@@ -22,11 +23,36 @@ import { getStory } from "@/lib/data/stories";
 import { badgeData } from "@/lib/domain/badges";
 import { excerpt } from "@/lib/domain/content";
 import { profilePath, storyPath } from "@/lib/domain/handle-routes";
-import { OG_SIZE, ogPaths, previewVersion } from "@/lib/domain/og";
+import { clampText, OG_SIZE, ogPaths, previewVersion } from "@/lib/domain/og";
 import { imageCreditSchema, isUnsplashImageUrl, unsplashShareImageUrl } from "@/lib/domain/unsplash";
+import { publicEnv } from "@/lib/env";
 import { allowedImagePrefixes, isAllowedStoryImage } from "@/lib/story-images";
 
 type Props = PageProps<"/[locale]/u/[handle]/[slug]">;
+type LoadedStory = NonNullable<Awaited<ReturnType<typeof getStory>>>;
+
+/**
+ * The share image: the cover, else the story's first picture (Unsplash hotlinked as a JPEG crop,
+ * uploads re-encoded by /api/og/story); no picture, or NSFW, gets a card with the title and writer.
+ */
+function storyShareImage(story: LoadedStory) {
+  const authorName = story.authorDisplayName || story.authorUsername;
+  const picture =
+    story.moderation === "nsfw"
+      ? null
+      : ([story.coverUrl, story.thumbnailUrl].find((url): url is string => !!url && isAllowedStoryImage(url)) ?? null);
+  const pictureAlt = picture === story.coverUrl ? story.coverAlt || story.title : story.title;
+  if (picture && isUnsplashImageUrl(picture)) return { url: unsplashShareImageUrl(picture), ...OG_SIZE, alt: pictureAlt };
+  return {
+    url: ogPaths.story(
+      story.authorUsername,
+      story.slug,
+      previewVersion(story.title, story.subtitle, authorName, story.readingTime, story.language, picture, story.moderation),
+    ),
+    ...OG_SIZE,
+    alt: picture ? pictureAlt : story.title,
+  };
+}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { handle, slug } = await params;
@@ -40,26 +66,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const url = storyPath(story.authorUsername, story.slug);
   const description = story.seoDescription || story.subtitle || story.excerpt;
   const authorName = story.authorDisplayName || story.authorUsername;
-  // Share previews (WhatsApp, X, iMessage…) use the cover, else the story's first picture: Unsplash
-  // pictures hotlinked as a JPEG crop, uploaded ones re-encoded by /api/og/story. No picture (or
-  // NSFW): a card with the title and writer from the same route.
-  const picture =
-    story.moderation === "nsfw"
-      ? null
-      : ([story.coverUrl, story.thumbnailUrl].find((url): url is string => !!url && isAllowedStoryImage(url)) ?? null);
-  const pictureAlt = picture === story.coverUrl ? story.coverAlt || story.title : story.title;
-  const shareImage =
-    picture && isUnsplashImageUrl(picture)
-      ? { url: unsplashShareImageUrl(picture), ...OG_SIZE, alt: pictureAlt }
-      : {
-          url: ogPaths.story(
-            story.authorUsername,
-            story.slug,
-            previewVersion(story.title, story.subtitle, authorName, story.readingTime, story.language, picture, story.moderation),
-          ),
-          ...OG_SIZE,
-          alt: picture ? pictureAlt : story.title,
-        };
+  // Share previews (WhatsApp, X, iMessage…).
+  const shareImage = storyShareImage(story);
   return {
     title: story.seoTitle || story.title,
     description,
@@ -112,9 +120,37 @@ async function Story({ params }: Pick<Props, "params">) {
     );
   }
   const nsfw = story.moderation === "nsfw";
+  const site = publicEnv.NEXT_PUBLIC_SITE_URL.replace(/\/$/, "");
+  const absolute = (path: string) => (path.startsWith("http") ? path : `${site}${path}`);
+  const description = story.seoDescription || story.subtitle || story.excerpt;
 
   return (
     <article id="story" className="px-4 py-12 sm:py-16" lang={story.language}>
+      {/* Structured data for search results; only for stories meant to be found. */}
+      {story.status === "published" && !nsfw ? (
+        <JsonLd
+          data={{
+            "@context": "https://schema.org",
+            "@type": "Article",
+            headline: clampText(story.seoTitle || story.title, 110),
+            description,
+            image: [absolute(storyShareImage(story).url)],
+            datePublished: story.publishedAt?.toISOString(),
+            inLanguage: story.language,
+            wordCount: story.wordCount,
+            isAccessibleForFree: true,
+            keywords: story.topics.map((topic) => (story.language === "es" ? topic.nameEs : topic.nameEn)).join(", ") || undefined,
+            mainEntityOfPage: { "@type": "WebPage", "@id": story.canonicalUrl ?? absolute(storyPath(story.authorUsername, story.slug)) },
+            author: { "@type": "Person", name: authorName, url: absolute(profilePath(story.authorUsername)) },
+            publisher: {
+              "@type": "Organization",
+              name: "Fogata",
+              url: `${site}/`,
+              logo: { "@type": "ImageObject", url: `${site}/brand/fogata-flame-1024.png` },
+            },
+          }}
+        />
+      ) : null}
       <ReadingProgress targetId="story" />
       <StoryTitleBar
         headerId="story-header"

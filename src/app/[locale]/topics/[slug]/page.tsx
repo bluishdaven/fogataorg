@@ -9,6 +9,7 @@ import { FollowButton } from "@/components/social/toggle-buttons";
 import { getViewer } from "@/lib/auth";
 import { getFollowState } from "@/lib/data/social";
 import { getTopicWithStories } from "@/lib/data/stories";
+import { localeAlternates } from "@/lib/domain/seo";
 
 type Props = PageProps<"/[locale]/topics/[slug]">;
 
@@ -17,7 +18,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const [topic, locale, t] = await Promise.all([getTopicWithStories(slug), getLocale(), getTranslations("Topics")]);
   if (!topic) return {};
   const name = locale === "es" ? topic.nameEs : topic.nameEn;
-  return { title: name, description: t("topicLede", { name }) };
+  return {
+    title: name,
+    description: t("topicLede", { name }),
+    alternates: localeAlternates(locale, `/topics/${topic.slug}`),
+    // An empty topic has nothing to find yet.
+    robots: topic.stories.length ? undefined : { index: false, follow: true },
+  };
 }
 
 export default function TopicPage({ params }: Props) {
