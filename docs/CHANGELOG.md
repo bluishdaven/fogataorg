@@ -7,7 +7,10 @@ what it is) and **Influences** (books, movies and shows, music, politics; one pe
 show them, with "12 stories · 18,450 words". Paste a fogata.org link, a story or a profile into
 WhatsApp, X or iMessage to see the new previews.
 
-- **Pronouns** sit next to the @handle on profiles and on the writer card under each story.
+- **Pronouns** sit next to the @handle on profiles and after the name in story cards, the story
+  byline, the writer card and responses. The writer card also shows the Now line.
+- **Influences are searchable**: searching "casa de los espiritus" finds people who list "La casa de
+  los espíritus", and the result says where ("Books: …").
 - **Word counts** are counted by the database from the published text, so they can't be faked and
   edits only count once published.
 - **Share previews**: the site link shows the flame card; stories show their picture (Unsplash

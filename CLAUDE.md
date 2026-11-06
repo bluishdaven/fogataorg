@@ -120,7 +120,10 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   Optional free-text pronouns, a "Now reading / watching / listening to" line (`now_focus` +
   `now_text`) and influences (`profiles.influences` jsonb: books, movies, music, politics; ≤ 5 each).
   DB checks cap lengths; pages read influences through `readInfluences()` because rows can be
-  written through the Data API. Profiles show `N stories · M words` over every listed story:
+  written through the Data API. Pronouns follow the name everywhere it's a byline (story cards,
+  story header, writer card, responses; author queries carry `pronouns`, the viewer too), and the
+  writer card shows the Now line (`<NowLine>`). People search also matches influences (≥ 3
+  characters, accent-insensitive, via `jsonb_each` in `search.ts`) and says which one matched. Profiles show `N stories · M words` over every listed story:
   `stories.word_count` is a generated column (`public.count_words()`, mirrors `countWords()`, a db
   test compares them), defined in a hand-written migration outside the Drizzle schema like
   `search_vector`; read it as `"stories"."word_count"`.
