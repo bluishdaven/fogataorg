@@ -45,6 +45,13 @@ test("writers submit to a circle, editors review, and accepted stories show the 
   await expect(band).toHaveCSS("color", "rgb(255, 255, 255)");
   expect(await axeSerious(owner)).toEqual([]);
 
+  // No header image: links to the circle preview with a card in its accent color.
+  const shareImage = new URL((await owner.locator('meta[property="og:image"]').getAttribute("content"))!);
+  expect(shareImage.pathname).toMatch(/^\/api\/og\/circle\/e2e-circle-\d+$/);
+  const preview = await owner.request.get(shareImage.pathname + shareImage.search);
+  expect(preview.status()).toBe(200);
+  expect(preview.headers()["content-type"]).toBe("image/png");
+
   await signInWithMagicLink(writer, "en");
   const title = `Circle story ${Date.now()}`;
   const storyUrl = await publishStory(writer, title);

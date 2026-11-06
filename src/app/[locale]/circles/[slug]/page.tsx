@@ -15,6 +15,9 @@ import { Link } from "@/i18n/navigation";
 import { getViewer } from "@/lib/auth";
 import { getCircle, getCircleViewerState, listSubmittableStories } from "@/lib/data/circles";
 import { profilePath } from "@/lib/domain/handle-routes";
+import { OG_SIZE, ogPaths, previewVersion } from "@/lib/domain/og";
+import { localeAlternates } from "@/lib/domain/seo";
+import { isUnsplashImageUrl, unsplashShareImageUrl } from "@/lib/domain/unsplash";
 
 type Props = PageProps<"/[locale]/circles/[slug]">;
 
@@ -22,7 +25,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const circle = await getCircle(slug);
   if (!circle) return {};
-  return { title: circle.name, description: circle.description || undefined };
+  const description = circle.description || undefined;
+  // Share previews: the circle's header (Unsplash hotlinked as a JPEG crop, uploads re-encoded by the
+  // route), else a card with its name on its accent color.
+  const header = circle.header;
+  const image =
+    header && isUnsplashImageUrl(header.url)
+      ? { url: unsplashShareImageUrl(header.url), ...OG_SIZE, alt: header.alt || circle.name }
+      : {
+          url: ogPaths.circle(circle.slug, previewVersion(circle.name, circle.description, circle.accentColor, header?.url)),
+          ...OG_SIZE,
+          alt: header?.alt || circle.name,
+        };
+  return {
+    title: circle.name,
+    description,
+    alternates: localeAlternates(await getLocale(), `/circles/${circle.slug}`),
+    robots: circle.stories.length ? undefined : { index: false, follow: true },
+    openGraph: { type: "website", siteName: "Fogata", title: circle.name, description, images: [image] },
+    twitter: { card: "summary_large_image" },
+  };
 }
 
 export default function CirclePage({ params }: Props) {

@@ -30,6 +30,7 @@ export const ogPaths = {
   story: (handle: string, slug: string, version: string) =>
     `/api/og/story/${encodeURIComponent(handle)}/${encodeURIComponent(slug)}?v=${version}`,
   profile: (handle: string, version: string) => `/api/og/profile/${encodeURIComponent(handle)}?v=${version}`,
+  circle: (slug: string, version: string) => `/api/og/circle/${encodeURIComponent(slug)}?v=${version}`,
 };
 
 /** Shared caches may keep a preview for a day and serve a stale one while refreshing. */

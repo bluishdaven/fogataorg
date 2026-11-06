@@ -184,3 +184,68 @@ export function ProfileCard({
     </Frame>
   );
 }
+
+/** A circle without a header image: its name on its accent color, the description, the flame. */
+export function CircleCard({
+  flame,
+  name,
+  description,
+  accent,
+  accentText,
+}: {
+  flame: string;
+  name: string;
+  description: string;
+  accent: string;
+  accentText: string;
+}) {
+  return (
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        background: C.paper,
+        fontFamily: "Inter",
+        color: C.ink,
+        position: "relative",
+      }}
+    >
+      <div
+        style={{
+          height: 300,
+          background: accent,
+          color: accentText,
+          display: "flex",
+          alignItems: "flex-end",
+          padding: "0 72px 40px",
+        }}
+      >
+        <div style={{ fontFamily: "Source Serif", fontWeight: 600, fontSize: name.length > 28 ? 64 : 80, lineHeight: 1.08, display: "block", lineClamp: 2 }}>
+          {name}
+        </div>
+      </div>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "36px 72px 0", maxWidth: 1000 }}>
+        {description ? <div style={{ fontSize: 32, lineHeight: 1.4, color: C.muted, display: "block", lineClamp: 3 }}>{description}</div> : null}
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          right: 72,
+          bottom: 44,
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          fontSize: 28,
+          fontWeight: 600,
+          color: C.emberText,
+        }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text */}
+        <img src={flame} width={40} height={40} />
+        fogata.org
+      </div>
+    </div>
+  );
+}
