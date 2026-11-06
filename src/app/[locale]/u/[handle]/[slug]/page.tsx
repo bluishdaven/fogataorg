@@ -165,6 +165,11 @@ async function Story({ params }: Pick<Props, "params">) {
                 {authorName}
               </NextLink>
               <UserBadges badges={badgeData({ publishedCount: story.authorPublishedCount, donorActive: story.authorDonorActive })} />
+              {story.authorPronouns ? (
+                <span className="text-sm text-muted-foreground" data-testid="byline-pronouns">
+                  {story.authorPronouns}
+                </span>
+              ) : null}
             </span>
             <p className="flex flex-wrap items-center gap-x-1.5 text-sm text-muted-foreground">
               {story.publishedAt ? (
@@ -219,6 +224,7 @@ async function Story({ params }: Pick<Props, "params">) {
             badges: badgeData({ publishedCount: story.authorPublishedCount, donorActive: story.authorDonorActive }),
             bio: story.authorBio,
             pronouns: story.authorPronouns,
+            now: story.authorNowText ? { focus: story.authorNowFocus, text: story.authorNowText } : null,
           }}
         />
       </Suspense>

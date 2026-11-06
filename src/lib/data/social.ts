@@ -81,7 +81,7 @@ export type ResponseView = {
   body: string;
   createdAt: Date;
   pinned: boolean;
-  author: { id: string; username: string; displayName: string; avatarUrl: string | null; badges: BadgeData };
+  author: { id: string; username: string; displayName: string; avatarUrl: string | null; pronouns: string; badges: BadgeData };
   sparks: number;
   sparkedByViewer: boolean;
   replies: ResponseView[];
@@ -101,6 +101,7 @@ export async function listResponses(viewer: Viewer | null, storyId: string): Pro
         username: profiles.username,
         displayName: profiles.displayName,
         avatarUrl: profiles.avatarUrl,
+        pronouns: profiles.pronouns,
         publishedCount: publishedCountSql(),
         donorActive: donorActiveSql(),
       })
@@ -143,6 +144,7 @@ export async function listResponses(viewer: Viewer | null, storyId: string): Pro
           username: row.username,
           displayName: row.displayName || row.username,
           avatarUrl: row.avatarUrl,
+          pronouns: row.pronouns,
           badges: badgeData(row),
         },
         sparks: countById.get(row.id) ?? 0,
@@ -192,6 +194,7 @@ export async function listSaved(viewer: Viewer) {
         username: profiles.username,
         displayName: profiles.displayName,
         avatarUrl: profiles.avatarUrl,
+        pronouns: profiles.pronouns,
         publishedCount: publishedCountSql(),
         donorActive: donorActiveSql(),
         moderation: moderationStatusSql,
@@ -215,7 +218,13 @@ export async function listSaved(viewer: Viewer) {
         row.moderation !== "nsfw" && row.thumbnailUrl && isAllowedStoryImage(row.thumbnailUrl)
           ? { url: row.thumbnailUrl, alt: row.thumbnailAlt }
           : null,
-      author: { username: row.username, displayName: row.displayName, avatarUrl: row.avatarUrl, badges: badgeData(row) },
+      author: {
+        username: row.username,
+        displayName: row.displayName,
+        avatarUrl: row.avatarUrl,
+        pronouns: row.pronouns,
+        badges: badgeData(row),
+      },
     }));
   });
 }

@@ -83,6 +83,7 @@ export async function getCircle(slug: string) {
         username: profiles.username,
         displayName: profiles.displayName,
         avatarUrl: profiles.avatarUrl,
+        pronouns: profiles.pronouns,
         publishedCount: publishedCountSql(),
         donorActive: donorActiveSql(),
       })
@@ -120,6 +121,7 @@ export async function getCircle(slug: string) {
           username: row.username,
           displayName: row.displayName,
           avatarUrl: row.avatarUrl,
+          pronouns: row.pronouns,
           badges: badgeData(row),
         },
       })),

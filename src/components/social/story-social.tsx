@@ -2,11 +2,13 @@ import { MessageCircle } from "lucide-react";
 import NextLink from "next/link";
 import { Avatar } from "@/components/avatar";
 import { UserBadges } from "@/components/badges/user-badges";
+import { NowLine } from "@/components/profile/now-line";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Toaster } from "@/components/ui/sonner";
 import { getViewer } from "@/lib/auth";
 import { getStorySocial } from "@/lib/data/social";
 import type { BadgeData } from "@/lib/domain/badges";
+import type { NowFocus } from "@/lib/domain/profile";
 import { profilePath, storyPath } from "@/lib/domain/handle-routes";
 import { storyImageFileName } from "@/lib/domain/story-card";
 import { publicEnv } from "@/lib/env";
@@ -44,6 +46,7 @@ export async function StorySocial({
     badges: BadgeData;
     bio: string;
     pronouns?: string;
+    now?: { focus: NowFocus; text: string } | null;
   };
   slug: string;
 }) {
@@ -132,6 +135,7 @@ export async function StorySocial({
               {t("followers", { count: social.followerCount })}
             </p>
             {author.bio ? <p className="mt-2 max-w-prose text-sm text-pretty">{author.bio}</p> : null}
+            {author.now ? <NowLine focus={author.now.focus} text={author.now.text} className="mt-2" /> : null}
           </div>
         </div>
         {social.isAuthor ? null : (

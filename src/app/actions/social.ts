@@ -105,7 +105,7 @@ export type PostedResponse = {
   blockId: string | null;
   body: string;
   createdAt: string;
-  author: { id: string; username: string; displayName: string; avatarUrl: string | null; badges: BadgeData };
+  author: { id: string; username: string; displayName: string; avatarUrl: string | null; pronouns: string; badges: BadgeData };
 };
 
 export async function postResponse(input: ResponseInput): Promise<Ok<{ response: PostedResponse }> | Fail> {
@@ -142,6 +142,7 @@ export async function postResponse(input: ResponseInput): Promise<Ok<{ response:
           username: viewer.username,
           displayName: viewer.displayName,
           avatarUrl: viewer.avatarUrl,
+          pronouns: viewer.pronouns,
           badges: viewer.badges,
         },
       },

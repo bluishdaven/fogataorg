@@ -254,6 +254,11 @@ function ResponseItem({
           {item.author.displayName}
         </NextLink>
         <UserBadges badges={item.author.badges} />
+        {item.author.pronouns ? (
+          <span className="text-xs text-muted-foreground" data-testid="response-pronouns">
+            {item.author.pronouns}
+          </span>
+        ) : null}
         {isWriter ? (
           <span className="rounded-full bg-ember-soft px-2 py-px text-xs font-medium text-ember-text">{t("writerBadge")}</span>
         ) : null}

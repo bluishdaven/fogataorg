@@ -14,6 +14,7 @@ export type Viewer = {
   username: string;
   displayName: string;
   avatarUrl: string | null;
+  pronouns: string;
   badges: BadgeData;
   /** Owner account (Supabase app_metadata.role = "admin"); can grant donor badges. */
   isAdmin: boolean;
@@ -39,6 +40,7 @@ export const getViewer = cache(async (): Promise<Viewer | null> => {
         username: profiles.username,
         displayName: profiles.displayName,
         avatarUrl: profiles.avatarUrl,
+        pronouns: profiles.pronouns,
         publishedCount: publishedCountSql(),
         donorActive: donorActiveSql(),
       })
@@ -55,6 +57,7 @@ export const getViewer = cache(async (): Promise<Viewer | null> => {
     username: row.username,
     displayName: row.displayName || row.username,
     avatarUrl: row.avatarUrl,
+    pronouns: row.pronouns,
     badges: badgeData(row),
     isAdmin: isAdminClaims(claims),
   };

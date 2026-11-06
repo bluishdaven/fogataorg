@@ -20,7 +20,7 @@ export type StoryCardData = {
   thumbnail: { url: string; alt: string } | null;
   /** Marked NSFW by moderation: labelled, and never shown with a picture. */
   nsfw?: boolean;
-  author: { username: string; displayName: string; avatarUrl?: string | null; badges?: BadgeData };
+  author: { username: string; displayName: string; avatarUrl?: string | null; pronouns?: string; badges?: BadgeData };
 };
 
 export function StoryCard({ story }: { story: StoryCardData }) {
@@ -36,6 +36,7 @@ export function StoryCard({ story }: { story: StoryCardData }) {
           <Avatar name={authorName} url={story.author.avatarUrl} className="size-6 text-[0.625rem]" />
           <span className="font-medium text-foreground">{authorName}</span>
           <UserBadges badges={story.author.badges} />
+          {story.author.pronouns ? <span data-testid="byline-pronouns">{story.author.pronouns}</span> : null}
         </p>
         <h3 className="font-serif text-xl leading-snug font-semibold text-balance sm:text-2xl" lang={story.language}>
           {/* Next's Link (not the i18n one): share URLs have no locale prefix. */}

@@ -54,6 +54,21 @@ describe("StoryCard", () => {
     expect(preview).toHaveAttribute("lang", "en");
   });
 
+  it("shows the writer's pronouns after their name when they've set them", () => {
+    const { rerender } = render(
+      <NextIntlClientProvider locale="en" messages={en} timeZone="UTC">
+        <StoryCard story={{ ...story, author: { ...story.author, pronouns: "she/her" } }} />
+      </NextIntlClientProvider>,
+    );
+    expect(screen.getByTestId("byline-pronouns")).toHaveTextContent("she/her");
+    rerender(
+      <NextIntlClientProvider locale="en" messages={en} timeZone="UTC">
+        <StoryCard story={story} />
+      </NextIntlClientProvider>,
+    );
+    expect(screen.queryByTestId("byline-pronouns")).not.toBeInTheDocument();
+  });
+
   it("keeps the text of NSFW stories out of lists", () => {
     render(
       <NextIntlClientProvider locale="en" messages={en} timeZone="UTC">

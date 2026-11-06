@@ -31,6 +31,7 @@ const cardColumns = {
   authorUsername: profiles.username,
   authorDisplayName: profiles.displayName,
   authorAvatarUrl: profiles.avatarUrl,
+  authorPronouns: profiles.pronouns,
   authorPublishedCount: publishedCountSql(),
   authorDonorActive: donorActiveSql(),
   moderation: moderationStatusSql,
@@ -49,6 +50,7 @@ type CardRow = {
   authorUsername: string;
   authorDisplayName: string;
   authorAvatarUrl: string | null;
+  authorPronouns: string;
   authorPublishedCount: number;
   authorDonorActive: boolean;
   moderation: "nsfw" | "removed" | null;
@@ -73,6 +75,7 @@ function toCard(row: CardRow) {
       username: row.authorUsername,
       displayName: row.authorDisplayName,
       avatarUrl: row.authorAvatarUrl,
+      pronouns: row.authorPronouns,
       badges: badgeData({ publishedCount: row.authorPublishedCount, donorActive: row.authorDonorActive }),
     },
   };
@@ -136,6 +139,8 @@ export async function getStory(handle: string, slug: string) {
         authorDonorActive: donorActiveSql(),
         authorBio: profiles.bio,
         authorPronouns: profiles.pronouns,
+        authorNowFocus: profiles.nowFocus,
+        authorNowText: profiles.nowText,
         moderation: moderationStatusSql,
         moderationReason: moderationReasonSql,
       })

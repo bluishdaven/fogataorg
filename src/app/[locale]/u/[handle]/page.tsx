@@ -1,10 +1,10 @@
-import { BookOpen, Headphones, Tv } from "lucide-react";
 import type { Metadata } from "next";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { Avatar } from "@/components/avatar";
 import { BadgeChips } from "@/components/badges/badge-guide";
+import { NowLine } from "@/components/profile/now-line";
 import { StoryCard } from "@/components/story-card";
 import { StoryListSkeleton } from "@/components/story-list-skeleton";
 import { FollowButton } from "@/components/social/toggle-buttons";
@@ -99,15 +99,7 @@ async function Profile({ params }: Pick<Props, "params">) {
         </p>
         <BadgeChips badges={badgeData(profile)} name={name} className="mt-1" />
         {profile.bio ? <p className="max-w-prose font-serif text-lg text-pretty">{profile.bio}</p> : null}
-        {profile.nowText ? (
-          <p className="flex items-start gap-2 text-sm" data-testid="profile-now">
-            <NowIcon focus={profile.nowFocus} />
-            <span>
-              <span className="font-medium">{t("now", { focus: profile.nowFocus })}:</span>{" "}
-              <span className="font-serif text-base italic">{profile.nowText}</span>
-            </span>
-          </p>
-        ) : null}
+        {profile.nowText ? <NowLine focus={profile.nowFocus} text={profile.nowText} /> : null}
         {profile.links.length ? (
           <ul className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
             {profile.links.flatMap((link) => {
@@ -195,9 +187,4 @@ async function ProfileFollow({ userId, username }: { userId: string; username: s
       )}
     </div>
   );
-}
-
-function NowIcon({ focus }: { focus: "reading" | "watching" | "listening" }) {
-  const Icon = focus === "watching" ? Tv : focus === "listening" ? Headphones : BookOpen;
-  return <Icon className="mt-0.5 size-4 shrink-0 text-ember-text" aria-hidden />;
 }
