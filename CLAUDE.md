@@ -116,6 +116,22 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   user's own folder are accepted, and a DB check (`profiles_avatar_url_own_folder`) enforces it even
   through the Data API. Replacing or removing a photo deletes the old file. Render avatars only with
   `<Avatar>`, which shows initials unless the URL is in our bucket; author queries carry `avatarUrl`.
+- **Profile extras** (`src/lib/domain/profile.ts`, plan in `docs/plans/profile-extras-and-previews.md`).
+  Optional free-text pronouns, a "Now reading / watching / listening to" line (`now_focus` +
+  `now_text`) and influences (`profiles.influences` jsonb: books, movies, music, politics; ≤ 5 each).
+  DB checks cap lengths; pages read influences through `readInfluences()` because rows can be
+  written through the Data API. Profiles show `N stories · M words` over every listed story:
+  `stories.word_count` is a generated column (`public.count_words()`, mirrors `countWords()`, a db
+  test compares them), defined in a hand-written migration outside the Drizzle schema like
+  `search_vector`; read it as `"stories"."word_count"`.
+- **Share previews** (`src/lib/domain/og.ts`, `src/lib/og/`, `src/app/api/og/`). `next/og` cards
+  (1200×630) for the site (default for every page, set in the root layout), stories without a usable
+  picture (or NSFW) and profiles; fonts are bundled woff files in `src/assets/fonts/` (OFL). Unsplash
+  pictures are hotlinked as a JPEG crop (`unsplashShareImageUrl`), never proxied; uploaded story
+  pictures are re-encoded to JPEG by the story route and profile photos to PNG (the renderer can't
+  draw WebP), both with `sharp`. Image URLs carry `?v=previewVersion(…)` of what they show, so edits
+  reach new shares. Pages that set their own `openGraph` must repeat `siteName` (Next replaces the
+  whole object). Card text follows the story's language or the person's own locale.
 - **Topics** come from a catalog migration (`*_topics_catalog.sql`, EN + ES names, upsert by slug).
   Add or rename topics with a new migration; the seed only references slugs that exist there.
 - **Sharing** (`src/components/social/share-button.tsx`, `src/lib/domain/share.ts`). A menu in the story

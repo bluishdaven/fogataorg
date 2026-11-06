@@ -1,5 +1,22 @@
 # Changelog
 
+## Profile extras and share previews (2026-11-06)
+
+**Demo**: Settings → Profile now has **Pronouns**, **Now** (Reading / Watching / Listening to, plus
+what it is) and **Influences** (books, movies and shows, music, politics; one per line). Profiles
+show them, with "12 stories · 18,450 words". Paste a fogata.org link, a story or a profile into
+WhatsApp, X or iMessage to see the new previews.
+
+- **Pronouns** sit next to the @handle on profiles and on the writer card under each story.
+- **Word counts** are counted by the database from the published text, so they can't be faked and
+  edits only count once published.
+- **Share previews**: the site link shows the flame card; stories show their picture (Unsplash
+  pictures hotlinked as required, uploaded ones as JPEG) or a card with the title and writer;
+  profiles show a card with photo, name, bio and counts. All say fogata.org.
+- Tests: 182 unit, 76 RLS (word counts match the app's, generated and unforgeable, profile limits
+  and ownership), Playwright for the settings → profile → previews flow and the uploaded-picture
+  preview. The summary email test now expects the Kindling badge notice next to the follow.
+
 ## Private circles, badge explainer and badge notifications (2026-11-05)
 
 **Demo**: start a circle and choose **Private** under "Who can publish" (or switch it in Manage →
