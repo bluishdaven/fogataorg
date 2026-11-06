@@ -22,6 +22,10 @@ const FIELD_ERRORS = new Set<ProfileErrorKey>([
   "linkLabel",
   "linkUrl",
   "tooManyLinks",
+  "pronouns",
+  "nowText",
+  "influence",
+  "tooManyInfluences",
 ]);
 
 function pgCode(error: unknown): string | undefined {
@@ -47,10 +51,13 @@ export async function updateProfile(input: ProfileUpdateInput): Promise<ProfileU
     return { ok: false, errors: [...errors] };
   }
 
-  const { displayName, username, bio, links } = parsed.data;
+  const { displayName, username, bio, links, pronouns, nowFocus, nowText, influences } = parsed.data;
   try {
     await withRls(viewer.claims, (tx) =>
-      tx.update(profiles).set({ displayName, username, bio, links }).where(eq(profiles.id, viewer.id)),
+      tx
+        .update(profiles)
+        .set({ displayName, username, bio, links, pronouns, nowFocus, nowText, influences })
+        .where(eq(profiles.id, viewer.id)),
     );
   } catch (error) {
     if (pgCode(error) === "23505") return { ok: false, errors: ["usernameTaken"] };

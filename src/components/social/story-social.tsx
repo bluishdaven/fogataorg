@@ -36,7 +36,15 @@ export async function StorySocial({
   readingTime: number;
   /** A few sentences from the start of the story, for the Stories image. */
   preview: string;
-  author: { id: string; username: string; displayName: string; avatarUrl: string | null; badges: BadgeData; bio: string };
+  author: {
+    id: string;
+    username: string;
+    displayName: string;
+    avatarUrl: string | null;
+    badges: BadgeData;
+    bio: string;
+    pronouns?: string;
+  };
   slug: string;
 }) {
   const viewer = await getViewer();
@@ -119,7 +127,10 @@ export async function StorySocial({
               </NextLink>
               <UserBadges badges={author.badges} className="text-lg" />
             </span>
-            <p className="text-sm text-muted-foreground">{t("followers", { count: social.followerCount })}</p>
+            <p className="text-sm text-muted-foreground">
+              {author.pronouns ? <span data-testid="author-pronouns">{author.pronouns} · </span> : null}
+              {t("followers", { count: social.followerCount })}
+            </p>
             {author.bio ? <p className="mt-2 max-w-prose text-sm text-pretty">{author.bio}</p> : null}
           </div>
         </div>

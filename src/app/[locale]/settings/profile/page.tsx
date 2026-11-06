@@ -9,6 +9,7 @@ import { donorActiveSql } from "@/lib/data/badge-sql";
 import { getViewer } from "@/lib/auth";
 import { withRls } from "@/lib/db/rls";
 import { profiles } from "@/lib/db/schema";
+import { readInfluences } from "@/lib/domain/profile";
 import { AvatarEditor } from "./avatar-editor";
 import { ProfileForm } from "./profile-form";
 
@@ -42,6 +43,10 @@ async function Form() {
         displayName: profiles.displayName,
         bio: profiles.bio,
         links: profiles.links,
+        pronouns: profiles.pronouns,
+        nowFocus: profiles.nowFocus,
+        nowText: profiles.nowText,
+        influences: profiles.influences,
         avatarUrl: profiles.avatarUrl,
         donorUntil: profiles.donorUntil,
         donorActive: donorActiveSql(),
@@ -61,7 +66,7 @@ async function Form() {
         </p>
       ) : null}
       <AvatarEditor userId={viewer.id} name={profile.displayName || profile.username} initialUrl={profile.avatarUrl} />
-      <ProfileForm initial={profile} />
+      <ProfileForm initial={{ ...profile, influences: readInfluences(profile.influences) }} />
     </>
   );
 }

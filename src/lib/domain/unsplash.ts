@@ -98,6 +98,22 @@ export function unsplashImageUrl(rawUrl: string, options: { width: number; quali
   return url.toString();
 }
 
+/**
+ * A 1200×630 JPEG crop of an Unsplash image for share previews, still hotlinked from Unsplash.
+ * JPEG because not every link-preview fetcher takes WebP or AVIF.
+ */
+export function unsplashShareImageUrl(rawUrl: string): string {
+  const url = new URL(rawUrl);
+  url.searchParams.set("w", "1200");
+  url.searchParams.set("h", "630");
+  url.searchParams.set("fit", "crop");
+  url.searchParams.set("crop", "entropy");
+  url.searchParams.set("fm", "jpg");
+  url.searchParams.set("q", "80");
+  url.searchParams.delete("auto");
+  return url.toString();
+}
+
 /** Adds the referral params Unsplash asks for on every link back to their site. */
 export function withUnsplashUtm(value: string): string {
   const url = new URL(value);

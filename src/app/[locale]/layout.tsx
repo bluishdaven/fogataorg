@@ -10,6 +10,7 @@ import { SiteHeader } from "@/components/site-header";
 import { ThemeProvider } from "@/components/theme-provider";
 import { routing } from "@/i18n/routing";
 import { HEADLINE_SCRIPT } from "@/lib/domain/headlines";
+import { OG_SIZE, ogPaths } from "@/lib/domain/og";
 import { READER_PREFS_SCRIPT } from "@/lib/domain/reader-prefs";
 import { publicEnv } from "@/lib/env";
 import "../globals.css";
@@ -35,7 +36,14 @@ export async function generateMetadata(): Promise<Metadata> {
     title: { default: t("title"), template: t("titleTemplate") },
     description: t("description"),
     applicationName: "Fogata",
-    openGraph: { siteName: "Fogata", type: "website", locale: locale === "es" ? "es_MX" : "en_US" },
+    openGraph: {
+      siteName: "Fogata",
+      type: "website",
+      locale: locale === "es" ? "es_MX" : "en_US",
+      // Pages without their own preview (home, topics, circles…) share the flame card.
+      images: [{ url: ogPaths.site(locale === "es" ? "es" : "en"), ...OG_SIZE, alt: "Fogata" }],
+    },
+    twitter: { card: "summary_large_image" },
   };
 }
 

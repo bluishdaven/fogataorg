@@ -88,7 +88,16 @@
     "stories": "Stories",
     "joined": "On Fogata since {date}",
     "noStories": "{name} hasn't published a story yet.",
-    "storyCount": "{count, plural, =0 {No stories} one {# story} other {# stories}}"
+    "storyCount": "{count, plural, =0 {No stories} one {# story} other {# stories}}",
+    "wordCount": "{count, plural, =0 {no words yet} one {# word} other {# words}}",
+    "now": "{focus, select, reading {Now reading} watching {Now watching} listening {Now listening to} other {Now}}",
+    "influences": "Influences",
+    "influenceKinds": {
+      "books": "Books",
+      "movies": "Movies and shows",
+      "music": "Music",
+      "politics": "Politics"
+    }
   },
   "Auth": {
     "title": "Sign in to Fogata",
@@ -392,6 +401,28 @@
     "username": "Username",
     "usernameHint": "Your profile and story links use this. Changing it changes those links.",
     "bio": "Short bio",
+    "pronouns": "Pronouns (optional)",
+    "pronounsPlaceholder": "e.g. she/her, he/him, they/them",
+    "pronounsHint": "Shown next to your username. Write them however you like.",
+    "now": "Now",
+    "nowHint": "What you're into these days. Leave it empty to hide it.",
+    "nowFocus": "Show",
+    "focus": {
+      "reading": "Reading",
+      "watching": "Watching",
+      "listening": "Listening to"
+    },
+    "nowText": "{focus, select, reading {What are you reading?} watching {What are you watching?} listening {What are you listening to?} other {What are you into?}}",
+    "nowPlaceholder": "{focus, select, reading {e.g. Pedro Páramo, by Juan Rulfo} watching {e.g. The Bear, season 3} listening {e.g. Un Verano Sin Ti, Bad Bunny} other {}}",
+    "influences": "Influences",
+    "influencesHint": "Up to 5 of each, one per line. Everyone can see them on your profile.",
+    "influenceKinds": {
+      "books": "Books",
+      "movies": "Movies and shows",
+      "music": "Music",
+      "politics": "Politics"
+    },
+    "influencePlaceholder": "{kind, select, books {One Hundred Years of Solitude} movies {Roma} music {Mercedes Sosa} politics {Social democracy} other {}}",
     "links": "Links",
     "linksHint": "Up to 5: your site, newsletter or social profiles.",
     "linkLabel": "Link label",
@@ -413,6 +444,10 @@
       "linkLabel": "Every link needs a short label (up to 40 characters).",
       "linkUrl": "Links must be full web addresses, like https://example.com.",
       "tooManyLinks": "You can add up to 5 links.",
+      "pronouns": "Pronouns can be at most 40 characters.",
+      "nowText": "Keep “Now” to 120 characters.",
+      "influence": "Each influence can be at most 80 characters.",
+      "tooManyInfluences": "Add up to 5 influences of each kind.",
       "invalid": "Something's not right. Check the form and try again."
     },
     "photo": "Profile photo",

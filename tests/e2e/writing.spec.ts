@@ -50,6 +50,13 @@ test("write, autosave, add an image, publish, then delete", async ({ page }) => 
   await expect(page.locator("article figure img")).toHaveAttribute("alt", "A small orange square");
   await expect(page.getByRole("link", { name: "Nature" })).toBeVisible();
 
+  // Its share preview is the uploaded picture, re-encoded as a JPEG link previews accept.
+  const shareImage = await page.locator('meta[property="og:image"]').getAttribute("content");
+  expect(shareImage).toMatch(/\/api\/og\/story\/e2e[a-z0-9_]+\/a-night-by-the-water-\d+\?v=/);
+  const preview = await page.request.get(new URL(shareImage!).pathname + new URL(shareImage!).search);
+  expect(preview.status()).toBe(200);
+  expect(preview.headers()["content-type"]).toBe("image/jpeg");
+
   // The home list shows the story with a thumbnail of its first picture.
   await page.goto("/en");
   await expect(page.getByRole("link", { name: title })).toBeVisible();

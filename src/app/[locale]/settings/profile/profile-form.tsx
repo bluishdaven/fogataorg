@@ -9,7 +9,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { profilePath } from "@/lib/domain/handle-routes";
-import { BIO_MAX, DISPLAY_NAME_MAX, MAX_PROFILE_LINKS, type ProfileErrorKey } from "@/lib/domain/profile";
+import {
+  BIO_MAX,
+  DISPLAY_NAME_MAX,
+  INFLUENCE_KINDS,
+  MAX_PROFILE_LINKS,
+  NOW_FOCUSES,
+  NOW_TEXT_MAX,
+  PRONOUNS_MAX,
+  type InfluenceKind,
+  type Influences,
+  type NowFocus,
+  type ProfileErrorKey,
+} from "@/lib/domain/profile";
 import { cn } from "@/lib/utils";
 
 type Link = { label: string; url: string };
@@ -17,13 +29,29 @@ type Link = { label: string; url: string };
 export function ProfileForm({
   initial,
 }: {
-  initial: { username: string; displayName: string; bio: string; links: Link[] };
+  initial: {
+    username: string;
+    displayName: string;
+    bio: string;
+    links: Link[];
+    pronouns: string;
+    nowFocus: NowFocus;
+    nowText: string;
+    influences: Influences;
+  };
 }) {
   const t = useTranslations("Settings");
   const [displayName, setDisplayName] = useState(initial.displayName);
   const [username, setUsername] = useState(initial.username);
   const [bio, setBio] = useState(initial.bio);
   const [links, setLinks] = useState<Link[]>(initial.links);
+  const [pronouns, setPronouns] = useState(initial.pronouns);
+  const [nowFocus, setNowFocus] = useState<NowFocus>(initial.nowFocus);
+  const [nowText, setNowText] = useState(initial.nowText);
+  // One entry per line while editing.
+  const [influences, setInfluences] = useState<Record<InfluenceKind, string>>(
+    () => Object.fromEntries(INFLUENCE_KINDS.map((kind) => [kind, (initial.influences[kind] ?? []).join("\n")])) as Record<InfluenceKind, string>,
+  );
   const [errors, setErrors] = useState<ProfileErrorKey[]>([]);
   const [saved, setSaved] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -38,6 +66,10 @@ export function ProfileForm({
       username,
       bio,
       links: links.filter((link) => link.label.trim() || link.url.trim()),
+      pronouns,
+      nowFocus,
+      nowText,
+      influences: Object.fromEntries(INFLUENCE_KINDS.map((kind) => [kind, influences[kind].split("\n")])),
     });
     setPending(false);
     if (result.ok) setSaved(result.username);
@@ -100,6 +132,24 @@ export function ProfileForm({
       </div>
 
       <div className="flex flex-col gap-1.5">
+        <Label htmlFor="pronouns">{t("pronouns")}</Label>
+        <Input
+          id="pronouns"
+          value={pronouns}
+          maxLength={PRONOUNS_MAX}
+          placeholder={t("pronounsPlaceholder")}
+          onChange={(event) => setPronouns(event.target.value)}
+          aria-invalid={has("pronouns") || undefined}
+          aria-describedby="pronouns-hint"
+          autoComplete="off"
+          className="sm:max-w-xs"
+        />
+        <p id="pronouns-hint" className="text-xs text-muted-foreground">
+          {t("pronounsHint")}
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-1.5">
         <div className="flex items-baseline justify-between">
           <Label htmlFor="bio">{t("bio")}</Label>
           <span className={cn("text-xs text-muted-foreground", bio.length > BIO_MAX && "text-destructive")} aria-hidden>
@@ -116,6 +166,40 @@ export function ProfileForm({
           className="rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
         />
       </div>
+
+      <fieldset className="flex flex-col gap-2" data-testid="now-fieldset">
+        <legend className="mb-1 text-sm font-medium">{t("now")}</legend>
+        <p className="text-xs text-muted-foreground">{t("nowHint")}</p>
+        <div role="radiogroup" aria-label={t("nowFocus")} className="flex flex-wrap gap-2">
+          {NOW_FOCUSES.map((focus) => (
+            <label
+              key={focus}
+              className="flex min-h-11 cursor-pointer items-center rounded-full border border-input px-4 text-sm has-checked:border-primary has-checked:bg-ember-soft has-focus-visible:ring-3 has-focus-visible:ring-ring/50 sm:min-h-8 sm:px-3"
+            >
+              <input
+                type="radio"
+                name="now-focus"
+                value={focus}
+                checked={nowFocus === focus}
+                onChange={() => setNowFocus(focus)}
+                className="sr-only"
+              />
+              {t(`focus.${focus}`)}
+            </label>
+          ))}
+        </div>
+        <Label htmlFor="now-text" className="sr-only">
+          {t("nowText", { focus: nowFocus })}
+        </Label>
+        <Input
+          id="now-text"
+          value={nowText}
+          maxLength={NOW_TEXT_MAX}
+          placeholder={t("nowPlaceholder", { focus: nowFocus })}
+          onChange={(event) => setNowText(event.target.value)}
+          aria-invalid={has("nowText") || undefined}
+        />
+      </fieldset>
 
       <fieldset className="flex flex-col gap-2">
         <legend className="mb-1 text-sm font-medium">{t("links")}</legend>
@@ -155,6 +239,27 @@ export function ProfileForm({
             {t("addLink")}
           </Button>
         ) : null}
+      </fieldset>
+
+      <fieldset className="flex flex-col gap-3" data-testid="influences-fieldset">
+        <legend className="mb-1 text-sm font-medium">{t("influences")}</legend>
+        <p className="text-xs text-muted-foreground">{t("influencesHint")}</p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {INFLUENCE_KINDS.map((kind) => (
+            <div key={kind} className="flex flex-col gap-1.5">
+              <Label htmlFor={`influences-${kind}`}>{t(`influenceKinds.${kind}`)}</Label>
+              <textarea
+                id={`influences-${kind}`}
+                value={influences[kind]}
+                rows={3}
+                placeholder={t("influencePlaceholder", { kind })}
+                onChange={(event) => setInfluences({ ...influences, [kind]: event.target.value })}
+                aria-invalid={has("influence", "tooManyInfluences") || undefined}
+                className="rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+              />
+            </div>
+          ))}
+        </div>
       </fieldset>
 
       <div>

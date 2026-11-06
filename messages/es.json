@@ -88,7 +88,16 @@
     "stories": "Historias",
     "joined": "En Fogata desde {date}",
     "noStories": "{name} todavía no ha publicado una historia.",
-    "storyCount": "{count, plural, =0 {Sin historias} one {# historia} other {# historias}}"
+    "storyCount": "{count, plural, =0 {Sin historias} one {# historia} other {# historias}}",
+    "wordCount": "{count, plural, =0 {aún sin palabras} one {# palabra} other {# palabras}}",
+    "now": "{focus, select, reading {Leyendo ahora} watching {Viendo ahora} listening {Escuchando ahora} other {Ahora}}",
+    "influences": "Referencias",
+    "influenceKinds": {
+      "books": "Libros",
+      "movies": "Películas y series",
+      "music": "Música",
+      "politics": "Política"
+    }
   },
   "Auth": {
     "title": "Entra a Fogata",
@@ -392,6 +401,28 @@
     "username": "Nombre de usuario",
     "usernameHint": "Tu perfil y los enlaces a tus historias lo usan. Si lo cambias, cambian esos enlaces.",
     "bio": "Biografía breve",
+    "pronouns": "Pronombres (opcional)",
+    "pronounsPlaceholder": "p. ej. ella, él, elle",
+    "pronounsHint": "Aparecen junto a tu nombre de usuario. Escríbelos como prefieras.",
+    "now": "Ahora",
+    "nowHint": "Lo que te tiene ocupado estos días. Déjalo vacío para ocultarlo.",
+    "nowFocus": "Mostrar",
+    "focus": {
+      "reading": "Leyendo",
+      "watching": "Viendo",
+      "listening": "Escuchando"
+    },
+    "nowText": "{focus, select, reading {¿Qué estás leyendo?} watching {¿Qué estás viendo?} listening {¿Qué estás escuchando?} other {¿En qué andas?}}",
+    "nowPlaceholder": "{focus, select, reading {p. ej. Pedro Páramo, de Juan Rulfo} watching {p. ej. The Bear, temporada 3} listening {p. ej. Un Verano Sin Ti, Bad Bunny} other {}}",
+    "influences": "Referencias",
+    "influencesHint": "Hasta 5 de cada una, una por línea. Todos pueden verlas en tu perfil.",
+    "influenceKinds": {
+      "books": "Libros",
+      "movies": "Películas y series",
+      "music": "Música",
+      "politics": "Política"
+    },
+    "influencePlaceholder": "{kind, select, books {Cien años de soledad} movies {Roma} music {Mercedes Sosa} politics {Socialdemocracia} other {}}",
     "links": "Enlaces",
     "linksHint": "Hasta 5: tu sitio, tu boletín o tus redes.",
     "linkLabel": "Texto del enlace",
@@ -413,6 +444,10 @@
       "linkLabel": "Cada enlace necesita un texto breve (hasta 40 caracteres).",
       "linkUrl": "Los enlaces deben ser direcciones web completas, como https://ejemplo.com.",
       "tooManyLinks": "Puedes agregar hasta 5 enlaces.",
+      "pronouns": "Los pronombres pueden tener hasta 40 caracteres.",
+      "nowText": "«Ahora» puede tener hasta 120 caracteres.",
+      "influence": "Cada referencia puede tener hasta 80 caracteres.",
+      "tooManyInfluences": "Agrega hasta 5 referencias de cada tipo.",
       "invalid": "Algo no está bien. Revisa el formulario y vuelve a intentarlo."
     },
     "photo": "Foto de perfil",

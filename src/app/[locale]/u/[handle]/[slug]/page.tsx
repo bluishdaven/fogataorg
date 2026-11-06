@@ -22,12 +22,9 @@ import { getStory } from "@/lib/data/stories";
 import { badgeData } from "@/lib/domain/badges";
 import { excerpt } from "@/lib/domain/content";
 import { profilePath, storyPath } from "@/lib/domain/handle-routes";
-import { imageCreditSchema, isUnsplashImageUrl, unsplashImageUrl } from "@/lib/domain/unsplash";
+import { OG_SIZE, ogPaths, previewVersion } from "@/lib/domain/og";
+import { imageCreditSchema, isUnsplashImageUrl, unsplashShareImageUrl } from "@/lib/domain/unsplash";
 import { allowedImagePrefixes, isAllowedStoryImage } from "@/lib/story-images";
-
-function coverImageUrl(url: string, width: number): string {
-  return isUnsplashImageUrl(url) ? unsplashImageUrl(url, { width }) : url;
-}
 
 type Props = PageProps<"/[locale]/u/[handle]/[slug]">;
 
@@ -42,28 +39,45 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const t = await getTranslations("Story");
   const url = storyPath(story.authorUsername, story.slug);
   const description = story.seoDescription || story.subtitle || story.excerpt;
-  // Share previews (WhatsApp, X, iMessage…) use the cover, else the story's first picture.
-  const cover =
+  const authorName = story.authorDisplayName || story.authorUsername;
+  // Share previews (WhatsApp, X, iMessage…) use the cover, else the story's first picture: Unsplash
+  // pictures hotlinked as a JPEG crop, uploaded ones re-encoded by /api/og/story. No picture (or
+  // NSFW): a card with the title and writer from the same route.
+  const picture =
     story.moderation === "nsfw"
       ? null
       : ([story.coverUrl, story.thumbnailUrl].find((url): url is string => !!url && isAllowedStoryImage(url)) ?? null);
+  const pictureAlt = picture === story.coverUrl ? story.coverAlt || story.title : story.title;
+  const shareImage =
+    picture && isUnsplashImageUrl(picture)
+      ? { url: unsplashShareImageUrl(picture), ...OG_SIZE, alt: pictureAlt }
+      : {
+          url: ogPaths.story(
+            story.authorUsername,
+            story.slug,
+            previewVersion(story.title, story.subtitle, authorName, story.readingTime, story.language, picture, story.moderation),
+          ),
+          ...OG_SIZE,
+          alt: picture ? pictureAlt : story.title,
+        };
   return {
     title: story.seoTitle || story.title,
     description,
-    authors: [{ name: story.authorDisplayName || story.authorUsername, url: profilePath(story.authorUsername) }],
+    authors: [{ name: authorName, url: profilePath(story.authorUsername) }],
     alternates: { canonical: story.canonicalUrl ?? url },
     robots: story.status === "unlisted" || story.moderation === "nsfw" ? { index: false } : undefined,
     openGraph: {
       type: "article",
+      siteName: "Fogata",
       title: story.title,
       description,
       url,
       locale: story.language === "es" ? "es_MX" : "en_US",
       publishedTime: story.publishedAt?.toISOString(),
-      authors: [t("by", { name: story.authorDisplayName || story.authorUsername })],
-      images: cover ? [{ url: coverImageUrl(cover, 1200), alt: cover === story.coverUrl ? story.coverAlt : story.title }] : undefined,
+      authors: [t("by", { name: authorName })],
+      images: [shareImage],
     },
-    twitter: { card: cover ? "summary_large_image" : "summary" },
+    twitter: { card: "summary_large_image" },
   };
 }
 
@@ -204,6 +218,7 @@ async function Story({ params }: Pick<Props, "params">) {
             avatarUrl: story.authorAvatarUrl,
             badges: badgeData({ publishedCount: story.authorPublishedCount, donorActive: story.authorDonorActive }),
             bio: story.authorBio,
+            pronouns: story.authorPronouns,
           }}
         />
       </Suspense>

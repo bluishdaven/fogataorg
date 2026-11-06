@@ -5,6 +5,7 @@ import { asAnon } from "@/lib/db/rls";
 import { profiles, stories, storyTopics, topics } from "@/lib/db/schema";
 import { badgeData } from "@/lib/domain/badges";
 import { excerpt } from "@/lib/domain/content";
+import { readInfluences } from "@/lib/domain/profile";
 import { isAllowedStoryImage } from "@/lib/story-images";
 import { donorActiveSql, publishedCountSql } from "./badge-sql";
 import { moderationReasonSql, moderationStatusSql, notModerated, notRemoved } from "./moderation-sql";
@@ -134,6 +135,7 @@ export async function getStory(handle: string, slug: string) {
         authorPublishedCount: publishedCountSql(),
         authorDonorActive: donorActiveSql(),
         authorBio: profiles.bio,
+        authorPronouns: profiles.pronouns,
         moderation: moderationStatusSql,
         moderationReason: moderationReasonSql,
       })
@@ -189,12 +191,27 @@ export async function getProfileWithStories(handle: string) {
         donorActive: donorActiveSql(),
         bio: profiles.bio,
         links: profiles.links,
+        pronouns: profiles.pronouns,
+        nowFocus: profiles.nowFocus,
+        nowText: profiles.nowText,
+        influences: profiles.influences,
+        locale: profiles.locale,
         createdAt: profiles.createdAt,
+        updatedAt: profiles.updatedAt,
       })
       .from(profiles)
       .where(sql`lower(${profiles.username}) = lower(${handle})`)
       .limit(1);
     if (!profile) return null;
+
+    // Totals over every story the profile lists (the list itself stops at 50).
+    const [totals] = await tx
+      .select({
+        stories: sql<number>`count(*)::int`,
+        words: sql<number>`coalesce(sum("stories"."word_count"), 0)::int`,
+      })
+      .from(stories)
+      .where(and(listed, eq(stories.authorId, profile.id)));
 
     const rows = await tx
       .select(cardColumns)
@@ -204,7 +221,13 @@ export async function getProfileWithStories(handle: string) {
       .orderBy(desc(stories.publishedAt))
       .limit(50);
 
-    return { ...profile, stories: rows.map(toCard) };
+    return {
+      ...profile,
+      influences: readInfluences(profile.influences),
+      storyCount: totals?.stories ?? 0,
+      wordCount: totals?.words ?? 0,
+      stories: rows.map(toCard),
+    };
   });
 }
 
