@@ -89,6 +89,13 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   (`speechChunks()`), in the story's language, marking the block with `data-listening` and keeping
   it in view; pause cancels and resume restarts the sentence (steadier than `speechSynthesis.pause`).
   Hidden where speech isn't available. The e2e test swaps in a silent fake `speechSynthesis`.
+- **Continue reading** (`reading_positions`, `src/lib/domain/reading-position.ts`,
+  `src/components/resume-reading.tsx`). The read beacon also carries the paragraph at the top of the
+  screen and the current progress; `/api/reads` saves it for signed-in readers (RLS own-only, live
+  stories; reaching 95% counts as finished = 1), and `ReadTracker` keeps visitors' newest 50 places
+  in localStorage (`fogata:positions`). Story pages offer a fixed "Pick up where you left off" pill
+  (not on passage links or once scrolled); the home page lists up to three unfinished stories from
+  the last 30 days. In the data download and the privacy policy.
 - **Circles** (`src/lib/data/circles.ts`, `src/app/actions/circles.ts`, `src/components/circles/`).
   `circles` (accent color, optional header), `circle_members` (one owner created by trigger, editors,
   writers) and `circle_submissions` (pending → accepted/declined; one active circle per story; members'

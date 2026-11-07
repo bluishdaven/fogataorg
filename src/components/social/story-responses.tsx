@@ -8,6 +8,7 @@ import { blockTexts } from "@/lib/domain/social";
 import { publicEnv } from "@/lib/env";
 import { ParagraphAnchors } from "./paragraph-anchors";
 import { ResponsesSection } from "./responses-section";
+import { ResumeReading } from "@/components/resume-reading";
 import { SelectionToolbar } from "./selection-toolbar";
 
 /** Responses, the reader's embers and the selection toolbar, loaded per reader inside <Suspense>. */
@@ -41,6 +42,7 @@ export async function StoryResponses({
 
   return (
     <>
+      <ResumeReading storyId={storyId} signedIn={Boolean(viewer)} />
       <ParagraphAnchors counts={counts} />
       <SelectionToolbar
         storyId={storyId}

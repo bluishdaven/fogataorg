@@ -11,6 +11,7 @@ import {
   pgTable,
   smallint,
   primaryKey,
+  real,
   text,
   timestamp,
   uniqueIndex,
@@ -430,6 +431,35 @@ export const storyVersions = pgTable(
     pgPolicy("story_versions_select_own", { for: "select", to: authenticatedRole, using: OWN_STORY(t.storyId) }),
     pgPolicy("story_versions_insert_own", { for: "insert", to: authenticatedRole, withCheck: OWN_STORY(t.storyId) }),
     pgPolicy("story_versions_update_own", { for: "update", to: authenticatedRole, using: OWN_STORY(t.storyId), withCheck: OWN_STORY(t.storyId) }),
+  ],
+);
+
+/**
+ * Where a signed-in reader stopped in each story ("Continue reading", on any device). Private to
+ * the reader. `progress` 1 means finished.
+ */
+export const readingPositions = pgTable(
+  "reading_positions",
+  {
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => profiles.id, { onDelete: "cascade" }),
+    storyId: uuid("story_id")
+      .notNull()
+      .references(() => stories.id, { onDelete: "cascade" }),
+    blockId: text("block_id"),
+    progress: real("progress").notNull().default(0),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.userId, t.storyId] }),
+    index("reading_positions_recent_idx").on(t.userId, t.updatedAt.desc()),
+    check("reading_positions_progress_range", sql`${t.progress} between 0 and 1`),
+    check("reading_positions_block_id_format", sql`${t.blockId} is null or ${t.blockId} ~ '^[0-9a-f-]{36}$'`),
+    pgPolicy("reading_positions_select_own", { for: "select", to: authenticatedRole, using: sql`${t.userId} = ${authUid}` }),
+    pgPolicy("reading_positions_insert_own", { for: "insert", to: authenticatedRole, withCheck: sql`${t.userId} = ${authUid} and ${LIVE_STORY(t.storyId)}` }),
+    pgPolicy("reading_positions_update_own", { for: "update", to: authenticatedRole, using: sql`${t.userId} = ${authUid}`, withCheck: sql`${t.userId} = ${authUid}` }),
+    pgPolicy("reading_positions_delete_own", { for: "delete", to: authenticatedRole, using: sql`${t.userId} = ${authUid}` }),
   ],
 );
 

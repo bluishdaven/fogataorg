@@ -584,6 +584,14 @@
     "progress": "Paragraph {current} of {total}",
     "paused": "Paused"
   },
+  "Resume": {
+    "label": "Continue reading",
+    "resume": "Pick up where you left off ({percent}%)",
+    "dismiss": "Start from the top",
+    "heading": "Continue reading",
+    "progress": "{percent}% read",
+    "by": "by {name}"
+  },
   "Settings": {
     "title": "Your profile",
     "lede": "This is how you appear on your stories and your profile page.",
@@ -1163,6 +1171,7 @@
             "Your preferences: interface language and how often we may email you. Theme and reading preferences stay in your own browser.",
             "Photos you upload. Your browser resizes them and removes location and camera data (EXIF/GPS) before they reach us.",
             "Anonymous reading counts: when you read a story, we note how far you got and roughly for how long, under a code that changes every day, so your reads can't be linked over time. We don't store your IP address with it. Writers only ever see totals, never who read.",
+            "Your place in stories: if you're signed in, the paragraph where you stopped in each story you started, so you can pick up on any device. Only you see it. Visitors' place stays in their own browser.",
             "Basic technical records that our hosting keeps for a short time to keep the site secure and working, such as IP address and browser type."
           ]
         },
