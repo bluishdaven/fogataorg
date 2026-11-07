@@ -10,6 +10,8 @@ test("the theme choice applies and survives a reload", async ({ page }) => {
   await expect(page.locator("html")).toHaveClass(/sepia/);
   await page.reload();
   await expect(page.locator("html")).toHaveClass(/sepia/);
+  // The theme's colors only: Tailwind's `sepia` filter utility must never apply to the page.
+  await expect(page.locator("html")).toHaveCSS("filter", "none");
 });
 
 const pages = [

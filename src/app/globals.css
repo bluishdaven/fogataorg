@@ -9,6 +9,10 @@
  * see /design for the living style guide.
  */
 
+/* The sepia theme puts class="sepia" on <html>; without this, Tailwind's own `sepia` filter utility
+   (generated because the word appears in the code) tints the whole page brown. */
+@source not inline("sepia");
+
 @custom-variant dark (&:is(.dark *));
 @custom-variant sepia (&:is(.sepia *));
 
