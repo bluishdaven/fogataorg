@@ -1,5 +1,17 @@
 # Changelog
 
+## Better voices in listen mode (2026-11-07)
+
+**Demo**: press **Listen** on a story, then the waveform button in the player: pick any voice your
+browser offers for the story's language. The choice is remembered.
+
+- By default listen mode now picks the most natural voice on the device (Apple's Enhanced and
+  Premium voices, Microsoft's Natural ones, Google's) instead of the device's default, and never
+  the robotic or sound-effect voices.
+- Online voices (Chrome's Google voices, Edge's Microsoft Natural voices) are listed separately
+  and only used when a reader picks one; the menu says the browser then sends what's being read to
+  that company. The privacy policy says so too. No paid voices.
+
 ## Circle images for Stories (2026-11-07)
 
 **Demo**: open any circle and tap **Share**: besides the link and the networks, **Image for

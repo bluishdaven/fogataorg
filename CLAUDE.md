@@ -97,6 +97,11 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   (`speechChunks()`), in the story's language, marking the block with `data-listening` and keeping
   it in view; pause cancels and resume restarts the sentence (steadier than `speechSynthesis.pause`).
   Hidden where speech isn't available. The e2e test swaps in a silent fake `speechSynthesis`.
+  Voices: `voicesFor()` ranks the browser's voices by name (natural/premium first, robotic last,
+  sound effects dropped) and `pickVoice()` uses the reader's saved choice (`fogata:voice:<lang>` in
+  localStorage) or the best voice on the device. Online voices (`localService: false`) are only
+  used when picked, with a note that the browser sends the text to their maker; the privacy policy
+  says so. Paid TTS was declined by the owner.
 - **Continue reading** (`reading_positions`, `src/lib/domain/reading-position.ts`,
   `src/components/resume-reading.tsx`). The read beacon also carries the paragraph at the top of the
   screen and the current progress; `/api/reads` saves it for signed-in readers when the read counts

@@ -598,7 +598,14 @@
     "stop": "Stop listening",
     "speed": "Speed",
     "progress": "Paragraph {current} of {total}",
-    "paused": "Paused"
+    "paused": "Paused",
+    "voice": "Voice",
+    "bestVoice": "Best on this device",
+    "onDevice": "On this device",
+    "online": "Online",
+    "onlineNote": "Online voice: your browser sends what's being read to {provider, select, google {Google} microsoft {Microsoft} other {the company behind it}} to speak it. Fogata sends nothing.",
+    "onlineHint": "Online voices often sound more natural, but your browser sends what's being read to its maker to speak it.",
+    "deviceNote": "These voices come with your device and read the story right there."
   },
   "Resume": {
     "label": "Continue reading",
@@ -1310,7 +1317,7 @@
         {
           "title": "Who helps us run Fogata",
           "paragraphs": [
-            "We use a few service providers, each only for its job: Supabase (database, sign-in and file storage), Vercel (hosting), Resend (sending email) and Google (only if you sign in with Google). On the sign-in page, Cloudflare Turnstile checks that you're a person, without tracking cookies. Photos picked from Unsplash load directly from Unsplash's servers, so Unsplash can see the reader's IP address; it doesn't set cookies on those images. Donations happen on Buy Me a Coffee, under its own privacy policy. These providers may process data in the United States and other countries, under their own security and privacy commitments."
+            "We use a few service providers, each only for its job: Supabase (database, sign-in and file storage), Vercel (hosting), Resend (sending email) and Google (only if you sign in with Google). On the sign-in page, Cloudflare Turnstile checks that you're a person, without tracking cookies. Photos picked from Unsplash load directly from Unsplash's servers, so Unsplash can see the reader's IP address; it doesn't set cookies on those images. Listen mode uses your browser's own voices: voices on your device read the story right there, and if you pick a voice marked online, your browser sends what's being read to the company behind that voice (such as Google or Microsoft) to speak it. Fogata itself sends nothing. Donations happen on Buy Me a Coffee, under its own privacy policy. These providers may process data in the United States and other countries, under their own security and privacy commitments."
           ]
         },
         {

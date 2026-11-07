@@ -598,7 +598,14 @@
     "stop": "Dejar de escuchar",
     "speed": "Velocidad",
     "progress": "Párrafo {current} de {total}",
-    "paused": "En pausa"
+    "paused": "En pausa",
+    "voice": "Voz",
+    "bestVoice": "La mejor de este dispositivo",
+    "onDevice": "En este dispositivo",
+    "online": "En línea",
+    "onlineNote": "Voz en línea: tu navegador envía lo que se lee a {provider, select, google {Google} microsoft {Microsoft} other {la empresa que la ofrece}} para pronunciarlo. Fogata no envía nada.",
+    "onlineHint": "Las voces en línea suelen sonar más naturales, pero tu navegador envía lo que se lee a su fabricante para pronunciarlo.",
+    "deviceNote": "Estas voces vienen con tu dispositivo y leen la historia ahí mismo."
   },
   "Resume": {
     "label": "Seguir leyendo",
@@ -1310,7 +1317,7 @@
         {
           "title": "Quién nos ayuda a operar Fogata",
           "paragraphs": [
-            "Usamos algunos proveedores, cada uno solo para su tarea: Supabase (base de datos, acceso y almacenamiento de archivos), Vercel (alojamiento), Resend (envío de correos) y Google (solo si entras con Google). En la página para entrar, Cloudflare Turnstile comprueba que eres una persona, sin cookies de rastreo. Las fotos elegidas de Unsplash se cargan directamente desde los servidores de Unsplash, así que Unsplash puede ver la dirección IP de quien lee; no pone cookies en esas imágenes. Las donaciones se hacen en Buy Me a Coffee, bajo su propio aviso de privacidad. Estos proveedores pueden tratar datos en Estados Unidos y otros países, con sus propios compromisos de seguridad y privacidad."
+            "Usamos algunos proveedores, cada uno solo para su tarea: Supabase (base de datos, acceso y almacenamiento de archivos), Vercel (alojamiento), Resend (envío de correos) y Google (solo si entras con Google). En la página para entrar, Cloudflare Turnstile comprueba que eres una persona, sin cookies de rastreo. Las fotos elegidas de Unsplash se cargan directamente desde los servidores de Unsplash, así que Unsplash puede ver la dirección IP de quien lee; no pone cookies en esas imágenes. El modo escuchar usa las voces de tu navegador: las voces de tu dispositivo leen la historia ahí mismo y, si eliges una voz marcada como en línea, tu navegador envía lo que se lee a la empresa que ofrece esa voz (como Google o Microsoft) para pronunciarlo. Fogata no envía nada. Las donaciones se hacen en Buy Me a Coffee, bajo su propio aviso de privacidad. Estos proveedores pueden tratar datos en Estados Unidos y otros países, con sus propios compromisos de seguridad y privacidad."
           ]
         },
         {
