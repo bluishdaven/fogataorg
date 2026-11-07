@@ -3,9 +3,10 @@
 import { AudioLines, Headphones, Pause, Play, Square } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useId, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { FlameLogo } from "@/components/flame-logo";
 import { Button } from "@/components/ui/button";
 import { pickVoice, speechChunks, VOICE_STORAGE_PREFIX, voiceLabel, voiceProvider, voicesFor } from "@/lib/domain/listen";
-import { scrollBehavior } from "@/lib/utils";
+import { cn, scrollBehavior } from "@/lib/utils";
 
 const SPEEDS = [0.8, 1, 1.25, 1.5] as const;
 const STORY_BODY_ID = "story-body";
@@ -65,7 +66,8 @@ export function ListenMode({ lang }: { lang: string }) {
   const t = useTranslations("Listen");
   const available = useSyncExternalStore(subscribe, supported, () => false);
   const [state, setState] = useState<"idle" | "playing" | "paused">("idle");
-  const [speed, setSpeed] = useState<(typeof SPEEDS)[number]>(1);
+  // A little slower than the voices' own pace reads better for long-form.
+  const [speed, setSpeed] = useState<(typeof SPEEDS)[number]>(0.8);
   const [position, setPosition] = useState({ current: 0, total: 0 });
   const queue = useRef<Item[]>([]);
   const at = useRef({ block: 0, chunk: 0 });
@@ -176,6 +178,8 @@ export function ListenMode({ lang }: { lang: string }) {
       <Button
         variant="ghost"
         size="sm"
+        // In the ember colors, so it invites a listen next to the plain reading settings.
+        className="bg-ember-soft text-ember-text hover:bg-ember-soft hover:text-ember-text hover:brightness-95 aria-pressed:bg-ember-soft dark:hover:bg-ember-soft dark:hover:brightness-125"
         onClick={() => (state === "idle" ? start() : stop())}
         aria-pressed={state !== "idle"}
         aria-label={t("label")}
@@ -188,7 +192,8 @@ export function ListenMode({ lang }: { lang: string }) {
         <div
           role="region"
           aria-label={t("player")}
-          className="fixed bottom-[calc(max(1rem,env(safe-area-inset-bottom))+4.5rem)] left-1/2 z-30 flex -translate-x-1/2 items-center gap-1 rounded-full border border-border bg-background/95 px-2 py-1 font-sans text-sm shadow-xl backdrop-blur"
+          className="listen-player fixed bottom-[calc(max(1rem,env(safe-area-inset-bottom))+4.5rem)] left-1/2 z-30 flex -translate-x-1/2 items-center gap-1 rounded-full border border-border bg-background/95 px-2 py-1 font-sans text-sm shadow-xl backdrop-blur"
+          data-playing={state === "playing"}
           data-testid="listen-player"
         >
           <Button
@@ -200,6 +205,13 @@ export function ListenMode({ lang }: { lang: string }) {
           >
             {state === "playing" ? <Pause /> : <Play />}
           </Button>
+          {/* A small fire burns while it reads, and sinks to embers when paused. */}
+          <span aria-hidden className={cn("listen-fire", state !== "playing" && "opacity-45")} data-testid="listen-fire">
+            <FlameLogo className="h-5" animated={state === "playing"} />
+            <span className="listen-spark" />
+            <span className="listen-spark" />
+            <span className="listen-spark" />
+          </span>
           <span className="px-1 whitespace-nowrap text-muted-foreground tabular-nums" aria-live="polite" data-testid="listen-status">
             {state === "paused" ? t("paused") : t("progress", position)}
           </span>

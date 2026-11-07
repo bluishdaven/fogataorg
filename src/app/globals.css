@@ -492,3 +492,74 @@ html[data-reader-font="readable"] .prose-fogata :is(h2, h3, blockquote, figcapti
   background-color: var(--ember-soft);
   box-shadow: 0 0 0 0.4em var(--ember-soft);
 }
+
+/* Listen mode's player: a small fire with rising sparks while it reads, and a warm glow around the
+   bar. Under reduced motion the flame holds still, no sparks rise and the glow stays steady. */
+.listen-fire {
+  position: relative;
+  display: inline-flex;
+  align-items: flex-end;
+  padding-inline: 0.125rem;
+  transition: opacity 300ms ease;
+}
+.listen-spark {
+  position: absolute;
+  bottom: 55%;
+  left: 45%;
+  width: 3px;
+  height: 3px;
+  border-radius: 9999px;
+  background: #ffd27a;
+  opacity: 0;
+  pointer-events: none;
+}
+.listen-player[data-playing="true"] {
+  box-shadow:
+    0 12px 32px -12px color-mix(in oklch, var(--ember) 55%, transparent),
+    0 0 0 1px color-mix(in oklch, var(--ember) 30%, transparent);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .listen-player[data-playing="true"] {
+    animation: listen-glow 3.2s ease-in-out infinite;
+  }
+  .listen-player[data-playing="true"] .listen-spark {
+    animation: listen-spark 1.9s ease-out infinite;
+  }
+  .listen-player[data-playing="true"] .listen-spark:nth-of-type(2) {
+    left: 20%;
+    background: var(--ember);
+    animation-delay: 0.65s;
+    --spark-drift: -4px;
+  }
+  .listen-player[data-playing="true"] .listen-spark:nth-of-type(3) {
+    left: 70%;
+    animation-delay: 1.3s;
+    --spark-drift: 5px;
+  }
+}
+@keyframes listen-spark {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--spark-drift, 2px), -20px) scale(0.3);
+    opacity: 0;
+  }
+}
+@keyframes listen-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 12px 32px -12px color-mix(in oklch, var(--ember) 45%, transparent),
+      0 0 0 1px color-mix(in oklch, var(--ember) 25%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 12px 36px -8px color-mix(in oklch, var(--ember) 70%, transparent),
+      0 0 0 1px color-mix(in oklch, var(--ember) 45%, transparent);
+  }
+}

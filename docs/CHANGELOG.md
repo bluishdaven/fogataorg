@@ -2,6 +2,11 @@
 
 ## Better voices in listen mode (2026-11-07)
 
+Later the same day: the **Listen** button is in the ember colors, the player shows a small fire
+with rising sparks and a warm glow while it reads (embers when paused; still for reduced motion),
+and reading starts at 0.8× by default. Also fixed: the sepia theme was being washed out by a
+Tailwind filter that shared its class name.
+
 **Demo**: press **Listen** on a story, then the waveform button in the player: pick any voice your
 browser offers for the story's language. The choice is remembered.
 

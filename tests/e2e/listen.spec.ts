@@ -62,13 +62,19 @@ test("listen mode reads the story aloud, paragraph by paragraph, and can pause, 
   await expect(page.getByTestId("listen-status")).toHaveText(/^Paragraph 1 of \d+$/);
   await expect(page.locator("#story-body [data-listening]")).toContainText("There is a great blue heron");
   await expect(page.getByTestId("listen-status")).toHaveText(/^Paragraph 2 of \d+$/, { timeout: 5_000 });
-  const spoken = await page.evaluate(() => (window as unknown as { __spoken: { text: string; lang: string }[] }).__spoken);
-  expect(spoken[0]).toMatchObject({ lang: "en" });
+  const spoken = await page.evaluate(() => (window as unknown as { __spoken: { text: string; lang: string; rate: number }[] }).__spoken);
+  // A little slower than the voice's own pace by default.
+  expect(spoken[0]).toMatchObject({ lang: "en", rate: 0.8 });
+  await expect(page.getByTestId("listen-speed")).toHaveValue("0.8");
+  // A small fire burns while it reads.
+  await expect(player).toHaveAttribute("data-playing", "true");
+  await expect(page.getByTestId("listen-fire")).toBeVisible();
   expect(spoken[0]!.text).toContain("There is a great blue heron");
   expect(await new AxeBuilder({ page }).include("[data-testid=listen-player]").analyze().then((r) => r.violations.map((v) => v.id))).toEqual([]);
 
   await page.getByTestId("listen-toggle").click();
   await expect(page.getByTestId("listen-status")).toHaveText("Paused");
+  await expect(player).toHaveAttribute("data-playing", "false");
   await page.getByTestId("listen-speed").selectOption("1.5");
   await page.getByTestId("listen-toggle").click();
   await expect.poll(() => page.evaluate(() => (window as unknown as { __spoken: { rate: number }[] }).__spoken.at(-1)?.rate)).toBe(1.5);
