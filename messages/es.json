@@ -587,6 +587,8 @@
     "shareVia": "Compartir con…",
     "shareStories": "Imagen para historias",
     "storyImageSaved": "Imagen guardada. Súbela a tu historia con el enlace.",
+    "storyLinkCopied": "Enlace copiado. Pégalo en un sticker de enlace en tu historia.",
+    "storyImageSavedLinkCopied": "Imagen guardada y enlace copiado. Sube la imagen a tu historia y pega el enlace en un sticker de enlace.",
     "storyImageFailed": "No se pudo crear la imagen. Inténtalo de nuevo."
   },
   "Circles": {

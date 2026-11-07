@@ -587,6 +587,8 @@
     "shareVia": "Share via…",
     "shareStories": "Image for Stories",
     "storyImageSaved": "Image saved. Add it to your Story with the link.",
+    "storyLinkCopied": "Link copied. Paste it into a link sticker on your Story.",
+    "storyImageSavedLinkCopied": "Image saved and link copied. Add the image to your Story and paste the link into a link sticker.",
     "storyImageFailed": "Couldn't create the image. Try again."
   },
   "Circles": {

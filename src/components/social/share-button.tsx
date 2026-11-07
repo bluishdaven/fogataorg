@@ -87,12 +87,20 @@ export function ShareButton({
 
   const shareImage = async () => {
     setBusy(true);
+    // Copy the story's link in the same tap (browsers only allow clipboard writes during one), so
+    // it's ready to paste into the Story's link sticker. Started before any await, on purpose.
+    const linkCopied: Promise<boolean> =
+      navigator.clipboard?.writeText(url).then(
+        () => true,
+        () => false,
+      ) ?? Promise.resolve(false);
     try {
       const blob = await prepareImage();
       const file = new File([blob], fileName, { type: "image/png" });
       if (shareSheet && navigator.canShare?.({ files: [file] })) {
         try {
           await navigator.share({ files: [file], title });
+          if (await linkCopied) toast.success(t("storyLinkCopied"));
           return;
         } catch (error) {
           if (isAbort(error)) return;
@@ -100,7 +108,7 @@ export function ShareButton({
         }
       }
       download(blob, fileName);
-      toast.success(t("storyImageSaved"));
+      toast.success((await linkCopied) ? t("storyImageSavedLinkCopied") : t("storyImageSaved"));
     } catch {
       toast.error(t("storyImageFailed"));
     } finally {

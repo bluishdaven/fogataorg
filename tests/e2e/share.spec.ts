@@ -37,14 +37,17 @@ function pngSize(buffer: Buffer): [number, number] {
   return [buffer.readUInt32BE(16), buffer.readUInt32BE(20)];
 }
 
-test("readers can download a ready-to-post Stories image of the story", async ({ page }, testInfo) => {
+test("readers can download a ready-to-post Stories image of the story, with its link copied", async ({ page, context }, testInfo) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   await page.goto(STORY);
   await page.getByTestId("story-actions").getByTestId("share-button").click();
   const downloading = page.waitForEvent("download");
   await page.getByTestId("share-stories").click();
   const download = await downloading;
   expect(download.suggestedFilename()).toBe("fogata-the-heron-knows-something-i-dont.png");
-  await expect(page.getByText("Image saved. Add it to your Story with the link.")).toBeVisible();
+  await expect(page.getByText("Image saved and link copied. Add the image to your Story and paste the link into a link sticker.")).toBeVisible();
+  // The link is on the clipboard, ready for the Story's link sticker.
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toMatch(new RegExp(`${STORY.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`));
 
   const path = testInfo.outputPath("story-image.png");
   await download.saveAs(path);
