@@ -225,6 +225,37 @@ describe("circle submissions", () => {
   });
 });
 
+describe("decline notes", () => {
+  it("are written by editors on declined submissions only and cleared if the decision changes", async () => {
+    await scenario(async (h) => {
+      const owner = await h.createUser();
+      const writer = await h.createUser();
+      const circle = await makeCircle(h, owner);
+      const story = await makeStory(h, writer);
+      const [submission] = await h.as(h.claimsFor(writer), (tx) =>
+        tx.insert(circleSubmissions).values({ circleId: circle.id, storyId: story.id, submittedBy: writer }).returning(),
+      );
+      const update = (userId: string, values: Partial<typeof circleSubmissions.$inferInsert>) =>
+        h.as(h.claimsFor(userId), (tx) => tx.update(circleSubmissions).set(values).where(eq(circleSubmissions.id, submission!.id)).returning());
+
+      // Dropped on a pending submission, and never written by the writer.
+      const [pending] = await update(owner, { declineNote: "Todavía no." });
+      expect(pending).toMatchObject({ status: "pending", declineNote: null });
+      expect(await update(writer, { status: "declined", declineNote: "Me rechazo." })).toHaveLength(0);
+
+      const [declined] = await update(owner, { status: "declined", declineNote: "  Muy bonita, pero no es para este círculo.  " });
+      expect(declined).toMatchObject({ status: "declined", declineNote: "Muy bonita, pero no es para este círculo." });
+      const [blank] = await update(owner, { declineNote: "   " });
+      expect(blank!.declineNote).toBeNull();
+      await expectPgError(update(owner, { declineNote: "x".repeat(501) }), PG.checkViolation);
+
+      await update(owner, { declineNote: "Inténtalo con otra." });
+      const [accepted] = await update(owner, { status: "accepted" });
+      expect(accepted!.declineNote).toBeNull();
+    });
+  });
+});
+
 describe("following circles", () => {
   it("uses the same follows table with exactly one target", async () => {
     await scenario(async (h) => {

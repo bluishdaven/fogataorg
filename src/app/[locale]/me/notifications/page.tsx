@@ -66,6 +66,11 @@ async function List() {
                 {item.responseExcerpt && item.type !== "spark" ? (
                   <span className="pl-4 font-serif text-sm text-muted-foreground italic">“{item.responseExcerpt}”</span>
                 ) : null}
+                {item.note ? (
+                  <span className="pl-4 text-sm text-muted-foreground" data-testid="decline-note">
+                    {t("declineNote", { note: item.note })}
+                  </span>
+                ) : null}
                 <time className="pl-4 text-xs text-muted-foreground" dateTime={item.updatedAt.toISOString()}>
                   {format.dateTime(item.updatedAt, { dateStyle: "medium", timeStyle: "short" })}
                 </time>

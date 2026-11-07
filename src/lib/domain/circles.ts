@@ -95,7 +95,20 @@ export const addMemberSchema = z.object({
 });
 
 export const submissionSchema = z.object({ circleId: z.uuid(), storyId: z.uuid() });
-export const decisionSchema = z.object({ submissionId: z.uuid(), status: z.enum(["accepted", "declined"]) });
+export const DECLINE_NOTE_MAX = 500;
+/** Accepting or declining a submission; a declined one may carry a short note to the writer. */
+export const decisionSchema = z
+  .object({
+    submissionId: z.uuid(),
+    status: z.enum(["accepted", "declined"]),
+    note: z
+      .string()
+      .trim()
+      .max(DECLINE_NOTE_MAX)
+      .optional()
+      .transform((value) => value || null),
+  })
+  .refine((value) => value.status === "declined" || value.note === null, { message: "invalid" });
 export const joinRequestSchema = z.object({ circleId: z.uuid() });
 export const joinDecisionSchema = z.object({ requestId: z.uuid(), accept: z.boolean() });
 

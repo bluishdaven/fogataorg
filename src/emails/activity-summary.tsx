@@ -21,7 +21,7 @@ export type ActivitySummaryProps = {
   preview: string;
   heading: string;
   intro: string;
-  items: { text: string; href: string }[];
+  items: { text: string; href: string; note?: string }[];
   more: string | null;
   cta: { label: string; href: string };
   footer: { why: string; settingsLabel: string; settingsHref: string; unsubscribeLabel: string; unsubscribeHref: string };
@@ -47,6 +47,12 @@ export function ActivitySummaryEmail({ lang, preview, heading, intro, items, mor
                 <Link href={item.href} style={{ color: colors.ink, textDecoration: "underline" }}>
                   {item.text}
                 </Link>
+                {item.note ? (
+                  <>
+                    <br />
+                    <span style={{ fontSize: 14, color: colors.muted }}>{item.note}</span>
+                  </>
+                ) : null}
               </Text>
             ))}
             {more ? <Text style={{ fontSize: 14, color: colors.muted, margin: "0 0 12px" }}>{more}</Text> : null}

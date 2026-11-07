@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { UserBadges } from "@/components/badges/user-badges";
 import type { BadgeData } from "@/lib/domain/badges";
+import { DECLINE_NOTE_MAX } from "@/lib/domain/circles";
 import { profilePath, storyPath } from "@/lib/domain/handle-routes";
 
 type Submission = { id: string; createdAt: Date; storyTitle: string; storySlug: string; authorUsername: string; authorName: string };
@@ -27,6 +28,8 @@ export function SubmissionQueue({ pending, accepted }: { pending: Submission[]; 
   const format = useFormatter();
   const router = useRouter();
   const [busy, setBusy] = useState<string | null>(null);
+  const [declining, setDeclining] = useState<string | null>(null);
+  const [note, setNote] = useState("");
 
   const act = async (id: string, action: () => Promise<{ ok: boolean }>, message: string) => {
     setBusy(id);
@@ -35,12 +38,18 @@ export function SubmissionQueue({ pending, accepted }: { pending: Submission[]; 
     if (!result.ok) toast.error(t("errors.not_allowed"));
     else {
       toast(message);
+      setDeclining(null);
       router.refresh();
     }
   };
 
-  const row = (item: Submission, actions: React.ReactNode) => (
-    <li key={item.id} className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between" data-testid="submission">
+  const decline = (event: FormEvent, id: string) => {
+    event.preventDefault();
+    void act(id, () => decideSubmission({ submissionId: id, status: "declined", note }), t("declinedToast"));
+  };
+
+  const row = (item: Submission, actions: React.ReactNode, extra?: React.ReactNode) => (
+    <li key={item.id} className="flex flex-col gap-2 py-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between" data-testid="submission">
       <span className="min-w-0">
         <NextLink href={storyPath(item.authorUsername, item.storySlug)} className="block truncate font-serif font-semibold hover:text-ember-text">
           {item.storyTitle}
@@ -50,6 +59,7 @@ export function SubmissionQueue({ pending, accepted }: { pending: Submission[]; 
         </span>
       </span>
       <span className="flex shrink-0 gap-1">{actions}</span>
+      {extra}
     </li>
   );
 
@@ -70,10 +80,45 @@ export function SubmissionQueue({ pending, accepted }: { pending: Submission[]; 
                   <Button size="sm" disabled={busy === item.id} onClick={() => void act(item.id, () => decideSubmission({ submissionId: item.id, status: "accepted" }), t("acceptedToast"))}>
                     {t("accept")}
                   </Button>
-                  <Button size="sm" variant="outline" disabled={busy === item.id} onClick={() => void act(item.id, () => decideSubmission({ submissionId: item.id, status: "declined" }), t("declinedToast"))}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={busy === item.id}
+                    aria-expanded={declining === item.id}
+                    onClick={() => {
+                      setNote("");
+                      setDeclining(declining === item.id ? null : item.id);
+                    }}
+                  >
                     {t("decline")}
                   </Button>
                 </>,
+                declining === item.id ? (
+                  <form onSubmit={(event) => decline(event, item.id)} className="flex w-full flex-col gap-2 rounded-xl border border-border p-3" data-testid="decline-form">
+                    <Label htmlFor={`decline-note-${item.id}`}>{t("declineNoteLabel")}</Label>
+                    <textarea
+                      id={`decline-note-${item.id}`}
+                      value={note}
+                      onChange={(event) => setNote(event.target.value)}
+                      maxLength={DECLINE_NOTE_MAX}
+                      rows={3}
+                      autoFocus
+                      aria-describedby={`decline-hint-${item.id}`}
+                      className="field-sizing-content min-h-20 resize-none rounded-lg border border-input bg-transparent px-3 py-2 text-sm focus-visible:border-ring"
+                    />
+                    <p id={`decline-hint-${item.id}`} className="text-xs text-muted-foreground">
+                      {t("declineNoteHint")}
+                    </p>
+                    <span className="flex justify-end gap-2">
+                      <Button type="button" size="sm" variant="ghost" onClick={() => setDeclining(null)}>
+                        {t("cancel")}
+                      </Button>
+                      <Button type="submit" size="sm" variant="destructive" disabled={busy === item.id}>
+                        {t("confirmDecline")}
+                      </Button>
+                    </span>
+                  </form>
+                ) : null,
               ),
             )}
           </ul>

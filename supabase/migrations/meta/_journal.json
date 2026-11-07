@@ -365,6 +365,20 @@
       "when": 1794071066997,
       "tag": "20261107170427_response_edit_triggers",
       "breakpoints": true
+    },
+    {
+      "idx": 52,
+      "version": "7",
+      "when": 1794071227062,
+      "tag": "20261107170707_decline_notes",
+      "breakpoints": true
+    },
+    {
+      "idx": 53,
+      "version": "7",
+      "when": 1794071228408,
+      "tag": "20261107170708_decline_note_grants",
+      "breakpoints": true
     }
   ]
 }

@@ -27,6 +27,8 @@ export type NotificationItem = {
   circle: { slug: string; name: string } | null;
   /** Badge notifications: the writing tier key or "donor", and whose profile shows it. */
   badge?: { key: string; username: string } | null;
+  /** Declined submissions: the editors' note to the writer, if they left one. */
+  note?: string | null;
 };
 
 /** A stored writing tier key, if it is one (rows come from the database). */

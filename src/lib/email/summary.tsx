@@ -44,6 +44,7 @@ export async function buildSummaryEmail(input: SummaryInput): Promise<OutgoingEm
   const shown = input.items.slice(0, SUMMARY_ITEM_LIMIT);
   const items = shown.map((item) => ({
     text: notificationMessage(socialT, item),
+    note: item.note ? socialT("declineNote", { note: item.note }) : undefined,
     href: new URL(notificationPath(item, locale), siteUrl).toString(),
   }));
   const remaining = Math.max(0, input.total - shown.length);

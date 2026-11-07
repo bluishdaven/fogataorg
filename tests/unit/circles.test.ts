@@ -7,6 +7,7 @@ import {
   addMemberSchema,
   contrastRatio,
   createCircleSchema,
+  decisionSchema,
   joinDecisionSchema,
   joinRequestSchema,
   readableTextOn,
@@ -54,6 +55,17 @@ describe("createCircleSchema", () => {
     expect(messages({ slug: "ab" })).toContain("slug");
     expect(messages({ accentColor: "teal" })).toContain("accent");
     expect(messages({ header: { url: "https://images.unsplash.com/x", alt: " ", credit: null } })).toContain("headerAlt");
+  });
+});
+
+describe("decisionSchema", () => {
+  const submissionId = "6f1c2a3b-4d5e-4f60-8a7b-9c0d1e2f3a4b";
+  it("takes an optional trimmed note only when declining", () => {
+    expect(decisionSchema.parse({ submissionId, status: "declined", note: "  Not quite a fit.  " }).note).toBe("Not quite a fit.");
+    expect(decisionSchema.parse({ submissionId, status: "declined", note: "   " }).note).toBeNull();
+    expect(decisionSchema.parse({ submissionId, status: "accepted" }).note).toBeNull();
+    expect(decisionSchema.safeParse({ submissionId, status: "accepted", note: "Welcome!" }).success).toBe(false);
+    expect(decisionSchema.safeParse({ submissionId, status: "declined", note: "x".repeat(501) }).success).toBe(false);
   });
 });
 

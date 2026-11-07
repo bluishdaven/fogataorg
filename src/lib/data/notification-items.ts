@@ -35,6 +35,11 @@ export async function selectNotificationItems(
       circleName: sql<string | null>`(select c.name from public.circles c where c.id = ${notifications.circleId})`,
       circleSlug: sql<string | null>`(select c.slug from public.circles c where c.id = ${notifications.circleId})`,
       badge: notifications.badge,
+      note: sql<string | null>`case when ${notifications.type} = 'declined' then (
+        select cs.decline_note from public.circle_submissions cs
+        where cs.story_id = ${notifications.storyId} and cs.circle_id = ${notifications.circleId} and cs.status = 'declined'
+        order by cs.decided_at desc nulls last limit 1
+      ) end`,
       recipient: sql<string>`(select p.username from public.profiles p where p.id = ${notifications.userId})`,
     })
     .from(notifications)
@@ -66,6 +71,7 @@ export async function selectNotificationItems(
       responseExcerpt: row.responseBody ? excerpt(row.responseBody, 90) : null,
       circle: row.circleSlug && row.circleName ? { slug: row.circleSlug, name: row.circleName } : null,
       badge: row.badge ? { key: row.badge, username: row.recipient } : null,
+      note: row.note,
     };
   });
 }

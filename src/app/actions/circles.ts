@@ -188,12 +188,12 @@ export async function decideSubmission(input: unknown): Promise<Result> {
   if (!viewer) return { ok: false, errors: ["unauthorized"] };
   const parsed = decisionSchema.safeParse(input);
   if (!parsed.success) return { ok: false, errors: ["invalid"] };
-  const { submissionId, status } = parsed.data;
+  const { submissionId, status, note } = parsed.data;
 
   const [row] = await withRls(viewer.claims, (tx) =>
     tx
       .update(circleSubmissions)
-      .set({ status })
+      .set({ status, declineNote: note })
       .where(eq(circleSubmissions.id, submissionId))
       .returning({ circleId: circleSubmissions.circleId, storyId: circleSubmissions.storyId }),
   );

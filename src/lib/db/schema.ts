@@ -752,9 +752,15 @@ export const circleSubmissions = pgTable(
     status: submissionStatus("status").notNull().default("pending"),
     decidedBy: uuid("decided_by").references(() => profiles.id, { onDelete: "set null" }),
     decidedAt: timestamp("decided_at", { withTimezone: true }),
+    // An optional word from the editors to the writer, only on declined submissions.
+    declineNote: text("decline_note"),
     ...timestamps,
   },
   (t) => [
+    check(
+      "circle_submissions_decline_note",
+      sql`${t.declineNote} is null or (${t.status} = 'declined' and char_length(${t.declineNote}) between 1 and 500)`,
+    ),
     uniqueIndex("circle_submissions_active_story_key")
       .on(t.storyId)
       .where(sql`${t.status} in ('pending', 'accepted')`),

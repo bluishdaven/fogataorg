@@ -1,0 +1,2 @@
+ALTER TABLE "circle_submissions" ADD COLUMN "decline_note" text;--> statement-breakpoint
+ALTER TABLE "circle_submissions" ADD CONSTRAINT "circle_submissions_decline_note" CHECK ("circle_submissions"."decline_note" is null or ("circle_submissions"."status" = 'declined' and char_length("circle_submissions"."decline_note") between 1 and 500));

@@ -127,6 +127,13 @@ describe("summary email", () => {
     expect(email.html).toContain("https://fogata.example/en/settings/notifications");
   });
 
+  it("shows the editors' note under a declined submission", async () => {
+    const declined: NotificationItem = { ...submission, type: "declined", note: "Precioso, pero <no> encaja aquí." };
+    const email = await buildSummaryEmail({ ...base, locale: "es", items: [declined], total: 1 });
+    expect(email.html).toContain("Nota de los editores: «Precioso, pero &lt;no&gt; encaja aquí.»");
+    expect(email.text).toContain("Nota de los editores: «Precioso, pero <no> encaja aquí.»");
+  });
+
   it("speaks Spanish, caps the list and says how many more there are", async () => {
     const items = Array.from({ length: SUMMARY_ITEM_LIMIT + 3 }, () => follow);
     const email = await buildSummaryEmail({ ...base, locale: "es", items, total: 20 });
