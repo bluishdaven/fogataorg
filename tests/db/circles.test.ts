@@ -256,6 +256,63 @@ describe("decline notes", () => {
   });
 });
 
+describe("handing over and deleting circles", () => {
+  const transfer = (h: Harness, userId: string, circleId: string, to: string) =>
+    h.as(h.claimsFor(userId), (tx) => tx.execute(sql`select public.transfer_circle(${circleId}::uuid, ${to}::uuid)`));
+
+  it("only lets the owner hand the circle to a current member, who is told", async () => {
+    await scenario(async (h) => {
+      const owner = await h.createUser();
+      const editor = await h.createUser();
+      const stranger = await h.createUser();
+      const circle = await makeCircle(h, owner);
+      await h.tx.insert(circleMembers).values({ circleId: circle.id, userId: editor, role: "editor" });
+
+      await expectPgError(h.savepoint(() => transfer(h, editor, circle.id, editor)), PG.insufficientPrivilege);
+      await expectPgError(h.savepoint(() => transfer(h, owner, circle.id, stranger)), PG.insufficientPrivilege);
+      await expectPgError(h.savepoint(() => transfer(h, owner, circle.id, owner)), PG.insufficientPrivilege);
+
+      await transfer(h, owner, circle.id, editor);
+      const [after] = await h.tx.select({ ownerId: circles.ownerId }).from(circles).where(eq(circles.id, circle.id));
+      expect(after!.ownerId).toBe(editor);
+      const roles = await h.tx.select({ userId: circleMembers.userId, role: circleMembers.role }).from(circleMembers).where(eq(circleMembers.circleId, circle.id));
+      expect(Object.fromEntries(roles.map((r) => [r.userId, r.role]))).toEqual({ [owner]: "editor", [editor]: "owner" });
+      const [notice] = await noticesFor(h, editor);
+      expect(notice).toMatchObject({ type: "circle_owner", circleId: circle.id, actorIds: [owner] });
+
+      // The old owner can now leave like any member.
+      const left = await h.as(h.claimsFor(owner), (tx) =>
+        tx.delete(circleMembers).where(and(eq(circleMembers.circleId, circle.id), eq(circleMembers.userId, owner))).returning(),
+      );
+      expect(left).toHaveLength(1);
+    });
+  });
+
+  it("only lets the owner delete a circle; stories stay, everything of the circle goes", async () => {
+    await scenario(async (h) => {
+      const owner = await h.createUser();
+      const editor = await h.createUser();
+      const writer = await h.createUser();
+      const circle = await makeCircle(h, owner);
+      await h.tx.insert(circleMembers).values({ circleId: circle.id, userId: editor, role: "editor" });
+      const story = await makeStory(h, writer);
+      await h.as(h.claimsFor(writer), (tx) => tx.insert(circleSubmissions).values({ circleId: circle.id, storyId: story.id, submittedBy: writer }));
+      await h.as(h.claimsFor(writer), (tx) => tx.insert(follows).values({ followerId: writer, followedCircleId: circle.id }));
+
+      expect(await h.as(h.claimsFor(editor), (tx) => tx.delete(circles).where(eq(circles.id, circle.id)).returning())).toHaveLength(0);
+      expect(await h.as(null, (tx) => tx.select().from(circles).where(eq(circles.id, circle.id)))).toHaveLength(1);
+
+      const deleted = await h.as(h.claimsFor(owner), (tx) => tx.delete(circles).where(eq(circles.id, circle.id)).returning());
+      expect(deleted).toHaveLength(1);
+      expect(await h.tx.select().from(circleMembers).where(eq(circleMembers.circleId, circle.id))).toHaveLength(0);
+      expect(await h.tx.select().from(circleSubmissions).where(eq(circleSubmissions.circleId, circle.id))).toHaveLength(0);
+      expect(await h.tx.select().from(follows).where(eq(follows.followedCircleId, circle.id))).toHaveLength(0);
+      expect(await h.tx.select().from(notifications).where(eq(notifications.circleId, circle.id))).toHaveLength(0);
+      expect(await h.tx.select().from(stories).where(eq(stories.id, story.id))).toHaveLength(1);
+    });
+  });
+});
+
 describe("following circles", () => {
   it("uses the same follows table with exactly one target", async () => {
     await scenario(async (h) => {

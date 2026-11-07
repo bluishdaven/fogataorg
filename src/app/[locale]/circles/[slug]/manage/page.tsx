@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
 import { CircleForm } from "@/components/circles/circle-form";
 import { JoinRequests, MembersManager, SubmissionQueue } from "@/components/circles/manage-circle";
+import { OwnerActions } from "@/components/circles/owner-actions";
 import { Toaster } from "@/components/ui/sonner";
 import { Link } from "@/i18n/navigation";
 import { getViewer } from "@/lib/auth";
@@ -64,6 +65,7 @@ async function Manage({ params }: Pick<Props, "params">) {
           }}
         />
       </section>
+      {circle.role === "owner" ? <OwnerActions circleId={circle.id} circleName={circle.name} members={circle.members} /> : null}
     </div>
   );
 }

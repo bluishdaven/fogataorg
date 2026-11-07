@@ -7,11 +7,14 @@ import { withRls } from "@/lib/db/rls";
 import { circleJoinRequests, circleMembers, circles, circleSubmissions, profiles, stories } from "@/lib/db/schema";
 import {
   addMemberSchema,
+  confirmsCircleName,
   createCircleSchema,
   decisionSchema,
+  deleteCircleSchema,
   joinDecisionSchema,
   joinRequestSchema,
   submissionSchema,
+  transferCircleSchema,
   updateCircleSchema,
   type CircleErrorKey,
   type CreateCircleInput,
@@ -282,5 +285,61 @@ export async function decideJoinRequest(input: unknown): Promise<Result> {
     throw error;
   }
   if (slug) invalidateCircle(slug);
+  return { ok: true };
+}
+
+/** The owner hands the circle to another member, staying on as an editor. */
+export async function transferCircle(input: unknown): Promise<Result> {
+  const viewer = await getViewer();
+  if (!viewer) return { ok: false, errors: ["unauthorized"] };
+  const parsed = transferCircleSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, errors: ["invalid"] };
+  let slug: string | null;
+  try {
+    slug = await withRls(viewer.claims, async (tx) => {
+      const rows = await tx.execute<{ slug: string | null }>(
+        sql`select public.transfer_circle(${parsed.data.circleId}::uuid, ${parsed.data.userId}::uuid) as slug`,
+      );
+      return rows[0]?.slug ?? null;
+    });
+  } catch (error) {
+    if (pgCode(error) === "42501") return { ok: false, errors: ["not_allowed"] };
+    throw error;
+  }
+  if (slug) invalidateCircle(slug);
+  return { ok: true };
+}
+
+/**
+ * The owner deletes the circle for good. Its members, queue and followers go with it; the stories
+ * stay with their writers (each story page drops its "Published in" line).
+ */
+export async function deleteCircle(input: unknown): Promise<Result> {
+  const viewer = await getViewer();
+  if (!viewer) return { ok: false, errors: ["unauthorized"] };
+  const parsed = deleteCircleSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, errors: ["invalid"] };
+  const { circleId, confirmName } = parsed.data;
+
+  const outcome = await withRls(viewer.claims, async (tx) => {
+    const [circle] = await tx
+      .select({ name: circles.name, slug: circles.slug, ownerId: circles.ownerId })
+      .from(circles)
+      .where(eq(circles.id, circleId));
+    if (!circle || circle.ownerId !== viewer.id) return "not_allowed" as const;
+    if (!confirmsCircleName(confirmName, circle.name)) return "confirmName" as const;
+    // The stories that showed this circle, so their pages can drop it.
+    const shown = await tx
+      .select({ slug: stories.slug, username: profiles.username })
+      .from(circleSubmissions)
+      .innerJoin(stories, eq(stories.id, circleSubmissions.storyId))
+      .innerJoin(profiles, eq(profiles.id, stories.authorId))
+      .where(and(eq(circleSubmissions.circleId, circleId), eq(circleSubmissions.status, "accepted")));
+    const deleted = await tx.delete(circles).where(eq(circles.id, circleId)).returning({ id: circles.id });
+    return deleted.length ? { slug: circle.slug, shown } : ("not_allowed" as const);
+  });
+  if (typeof outcome === "string") return { ok: false, errors: [outcome] };
+  invalidateCircle(outcome.slug);
+  for (const story of outcome.shown) updateTag(`story:${story.username.toLowerCase()}/${story.slug}`);
   return { ok: true };
 }

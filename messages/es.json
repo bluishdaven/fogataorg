@@ -787,7 +787,8 @@
       "badge": "Ganaste la insignia {badge, select, kindling {Yesca} candle {Vela} flame {Llama} torch {Antorcha} hearth {Hogar} bonfire {Hoguera} beacon {Faro} star {Estrella} sun {Sol} phoenix {Fénix} other {nueva}}: {count, plural, one {tu primera historia publicada} other {# historias publicadas}}. ¡Que no se apague el fuego!",
       "donor": "¡Ya eres Mecenas! Gracias por apoyar a Fogata con una donación.",
       "join_request": "{others, plural, =0 {{actor} pidió unirse a {circle}} one {{actor} y # persona más pidieron unirse a {circle}} other {{actor} y # personas más pidieron unirse a {circle}}}",
-      "join_accepted": "{actor} te aceptó en {circle}. Ahora tus historias entran directo."
+      "join_accepted": "{actor} te aceptó en {circle}. Ahora tus historias entran directo.",
+      "circle_owner": "{actor} te entregó {circle}. Ahora lo administras tú."
     },
     "savedTitle": "Leña guardada",
     "savedLede": "Historias que guardaste para después. Solo tú puedes ver esta lista.",
@@ -931,13 +932,31 @@
       "alreadySubmitted": "Esa historia ya está en un círculo (o esperando revisión).",
       "invalid": "Algo no está bien. Vuelve a intentarlo.",
       "alreadyRequested": "Ya pediste unirte a este círculo.",
-      "rateLimited": "Llegaste al límite por ahora. Espera un poco y vuelve a intentarlo. (Las cuentas nuevas tienen límites más bajos su primer día)."
+      "rateLimited": "Llegaste al límite por ahora. Espera un poco y vuelve a intentarlo. (Las cuentas nuevas tienen límites más bajos su primer día).",
+      "confirmName": "Escribe el nombre del círculo tal cual para eliminarlo."
     },
     "uploadErrors": {
       "type": "Ese tipo de archivo no es compatible. Usa JPEG, PNG, WebP, GIF o AVIF.",
       "size": "Esa imagen pesa más de 10 MB.",
       "failed": "No se pudo subir la imagen. Vuelve a intentarlo."
-    }
+    },
+    "ownerHeading": "Administración",
+    "transferTitle": "Entregar este círculo",
+    "transferHint": "La persona que elijas pasa a administrarlo. Tú sigues editando y puedes salir cuando quieras.",
+    "transferTo": "Quién lo administrará",
+    "transfer": "Entregar",
+    "transferNoMembers": "Primero suma a alguien al círculo: solo sus integrantes pueden administrarlo.",
+    "transferConfirm": "¿Entregarle {circle} a {name}? Tú seguirás editando.",
+    "transferredToast": "Ahora {name} administra el círculo.",
+    "deleteTitle": "Eliminar este círculo",
+    "deleteHint": "Su página, integrantes, cola y seguidores desaparecen para siempre. Las historias se quedan con quienes las escribieron.",
+    "deleteCircle": "Eliminar círculo…",
+    "deleteDialogTitle": "¿Eliminar {circle}?",
+    "deleteDialogDescription": "No se puede deshacer. Cada historia sigue en el perfil de quien la escribió; solo deja de formar parte de este círculo.",
+    "deleteTypeName": "Escribe «{circle}» para confirmar",
+    "deleteForever": "Eliminar para siempre",
+    "deleting": "Eliminando…",
+    "deletedToast": "{circle} se eliminó."
   },
   "Email": {
     "subject": "{count, plural, one {# notificación nueva en Fogata} other {# notificaciones nuevas en Fogata}}",

@@ -345,6 +345,8 @@ export const notificationType = pgEnum("notification_type", [
   // Someone asked to join a private circle (to its owner and editors), or was let in.
   "join_request",
   "join_accepted",
+  // The owner handed a circle over to this member.
+  "circle_owner",
 ]);
 
 /** A reader following a writer or a topic (circles later). Exactly one target is set. */
@@ -699,6 +701,8 @@ export const circles = pgTable(
       using: CIRCLE_EDITOR(t.id),
       withCheck: CIRCLE_EDITOR(t.id),
     }),
+    // Only the owner deletes a circle (members, submissions and follows go with it).
+    pgPolicy("circles_delete_owner", { for: "delete", to: authenticatedRole, using: sql`${t.ownerId} = ${authUid}` }),
   ],
 );
 

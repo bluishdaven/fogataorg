@@ -203,3 +203,74 @@ test("new accounts can start two circles on their first day", async ({ page }) =
   await page.getByTestId("circle-submit").click();
   await expect(page.getByRole("main").getByRole("alert")).toContainText("You've reached the limit for now");
 });
+
+test("editors decline with a note; owners hand a circle over; the new owner deletes it", async ({ browser }) => {
+  test.setTimeout(150_000);
+  const ownerContext = await browser.newContext();
+  const writerContext = await browser.newContext();
+  const owner = await ownerContext.newPage();
+  const writer = await writerContext.newPage();
+
+  await signInWithMagicLink(owner, "en");
+  const name = circleName();
+  const circleUrl = await createCircle(owner, name);
+
+  await signInWithMagicLink(writer, "en");
+  await writer.getByTestId("account-menu").click();
+  const writerHandle = (await writer.getByText(/^@e2e[a-z0-9_]+$/).textContent())!.slice(1);
+  await writer.keyboard.press("Escape");
+  const title = `Declined story ${Date.now()}`;
+  await publishStory(writer, title);
+  await writer.goto(circleUrl);
+  await writer.getByTestId("submit-story").click();
+  await writer.getByRole("dialog").getByRole("listitem").filter({ hasText: title }).getByRole("button", { name: "Submit" }).click();
+  await expect(writer.getByText(`Submitted to ${name}. Editors will review it.`)).toBeVisible();
+
+  // Decline with a note.
+  await owner.goto(`${circleUrl}/manage`);
+  const submission = owner.getByTestId("submission").filter({ hasText: title });
+  await submission.getByRole("button", { name: "Decline" }).click();
+  await submission.getByLabel("A note for the writer (optional)").fill("Lovely, but we only take stories set near water.");
+  expect(await axeSerious(owner)).toEqual([]);
+  await submission.getByTestId("decline-form").getByRole("button", { name: "Decline" }).click();
+  await expect(owner.getByText("Declined. The writer has been told.")).toBeVisible();
+
+  await writer.goto("/en/me/notifications");
+  const notice = writer.getByTestId("notification").filter({ hasText: `declined “${title}” for ${name}` });
+  await expect(notice.getByTestId("decline-note")).toHaveText("Note from the editors: “Lovely, but we only take stories set near water.”");
+
+  // Hand the circle to the writer (added as an editor first).
+  await owner.getByLabel("Add someone by username").fill(writerHandle);
+  await owner.getByRole("button", { name: "Add", exact: true }).click();
+  await expect(owner.getByTestId("member").filter({ hasText: `@${writerHandle}` })).toBeVisible();
+  const ownership = owner.getByTestId("owner-actions");
+  await expect(ownership.getByLabel("New owner").locator("option:checked")).toContainText(`@${writerHandle}`);
+  owner.once("dialog", (dialog) => void dialog.accept());
+  await ownership.getByRole("button", { name: "Hand over" }).click();
+  await expect(owner.getByTestId("owner-actions")).toHaveCount(0);
+  await expect(owner.getByTestId("member").filter({ hasText: `@${writerHandle}` })).toContainText("Owner");
+
+  await writer.goto("/en/me/notifications");
+  await writer.getByTestId("notification").filter({ hasText: `handed ${name} over to you` }).click();
+  await expect(writer).toHaveURL(new RegExp(`${new URL(circleUrl).pathname}/manage$`));
+
+  // The new owner deletes it, after typing its name.
+  await writer.getByTestId("delete-circle").click();
+  const dialog = writer.getByRole("dialog");
+  const confirm = dialog.getByRole("button", { name: "Delete forever" });
+  await expect(confirm).toBeDisabled();
+  await dialog.getByLabel(`Type “${name}” to confirm`).fill(name.toLowerCase());
+  await expect(confirm).toBeEnabled();
+  // Enabled buttons fade in from half opacity; check contrast once they're there.
+  await expect(confirm).toHaveCSS("opacity", "1");
+  expect(await axeSerious(writer)).toEqual([]);
+  await confirm.click();
+  await expect(writer).toHaveURL(/\/en\/circles$/);
+  await expect(writer.getByTestId("circle-list").getByText(name)).toHaveCount(0);
+  await writer.goto(circleUrl);
+  await expect(writer.getByRole("heading", { name: "This trail goes cold" })).toBeVisible();
+
+  await deleteFromMyStories(writer, title);
+  await ownerContext.close();
+  await writerContext.close();
+});

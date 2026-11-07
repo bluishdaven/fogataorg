@@ -19,7 +19,8 @@ export type NotificationItem = {
     | "badge"
     | "donor"
     | "join_request"
-    | "join_accepted";
+    | "join_accepted"
+    | "circle_owner";
   actor: { username: string; name: string } | null;
   others: number;
   story: { title: string; slug: string; author: string } | null;
@@ -60,7 +61,9 @@ export function notificationMessage(t: SocialTranslator, item: NotificationItem)
 /** Site-relative link for a notification (locale prefix only where the UI needs one). */
 export function notificationPath(item: NotificationItem, locale: string): string {
   if ((item.type === "badge" || item.type === "donor") && item.badge) return profilePath(item.badge.username);
-  if ((item.type === "submission" || item.type === "join_request") && item.circle) return `/${locale}/circles/${item.circle.slug}/manage`;
+  if ((item.type === "submission" || item.type === "join_request" || item.type === "circle_owner") && item.circle) {
+    return `/${locale}/circles/${item.circle.slug}/manage`;
+  }
   if (item.type === "join_accepted" && item.circle) return `/${locale}/circles/${item.circle.slug}`;
   if (item.type === "follow" && item.actor) return profilePath(item.actor.username);
   if (item.story) {

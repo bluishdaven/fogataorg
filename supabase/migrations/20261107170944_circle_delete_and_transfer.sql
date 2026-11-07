@@ -1,0 +1,2 @@
+ALTER TYPE "public"."notification_type" ADD VALUE 'circle_owner';--> statement-breakpoint
+CREATE POLICY "circles_delete_owner" ON "circles" AS PERMISSIVE FOR DELETE TO "authenticated" USING ("circles"."owner_id" = (select auth.uid()));

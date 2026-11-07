@@ -5,6 +5,7 @@ import es from "../../messages/es.json";
 import {
   ACCENT_PRESETS,
   addMemberSchema,
+  confirmsCircleName,
   contrastRatio,
   createCircleSchema,
   decisionSchema,
@@ -69,6 +70,14 @@ describe("decisionSchema", () => {
   });
 });
 
+describe("confirmsCircleName", () => {
+  it("matches the circle's name ignoring case and outer spaces, never an empty answer", () => {
+    expect(confirmsCircleName("  agua dulce ", "Agua Dulce")).toBe(true);
+    expect(confirmsCircleName("Agua", "Agua Dulce")).toBe(false);
+    expect(confirmsCircleName("   ", "   ")).toBe(false);
+  });
+});
+
 describe("addMemberSchema", () => {
   it("accepts usernames with or without @", () => {
     const id = "0b9f6a52-8f0e-4c55-9d7a-2f4b1c3d5e6f";
@@ -102,7 +111,7 @@ describe("join notifications", () => {
     const t = createTranslator({ locale, messages, namespace: "Social" });
     return (key, values) => (t as unknown as SocialTranslator)(key, values);
   }
-  const item = (type: "join_request" | "join_accepted", others = 0): NotificationItem => ({
+  const item = (type: "join_request" | "join_accepted" | "circle_owner", others = 0): NotificationItem => ({
     type,
     actor: { username: "ana", name: "Ana" },
     others,
@@ -124,5 +133,11 @@ describe("join notifications", () => {
   it("open the requests for editors and the circle for new members", () => {
     expect(notificationPath(item("join_request"), "en")).toBe("/en/circles/lake-notes/manage");
     expect(notificationPath(item("join_accepted"), "es")).toBe("/es/circles/lake-notes");
+  });
+
+  it("tell a new owner who handed the circle over and take them to its manage page", () => {
+    expect(notificationMessage(translator(en, "en"), item("circle_owner"))).toBe("Ana handed Lake Notes over to you. You're its owner now.");
+    expect(notificationMessage(translator(es, "es"), item("circle_owner"))).toBe("Ana te entregó Lake Notes. Ahora lo administras tú.");
+    expect(notificationPath(item("circle_owner"), "es")).toBe("/es/circles/lake-notes/manage");
   });
 });

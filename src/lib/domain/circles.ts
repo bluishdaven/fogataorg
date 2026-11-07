@@ -110,6 +110,15 @@ export const decisionSchema = z
   })
   .refine((value) => value.status === "declined" || value.note === null, { message: "invalid" });
 export const joinRequestSchema = z.object({ circleId: z.uuid() });
+/** The owner hands the circle to another member. */
+export const transferCircleSchema = z.object({ circleId: z.uuid(), userId: z.uuid() });
+/** Deleting needs the circle's name typed back, so it can't happen by accident. */
+export const deleteCircleSchema = z.object({ circleId: z.uuid(), confirmName: z.string().max(200) });
+
+/** Whether the typed name matches the circle's (ignoring case and surrounding spaces). */
+export function confirmsCircleName(typed: string, name: string): boolean {
+  return typed.trim().toLocaleLowerCase() === name.trim().toLocaleLowerCase() && typed.trim() !== "";
+}
 export const joinDecisionSchema = z.object({ requestId: z.uuid(), accept: z.boolean() });
 
 export type CircleErrorKey =
@@ -128,4 +137,5 @@ export type CircleErrorKey =
   | "alreadySubmitted"
   | "alreadyRequested"
   | "rateLimited"
+  | "confirmName"
   | "invalid";

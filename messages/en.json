@@ -787,7 +787,8 @@
       "badge": "You earned the {badge, select, kindling {Kindling} candle {Candle} flame {Flame} torch {Torch} hearth {Hearth} bonfire {Bonfire} beacon {Beacon} star {Star} sun {Sun} phoenix {Phoenix} other {new}} badge: {count, plural, one {your first published story} other {# published stories}}. Keep the fire going!",
       "donor": "You're a Firekeeper! Thank you for supporting Fogata with a donation.",
       "join_request": "{others, plural, =0 {{actor} asked to join {circle}} one {{actor} and # other asked to join {circle}} other {{actor} and # others asked to join {circle}}}",
-      "join_accepted": "{actor} accepted you into {circle}. Your stories go straight in now."
+      "join_accepted": "{actor} accepted you into {circle}. Your stories go straight in now.",
+      "circle_owner": "{actor} handed {circle} over to you. You're its owner now."
     },
     "savedTitle": "Saved",
     "savedLede": "Stories you've kept for later. Only you can see this list.",
@@ -931,13 +932,31 @@
       "alreadySubmitted": "That story is already in (or waiting for) a circle.",
       "invalid": "Something's not right. Try again.",
       "alreadyRequested": "You've already asked to join this circle.",
-      "rateLimited": "You've reached the limit for now. Wait a little and try again. (New accounts have lower limits on their first day.)"
+      "rateLimited": "You've reached the limit for now. Wait a little and try again. (New accounts have lower limits on their first day.)",
+      "confirmName": "Type the circle's name exactly to delete it."
     },
     "uploadErrors": {
       "type": "That file type isn't supported. Use JPEG, PNG, WebP, GIF or AVIF.",
       "size": "That image is larger than 10 MB.",
       "failed": "The image couldn't be uploaded. Try again."
-    }
+    },
+    "ownerHeading": "Ownership",
+    "transferTitle": "Hand over this circle",
+    "transferHint": "The person you choose becomes the owner. You stay on as an editor and can leave whenever you like.",
+    "transferTo": "New owner",
+    "transfer": "Hand over",
+    "transferNoMembers": "Add someone to the circle first: only members can become its owner.",
+    "transferConfirm": "Make {name} the owner of {circle}? You'll become an editor.",
+    "transferredToast": "{name} is the owner now.",
+    "deleteTitle": "Delete this circle",
+    "deleteHint": "Its page, members, queue and followers go away for good. Stories stay with their writers.",
+    "deleteCircle": "Delete circle…",
+    "deleteDialogTitle": "Delete {circle}?",
+    "deleteDialogDescription": "This can't be undone. Every story in it stays on its writer's profile; it just stops being part of this circle.",
+    "deleteTypeName": "Type “{circle}” to confirm",
+    "deleteForever": "Delete forever",
+    "deleting": "Deleting…",
+    "deletedToast": "{circle} was deleted."
   },
   "Email": {
     "subject": "{count, plural, one {# new notification on Fogata} other {# new notifications on Fogata}}",
