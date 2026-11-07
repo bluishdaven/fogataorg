@@ -1040,7 +1040,8 @@
     "circlePrivateEyebrow": "A private circle on Fogata",
     "circleStats": "{stories, plural, one {# story} other {# stories}} · {members, plural, one {# member} other {# members}}",
     "circleLatest": "Latest stories",
-    "circleCta": "Read the circle"
+    "circleCta": "Read the circle",
+    "circleMembers": "{members, plural, one {# member} other {# members}}"
   },
   "Badges": {
     "tiers": {

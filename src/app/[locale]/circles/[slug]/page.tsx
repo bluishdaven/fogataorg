@@ -105,7 +105,10 @@ async function Circle({ params }: Pick<Props, "params">) {
                 accentColor: circle.accentColor,
                 headerUrl,
                 eyebrow: card(circle.isPrivate ? "circlePrivateEyebrow" : "circleEyebrow"),
-                stats: card("circleStats", { stories: circle.stories.length, members: circle.members.length }),
+                // A new circle shows who's in it rather than "0 stories".
+                stats: circle.stories.length
+                  ? card("circleStats", { stories: circle.stories.length, members: circle.members.length })
+                  : card("circleMembers", { members: circle.members.length }),
                 latestLabel: card("circleLatest"),
                 latest: circle.stories.slice(0, 3).map((story) => ({
                   title: story.title,
