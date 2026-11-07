@@ -40,7 +40,7 @@ export function fontFamily(variable: string, fallback: string): string {
   return value ? `${value}, ${fallback}` : fallback;
 }
 
-function loadImage(src: string): Promise<HTMLImageElement | null> {
+export function loadImage(src: string): Promise<HTMLImageElement | null> {
   return new Promise((resolve) => {
     const image = new Image();
     image.crossOrigin = "anonymous"; // Without CORS the photo is skipped, so the canvas never gets tainted.
@@ -50,7 +50,7 @@ function loadImage(src: string): Promise<HTMLImageElement | null> {
   });
 }
 
-function roundedRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+export function roundedRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
   ctx.beginPath();
   ctx.roundRect(x, y, w, h, r);
 }

@@ -55,3 +55,27 @@ test("readers can download a ready-to-post Stories image of the story, with its 
   expect(pngSize(png)).toEqual([1080, 1920]);
   expect(png.length).toBeGreaterThan(40_000); // real content, not a blank canvas
 });
+
+test("circle pages share too, with a Stories image of the circle", async ({ page, context }, testInfo) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.goto("/en/circles/lake-notes");
+  const share = page.getByTestId("circle-band").getByTestId("share-button");
+  await expect(share).toHaveText("Share");
+  await share.click();
+  // The shared link has no language prefix, so each visitor lands in their own language.
+  const whatsapp = page.getByTestId("share-whatsapp");
+  expect(decodeURIComponent((await whatsapp.getAttribute("href"))!)).toMatch(/Lake Notes, a circle on Fogata https?:\/\/[^/]+\/circles\/lake-notes$/);
+
+  const downloading = page.waitForEvent("download");
+  await page.getByTestId("share-stories").click();
+  const download = await downloading;
+  expect(download.suggestedFilename()).toBe("fogata-circle-lake-notes.png");
+  await expect(page.getByText("Image saved and link copied.", { exact: false })).toBeVisible();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toMatch(/^https?:\/\/[^/]+\/circles\/lake-notes$/);
+
+  const path = testInfo.outputPath("circle-image.png");
+  await download.saveAs(path);
+  const png = await readFile(path);
+  expect(pngSize(png)).toEqual([1080, 1920]);
+  expect(png.length).toBeGreaterThan(40_000);
+});

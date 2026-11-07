@@ -101,15 +101,18 @@ export async function StorySocial({
           fileName={storyImageFileName(slug)}
           allowImage={!nsfw}
           image={{
-            title,
-            author: name,
-            avatarUrl: author.avatarUrl,
-            preview,
-            eyebrow: card("eyebrow"),
-            readingLabel: common("minRead", { minutes: readingTime }),
-            cta: card("cta"),
-            url: shareUrl,
-            lang: language,
+            kind: "story",
+            input: {
+              title,
+              author: name,
+              avatarUrl: author.avatarUrl,
+              preview,
+              eyebrow: card("eyebrow"),
+              readingLabel: common("minRead", { minutes: readingTime }),
+              cta: card("cta"),
+              url: shareUrl,
+              lang: language,
+            },
           }}
         />
       </div>

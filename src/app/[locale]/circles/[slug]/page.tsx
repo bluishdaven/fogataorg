@@ -7,6 +7,7 @@ import { Suspense } from "react";
 import { CircleHeader } from "@/components/circles/circle-header";
 import { JoinCircleButton } from "@/components/circles/join-circle-button";
 import { SubmitStoryDialog } from "@/components/circles/submit-story-dialog";
+import { ShareButton } from "@/components/social/share-button";
 import { FollowButton } from "@/components/social/toggle-buttons";
 import { StoryCard } from "@/components/story-card";
 import { buttonVariants } from "@/components/ui/button";
@@ -14,10 +15,13 @@ import { Toaster } from "@/components/ui/sonner";
 import { Link } from "@/i18n/navigation";
 import { getViewer } from "@/lib/auth";
 import { getCircle, getCircleViewerState, listSubmittableStories } from "@/lib/data/circles";
+import { circleImageFileName, circleShareUrl } from "@/lib/domain/circle-card";
 import { profilePath } from "@/lib/domain/handle-routes";
 import { OG_SIZE, ogPaths, previewVersion } from "@/lib/domain/og";
 import { localeAlternates } from "@/lib/domain/seo";
+import { storyImagePrefix } from "@/lib/domain/stories";
 import { isUnsplashImageUrl, unsplashShareImageUrl } from "@/lib/domain/unsplash";
+import { publicEnv } from "@/lib/env";
 
 type Props = PageProps<"/[locale]/circles/[slug]">;
 
@@ -62,8 +66,15 @@ async function Circle({ params }: Pick<Props, "params">) {
   const { slug } = await params;
   const circle = await getCircle(slug);
   if (!circle) notFound();
-  const t = await getTranslations("Circles");
+  const locale = await getLocale();
+  const [t, card] = await Promise.all([getTranslations("Circles"), getTranslations("ShareCard")]);
   const editors = circle.members.filter((m) => m.role === "owner" || m.role === "editor");
+  const shareUrl = circleShareUrl(publicEnv.NEXT_PUBLIC_SITE_URL, circle.slug);
+  // Only a header we host goes into the Stories image; Unsplash photos stay hotlinked, never baked in.
+  const headerUrl =
+    circle.header && !isUnsplashImageUrl(circle.header.url) && circle.header.url.startsWith(storyImagePrefix(publicEnv.NEXT_PUBLIC_SUPABASE_URL))
+      ? circle.header.url
+      : null;
 
   return (
     <>
@@ -75,9 +86,38 @@ async function Circle({ params }: Pick<Props, "params">) {
         privateLabel={circle.isPrivate ? t("privateLabel") : null}
         privateNote={circle.isPrivate ? t("privateNote") : null}
       >
-        <Suspense fallback={<div className="h-8 w-40 animate-pulse rounded bg-black/10" aria-hidden />}>
-          <CircleActions circleId={circle.id} slug={circle.slug} name={circle.name} isPrivate={circle.isPrivate} />
-        </Suspense>
+        <div className="flex flex-wrap items-center gap-3">
+          <Suspense fallback={<div className="h-8 w-40 animate-pulse rounded bg-black/10" aria-hidden />}>
+            <CircleActions circleId={circle.id} slug={circle.slug} name={circle.name} isPrivate={circle.isPrivate} />
+          </Suspense>
+          <ShareButton
+            appearance="button"
+            side="bottom"
+            url={shareUrl}
+            title={circle.name}
+            text={t("shareText", { name: circle.name })}
+            fileName={circleImageFileName(circle.slug)}
+            image={{
+              kind: "circle",
+              input: {
+                name: circle.name,
+                description: circle.description,
+                accentColor: circle.accentColor,
+                headerUrl,
+                eyebrow: card(circle.isPrivate ? "circlePrivateEyebrow" : "circleEyebrow"),
+                stats: card("circleStats", { stories: circle.stories.length, members: circle.members.length }),
+                latestLabel: card("circleLatest"),
+                latest: circle.stories.slice(0, 3).map((story) => ({
+                  title: story.title,
+                  author: story.author.displayName || story.author.username,
+                })),
+                cta: card("circleCta"),
+                url: shareUrl,
+                lang: locale,
+              },
+            }}
+          />
+        </div>
       </CircleHeader>
       <div className="mt-10 grid gap-10 md:grid-cols-[minmax(0,1fr)_14rem]">
         <section aria-labelledby="circle-stories">

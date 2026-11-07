@@ -254,7 +254,11 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   reader's UI. Making the image also copies the story's link (started in the same tap, before any
   await, since clipboard writes need one) for the Story's link sticker. Phones hand the PNG to the share sheet (rendering starts when the menu opens, because
   iOS only allows sharing shortly after a tap); desktops download it. Only our avatars bucket (CORS
-  enabled) is drawn, so the canvas can't be tainted.
+  enabled) is drawn, so the canvas can't be tainted. Circles have the same menu on their page
+  (`ShareButton` takes `image: { kind: "story" | "circle", input }`): `circle-image.ts` draws the
+  circle on its accent with `readableTextOn()` text, includes only an uploaded header from our
+  bucket (never an Unsplash photo, which must stay hotlinked), and shares the unprefixed
+  `/circles/<slug>` (the proxy redirects by language; helpers in `src/lib/domain/circle-card.ts`).
 - **Badges** (`src/lib/domain/badges.ts`, `src/components/badges/`, plan in `docs/plans/badges.md`).
   Writing tiers come from a live count of published, public stories (`publishedCountSql` in
   `src/lib/data/badge-sql.ts`, carried by every author query as `badges`); ten tiers from 1 to 1,000.

@@ -991,7 +991,8 @@
     "deleteTypeName": "Escribe «{circle}» para confirmar",
     "deleteForever": "Eliminar para siempre",
     "deleting": "Eliminando…",
-    "deletedToast": "{circle} se eliminó."
+    "deletedToast": "{circle} se eliminó.",
+    "shareText": "{name}, un círculo en Fogata"
   },
   "Email": {
     "subject": "{count, plural, one {# notificación nueva en Fogata} other {# notificaciones nuevas en Fogata}}",
@@ -1034,7 +1035,12 @@
   },
   "ShareCard": {
     "eyebrow": "Una historia en Fogata",
-    "cta": "Lee la historia completa"
+    "cta": "Lee la historia completa",
+    "circleEyebrow": "Un círculo en Fogata",
+    "circlePrivateEyebrow": "Un círculo privado en Fogata",
+    "circleStats": "{stories, plural, one {# historia} other {# historias}} · {members, plural, one {# integrante} other {# integrantes}}",
+    "circleLatest": "Historias recientes",
+    "circleCta": "Lee el círculo"
   },
   "Badges": {
     "tiers": {

@@ -12,8 +12,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { renderCircleImage, type CircleImageInput } from "@/components/circles/circle-image";
+import { Button } from "@/components/ui/button";
 import { SHARE_NETWORKS, shareLink } from "@/lib/domain/share";
 import { renderStoryImage, type StoryImageInput } from "./story-image";
+
+/** What the "Image for Stories" shows: a story, or a whole circle. */
+export type ShareImage = { kind: "story"; input: StoryImageInput } | { kind: "circle"; input: CircleImageInput };
+
+const renderImage = (image: ShareImage) => (image.kind === "story" ? renderStoryImage(image.input) : renderCircleImage(image.input));
 
 const NETWORK_NAMES = {
   whatsapp: "WhatsApp",
@@ -53,14 +60,19 @@ export function ShareButton({
   image,
   fileName,
   allowImage = true,
+  appearance = "icon",
+  side = "top",
 }: {
   url: string;
   title: string;
   text: string;
-  /** Everything the Stories image shows, with copy in the story's language. */
-  image: StoryImageInput;
+  /** Everything the Stories image shows (story copy follows the story's language). */
+  image: ShareImage;
   fileName: string;
   allowImage?: boolean;
+  /** A round icon (the story action bar) or a labelled button (circle pages). */
+  appearance?: "icon" | "button";
+  side?: "top" | "bottom";
 }) {
   const t = useTranslations("Social");
   const shareSheet = useSyncExternalStore(subscribe, hasShareSheet, () => false);
@@ -69,7 +81,7 @@ export function ShareButton({
 
   // Start drawing as soon as the menu opens: phones only allow sharing shortly after a tap.
   const prepareImage = () => {
-    rendering.current ??= renderStoryImage(image).catch((error: unknown) => {
+    rendering.current ??= renderImage(image).catch((error: unknown) => {
       rendering.current = null;
       throw error;
     });
@@ -123,18 +135,25 @@ export function ShareButton({
       }}
     >
       <DropdownMenuTrigger asChild>
-        <button
-          type="button"
-          className="flex size-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent"
-          aria-label={t("share")}
-          title={t("share")}
-          aria-busy={busy || undefined}
-          data-testid="share-button"
-        >
-          <Share className="size-5" aria-hidden />
-        </button>
+        {appearance === "button" ? (
+          <Button variant="secondary" size="sm" aria-busy={busy || undefined} data-testid="share-button">
+            <Share aria-hidden />
+            {t("share")}
+          </Button>
+        ) : (
+          <button
+            type="button"
+            className="flex size-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent"
+            aria-label={t("share")}
+            title={t("share")}
+            aria-busy={busy || undefined}
+            data-testid="share-button"
+          >
+            <Share className="size-5" aria-hidden />
+          </button>
+        )}
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" side="top" className="min-w-56">
+      <DropdownMenuContent align={appearance === "button" ? "start" : "end"} side={side} className="min-w-56">
         <DropdownMenuLabel>{t("share")}</DropdownMenuLabel>
         {shareSheet ? (
           <DropdownMenuItem

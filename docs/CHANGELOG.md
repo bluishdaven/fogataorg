@@ -1,5 +1,18 @@
 # Changelog
 
+## Circle images for Stories (2026-11-07)
+
+**Demo**: open any circle and tap **Share**: besides the link and the networks, **Image for
+Stories** makes a 1080×1920 picture of the circle, ready for Instagram, WhatsApp or Facebook
+Stories, and copies the circle's link for the link sticker.
+
+- Drawn in the browser like the story image: the circle's accent color (white or black text,
+  whichever reads), its uploaded header picture if it has one (Unsplash photos are never baked
+  in), name, description, story and member counts, its latest stories when there's room, and
+  "Read the circle" with the address.
+- The shared link has no language prefix (`fogata.org/circles/<slug>`), so each visitor lands in
+  their own language. The image's copy follows the sharer's language.
+
 ## Reading lists, undo sparks, editing responses, mute and block, circle ownership (2026-11-07)
 
 **Demo**: tap the bookmark on a story: it's saved, and a small menu lets you tick other lists or
