@@ -413,6 +413,32 @@ export const sparks = pgTable(
 );
 
 /** Private reading list ("Saved" / "Leña guardada"). */
+/** A reader's own named reading lists, next to the default "Saved" list. Private. */
+export const readingLists = pgTable(
+  "reading_lists",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => profiles.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    ...timestamps,
+  },
+  (t) => [
+    uniqueIndex("reading_lists_user_name_key").on(t.userId, sql`lower(btrim(${t.name}))`),
+    check("reading_lists_name_length", sql`char_length(btrim(${t.name})) between 1 and 60`),
+    pgPolicy("reading_lists_select_own", { for: "select", to: authenticatedRole, using: sql`${t.userId} = ${authUid}` }),
+    pgPolicy("reading_lists_insert_own", { for: "insert", to: authenticatedRole, withCheck: sql`${t.userId} = ${authUid}` }),
+    pgPolicy("reading_lists_update_own", {
+      for: "update",
+      to: authenticatedRole,
+      using: sql`${t.userId} = ${authUid}`,
+      withCheck: sql`${t.userId} = ${authUid}`,
+    }),
+    pgPolicy("reading_lists_delete_own", { for: "delete", to: authenticatedRole, using: sql`${t.userId} = ${authUid}` }),
+  ],
+);
+
 export const bookmarks = pgTable(
   "bookmarks",
   {
@@ -423,16 +449,23 @@ export const bookmarks = pgTable(
     storyId: uuid("story_id")
       .notNull()
       .references(() => stories.id, { onDelete: "cascade" }),
+    // Null is the default "Saved" list; a story can be in several lists, once each.
+    listId: uuid("list_id").references(() => readingLists.id, { onDelete: "cascade" }),
     ...timestamps,
   },
   (t) => [
-    uniqueIndex("bookmarks_user_story_key").on(t.userId, t.storyId),
+    uniqueIndex("bookmarks_user_story_list_key").on(
+      t.userId,
+      t.storyId,
+      sql`coalesce(${t.listId}, '00000000-0000-0000-0000-000000000000'::uuid)`,
+    ),
     index("bookmarks_user_idx").on(t.userId, t.createdAt.desc()),
+    index("bookmarks_list_idx").on(t.listId),
     pgPolicy("bookmarks_select_own", { for: "select", to: authenticatedRole, using: sql`${t.userId} = ${authUid}` }),
     pgPolicy("bookmarks_insert_own", {
       for: "insert",
       to: authenticatedRole,
-      withCheck: sql`${t.userId} = ${authUid} and exists (select 1 from public.stories s where s.id = ${t.storyId})`,
+      withCheck: sql`${t.userId} = ${authUid} and exists (select 1 from public.stories s where s.id = ${t.storyId}) and (${t.listId} is null or exists (select 1 from public.reading_lists l where l.id = ${t.listId} and l.user_id = ${authUid}))`,
     }),
     pgPolicy("bookmarks_delete_own", { for: "delete", to: authenticatedRole, using: sql`${t.userId} = ${authUid}` }),
   ],

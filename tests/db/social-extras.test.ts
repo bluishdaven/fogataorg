@@ -1,6 +1,6 @@
-import { and, eq, notInArray } from "drizzle-orm";
+import { and, eq, isNull, notInArray, sql } from "drizzle-orm";
 import { afterAll, describe, expect, it } from "vitest";
-import { notifications, profiles, responses, responseSparks, sparks, stories } from "@/lib/db/schema";
+import { bookmarks, notifications, profiles, readingLists, responses, responseSparks, sparks, stories } from "@/lib/db/schema";
 import { closeDb, expectPgError, PG, scenario, type Harness } from "./harness";
 
 afterAll(closeDb);
@@ -119,6 +119,67 @@ describe("editing responses", () => {
       await expectPgError(
         h.as(h.claimsFor(responder), (tx) => tx.update(responses).set({ editedAt: null }).where(eq(responses.id, response!.id))),
         PG.insufficientPrivilege,
+      );
+    });
+  });
+});
+
+describe("reading lists", () => {
+  it("are private, hold a story once each, and only take the reader's own lists", async () => {
+    await scenario(async (h) => {
+      const writer = await h.createUser();
+      const reader = await h.createUser();
+      const other = await h.createUser();
+      const story = await makeStory(h, writer);
+      const as = (userId: string) => <T>(fn: Parameters<typeof h.as<T>>[1]) => h.as(h.claimsFor(userId), fn);
+
+      const [list] = await as(reader)((tx) => tx.insert(readingLists).values({ userId: reader, name: "Para el tren" }).returning());
+      await expectPgError(
+        h.savepoint(() => as(reader)((tx) => tx.insert(readingLists).values({ userId: reader, name: "  para el TREN " }))),
+        PG.uniqueViolation,
+      );
+      await expectPgError(h.savepoint(() => as(reader)((tx) => tx.insert(readingLists).values({ userId: reader, name: "   " }))), PG.checkViolation);
+      await expectPgError(h.savepoint(() => as(reader)((tx) => tx.insert(readingLists).values({ userId: other, name: "Ajena" }))), PG.insufficientPrivilege);
+
+      // Saved (no list) and a named list: two rows, one each.
+      await as(reader)((tx) => tx.insert(bookmarks).values({ userId: reader, storyId: story.id }));
+      await as(reader)((tx) => tx.insert(bookmarks).values({ userId: reader, storyId: story.id, listId: list!.id }));
+      await expectPgError(
+        h.savepoint(() => as(reader)((tx) => tx.insert(bookmarks).values({ userId: reader, storyId: story.id, listId: list!.id }))),
+        PG.uniqueViolation,
+      );
+      await expectPgError(
+        h.savepoint(() => as(reader)((tx) => tx.insert(bookmarks).values({ userId: reader, storyId: story.id }))),
+        PG.uniqueViolation,
+      );
+      // Nobody else can file into this list, or see it.
+      await expectPgError(
+        h.savepoint(() => as(other)((tx) => tx.insert(bookmarks).values({ userId: other, storyId: story.id, listId: list!.id }))),
+        PG.insufficientPrivilege,
+      );
+      expect(await as(other)((tx) => tx.select().from(readingLists))).toHaveLength(0);
+      expect(await as(other)((tx) => tx.update(readingLists).set({ name: "Mía" }).where(eq(readingLists.id, list!.id)).returning())).toHaveLength(0);
+
+      // A story in two lists is still one save for the heat score.
+      const [heat] = await h.tx.execute<{ heat: number }>(sql`select heat from public.story_heat() where story_id = ${story.id}`);
+      expect(Number(heat!.heat)).toBeCloseTo(2.5, 1);
+
+      // Deleting the list keeps the story in Saved.
+      await as(reader)((tx) => tx.delete(readingLists).where(eq(readingLists.id, list!.id)));
+      const left = await h.tx.select().from(bookmarks).where(eq(bookmarks.userId, reader));
+      expect(left).toHaveLength(1);
+      expect(left[0]!.listId).toBeNull();
+      expect(await h.tx.select().from(bookmarks).where(and(eq(bookmarks.userId, reader), isNull(bookmarks.listId)))).toHaveLength(1);
+    });
+  });
+
+  it("stop at 50 per reader", async () => {
+    await scenario(async (h) => {
+      const reader = await h.createUser();
+      await h.tx.insert(readingLists).values(Array.from({ length: 50 }, (_, i) => ({ userId: reader, name: `Lista ${i}` })));
+      await expectPgError(
+        h.as(h.claimsFor(reader), (tx) => tx.insert(readingLists).values({ userId: reader, name: "Una más" })),
+        "54000",
       );
     });
   });

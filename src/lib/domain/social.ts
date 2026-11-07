@@ -17,7 +17,14 @@ export const sparksSchema = z.object({
   count: z.number().int().min(0).max(MAX_SPARKS),
 });
 
-export const bookmarkSchema = z.object({ storyId: z.uuid(), saved: z.boolean() });
+/** Saving to (or removing from) one list; no list is the default "Saved" list. */
+export const bookmarkSchema = z.object({ storyId: z.uuid(), saved: z.boolean(), listId: z.uuid().nullable().default(null) });
+
+export const READING_LIST_NAME_MAX = 60;
+const readingListName = z.string().trim().min(1, { message: "listName" }).max(READING_LIST_NAME_MAX, { message: "listName" });
+/** A new reading list, optionally with the story it's being made for. */
+export const createReadingListSchema = z.object({ name: readingListName, storyId: z.uuid().optional() });
+export const renameReadingListSchema = z.object({ id: z.uuid(), name: readingListName });
 
 const responseBody = z
   .string()

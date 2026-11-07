@@ -8,6 +8,7 @@ import {
   follows,
   highlights,
   profiles,
+  readingLists,
   readingPositions,
   responses,
   series,
@@ -71,11 +72,13 @@ export async function GET() {
       .innerJoin(stories, eq(stories.id, sparks.storyId))
       .innerJoin(profiles, eq(profiles.id, stories.authorId))
       .where(eq(sparks.userId, viewer.id));
+    // listName null is the default Saved list.
     const saved = await tx
-      .select({ savedAt: bookmarks.createdAt, ...ref })
+      .select({ savedAt: bookmarks.createdAt, listName: readingLists.name, ...ref })
       .from(bookmarks)
       .innerJoin(stories, eq(stories.id, bookmarks.storyId))
       .innerJoin(profiles, eq(profiles.id, stories.authorId))
+      .leftJoin(readingLists, eq(readingLists.id, bookmarks.listId))
       .where(eq(bookmarks.userId, viewer.id));
     const mySeries = await tx
       .select({ id: series.id, title: series.title, slug: series.slug, description: series.description })
@@ -136,7 +139,7 @@ export async function GET() {
       })),
       responses: myResponses.map((r) => ({ body: r.body, createdAt: r.createdAt, reply: Boolean(r.isReply), story: { title: r.title, url: link(r.author, r.slug) } })),
       sparks: mySparks.map((s) => ({ count: s.count, story: { title: s.title, url: link(s.author, s.slug) } })),
-      saved: saved.map((s) => ({ savedAt: s.savedAt, story: { title: s.title, url: link(s.author, s.slug) } })),
+      saved: saved.map((s) => ({ savedAt: s.savedAt, list: s.listName ?? "Saved", story: { title: s.title, url: link(s.author, s.slug) } })),
       series: mySeries.map(({ id, ...item }) => ({
         ...item,
         url: `${site}/@${viewer.username}/series/${item.slug}`,

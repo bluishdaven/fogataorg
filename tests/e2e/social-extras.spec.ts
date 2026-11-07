@@ -55,3 +55,52 @@ test("readers can edit their responses, which then show as edited", async ({ pag
   await reloaded.getByRole("button", { name: "Delete" }).click();
   await expect(reloaded).toBeHidden();
 });
+
+test("readers keep stories in reading lists, then rename and delete a list", async ({ page }) => {
+  await signInWithMagicLink(page, "en");
+  await page.goto(STORY);
+  const save = page.getByTestId("save-button");
+  await save.click();
+  const menu = page.getByTestId("save-menu");
+  await expect(menu.getByRole("checkbox", { name: "Saved" })).toBeChecked();
+  await expect(save).toHaveAttribute("data-saved", "true");
+
+  // A new list from the menu holds the story too.
+  const listName = `Train rides ${Date.now()}`;
+  await menu.getByLabel("Name of the new list").fill(listName);
+  await menu.getByRole("button", { name: "Create" }).click();
+  await expect(menu.getByRole("checkbox", { name: listName })).toBeChecked();
+  // Same name again explains the problem.
+  await menu.getByLabel("Name of the new list").fill(listName.toUpperCase());
+  await menu.getByRole("button", { name: "Create" }).click();
+  await expect(menu.getByRole("alert")).toHaveText("You already have a list with that name.");
+
+  // Out of Saved, still in the list: still saved.
+  await menu.getByRole("checkbox", { name: "Saved" }).uncheck();
+  await expect(save).toHaveAttribute("data-saved", "true");
+  await menu.getByRole("button", { name: "Done" }).click();
+  await expect(menu).toBeHidden();
+  await expect(save).toBeFocused();
+
+  await page.goto("/en/me/saved");
+  const chips = page.getByTestId("reading-lists");
+  await expect(chips.getByRole("link", { name: /^Saved/ })).toHaveAttribute("aria-current", "page");
+  await expect(page.getByText("Nothing saved yet.", { exact: false })).toBeVisible();
+  await chips.getByRole("link", { name: new RegExp(listName) }).click();
+  await expect(page.getByTestId("reading-list-name")).toHaveText(listName);
+  await expect(page.getByTestId("saved-list").getByRole("link", { name: "The heron knows something I don't" })).toBeVisible();
+
+  await page.getByRole("button", { name: "Rename" }).click();
+  await page.getByLabel("List name").fill(`${listName} (slow)`);
+  await page.getByRole("button", { name: "Save", exact: true }).click();
+  await expect(page.getByTestId("reading-list-name")).toHaveText(`${listName} (slow)`);
+
+  page.once("dialog", (dialog) => void dialog.accept());
+  await page.getByRole("button", { name: "Delete list" }).click();
+  await expect(page).toHaveURL(/\/en\/me\/saved$/);
+  await expect(page.getByTestId("reading-lists")).toHaveCount(0);
+
+  // Back on the story, nothing holds it any more.
+  await page.goto(STORY);
+  await expect(page.getByTestId("save-button")).toHaveAttribute("data-saved", "false");
+});

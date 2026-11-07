@@ -767,7 +767,10 @@
       "not_allowed": "You can't do that here.",
       "empty": "Write something first.",
       "tooLong": "Responses can be at most 4,000 characters.",
-      "rateLimited": "You've reached the limit for now. Wait a little and try again. (New accounts have lower limits on their first day.)"
+      "rateLimited": "You've reached the limit for now. Wait a little and try again. (New accounts have lower limits on their first day.)",
+      "listName": "List names need 1–60 characters.",
+      "listExists": "You already have a list with that name.",
+      "tooManyLists": "You can have up to 50 lists."
     },
     "notifications": "Notifications",
     "notificationsUnread": "{count, plural, one {Notifications, # unread} other {Notifications, # unread}}",
@@ -791,7 +794,7 @@
       "circle_owner": "{actor} handed {circle} over to you. You're its owner now."
     },
     "savedTitle": "Saved",
-    "savedLede": "Stories you've kept for later. Only you can see this list.",
+    "savedLede": "Stories you've kept for later. Only you can see your lists.",
     "savedEmpty": "Nothing saved yet. Use the bookmark on any story to keep it here.",
     "emailSettings": "Email settings",
     "share": "Share",
@@ -818,7 +821,22 @@
     "passageCopied": "Link to this passage copied.",
     "quoteCardSaved": "Quote card saved.",
     "quoteCardSavedLinkCopied": "Quote card saved. The link to the passage is copied too.",
-    "quoteCardFailed": "Couldn't make the quote card. Try again."
+    "quoteCardFailed": "Couldn't make the quote card. Try again.",
+    "saveTo": "Save to",
+    "savedChangeLists": "Saved. Change lists",
+    "newList": "New list",
+    "newListName": "Name of the new list",
+    "createList": "Create",
+    "listCreatedToast": "Saved to {name}.",
+    "done": "Done",
+    "listsNav": "Your lists",
+    "renameList": "Rename",
+    "listName": "List name",
+    "deleteList": "Delete list",
+    "deleteListConfirm": "Delete “{name}”? Its stories stay in any other list they're in.",
+    "listEmpty": "This list is empty. Use the bookmark on any story to add it here.",
+    "listRenamedToast": "List renamed.",
+    "listDeletedToast": "List deleted."
   },
   "Circles": {
     "title": "Circles",

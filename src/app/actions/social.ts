@@ -4,12 +4,15 @@ import { and, eq, isNull, sql } from "drizzle-orm";
 import { allowAction } from "@/lib/limits";
 import { getViewer } from "@/lib/auth";
 import { withRls } from "@/lib/db/rls";
-import { bookmarks, follows, notifications, responses, responseSparks, sparks, stories } from "@/lib/db/schema";
+import { bookmarks, follows, notifications, readingLists, responses, responseSparks, sparks, stories } from "@/lib/db/schema";
+import { getSaveState } from "@/lib/data/social";
 import type { TiptapDoc } from "@/lib/domain/content";
 import {
   blockTexts,
   bookmarkSchema,
+  createReadingListSchema,
   followSchema,
+  renameReadingListSchema,
   responseEditSchema,
   responseIdSchema,
   responseSchema,
@@ -19,7 +22,10 @@ import {
 import type { BadgeData } from "@/lib/domain/badges";
 
 type Ok<T = object> = { ok: true } & T;
-type Fail = { ok: false; error: "unauthorized" | "invalid" | "not_allowed" | "empty" | "tooLong" | "rateLimited" };
+type Fail = {
+  ok: false;
+  error: "unauthorized" | "invalid" | "not_allowed" | "empty" | "tooLong" | "rateLimited" | "listName" | "listExists" | "tooManyLists";
+};
 
 function pgCode(error: unknown): string | undefined {
   let current: unknown = error;
@@ -86,19 +92,94 @@ export async function setSparks(input: unknown): Promise<Ok<{ count: number }> |
   });
 }
 
+/** Puts a story in one of the reader's lists or takes it out (no list: the default Saved list). */
 export async function setBookmark(input: unknown): Promise<Ok<{ saved: boolean }> | Fail> {
   const parsed = bookmarkSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: "invalid" };
-  const { storyId, saved } = parsed.data;
+  const { storyId, saved, listId } = parsed.data;
   return asViewer(async (viewer) => {
     await withRls(viewer.claims, async (tx) => {
       if (saved) {
-        await tx.insert(bookmarks).values({ userId: viewer.id, storyId }).onConflictDoNothing();
+        await tx.insert(bookmarks).values({ userId: viewer.id, storyId, listId }).onConflictDoNothing();
       } else {
-        await tx.delete(bookmarks).where(and(eq(bookmarks.storyId, storyId), eq(bookmarks.userId, viewer.id)));
+        await tx
+          .delete(bookmarks)
+          .where(
+            and(
+              eq(bookmarks.storyId, storyId),
+              eq(bookmarks.userId, viewer.id),
+              listId ? eq(bookmarks.listId, listId) : isNull(bookmarks.listId),
+            ),
+          );
       }
     });
     return { ok: true as const, saved };
+  });
+}
+
+export type SaveLists = { lists: { id: string; name: string }[]; inLists: (string | null)[] };
+
+/** The reader's lists and which ones hold this story, for the save menu. */
+export async function getSaveLists(storyId: string): Promise<Ok<SaveLists> | Fail> {
+  if (!responseIdSchema.safeParse(storyId).success) return { ok: false, error: "invalid" };
+  return asViewer(async (viewer) => ({ ok: true as const, ...(await getSaveState(viewer, storyId)) }));
+}
+
+function listError(error: unknown): Fail | null {
+  const code = pgCode(error);
+  if (code === "23505") return { ok: false, error: "listExists" };
+  if (code === "54000") return { ok: false, error: "tooManyLists" };
+  return null;
+}
+
+/** Starts a reading list, and puts the story in it when one is given. */
+export async function createReadingList(input: unknown): Promise<Ok<{ list: { id: string; name: string } }> | Fail> {
+  const parsed = createReadingListSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: "listName" };
+  const { name, storyId } = parsed.data;
+  return asViewer(async (viewer) => {
+    try {
+      const list = await withRls(viewer.claims, async (tx) => {
+        const [row] = await tx
+          .insert(readingLists)
+          .values({ userId: viewer.id, name })
+          .returning({ id: readingLists.id, name: readingLists.name });
+        if (storyId) await tx.insert(bookmarks).values({ userId: viewer.id, storyId, listId: row!.id }).onConflictDoNothing();
+        return row!;
+      });
+      return { ok: true as const, list };
+    } catch (error) {
+      const failed = listError(error);
+      if (failed) return failed;
+      throw error;
+    }
+  });
+}
+
+export async function renameReadingList(input: unknown): Promise<Ok | Fail> {
+  const parsed = renameReadingListSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: "listName" };
+  const { id, name } = parsed.data;
+  return asViewer(async (viewer) => {
+    try {
+      const rows = await withRls(viewer.claims, (tx) =>
+        tx.update(readingLists).set({ name }).where(eq(readingLists.id, id)).returning({ id: readingLists.id }),
+      );
+      return rows.length ? { ok: true as const } : { ok: false as const, error: "not_allowed" as const };
+    } catch (error) {
+      const failed = listError(error);
+      if (failed) return failed;
+      throw error;
+    }
+  });
+}
+
+/** Deletes a list; its stories stay in any other list they're in. */
+export async function deleteReadingList(id: string): Promise<Ok | Fail> {
+  if (!responseIdSchema.safeParse(id).success) return { ok: false, error: "invalid" };
+  return asViewer(async (viewer) => {
+    const rows = await withRls(viewer.claims, (tx) => tx.delete(readingLists).where(eq(readingLists.id, id)).returning({ id: readingLists.id }));
+    return rows.length ? { ok: true as const } : { ok: false as const, error: "not_allowed" as const };
   });
 }
 

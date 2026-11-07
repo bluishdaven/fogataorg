@@ -5,6 +5,7 @@ import { withRls } from "@/lib/db/rls";
 import {
   bookmarks,
   follows,
+  readingLists,
   notifications,
   profiles,
   responses,
@@ -181,7 +182,48 @@ export async function getFollowState(viewer: Viewer | null, target: { userId?: s
   });
 }
 
-export async function listSaved(viewer: Viewer) {
+export type ReadingListSummary = { id: string; name: string; count: number };
+
+/** The reader's named lists (oldest first) with how many live stories each holds, and the Saved count. */
+export async function listReadingLists(viewer: Viewer): Promise<{ savedCount: number; lists: ReadingListSummary[] }> {
+  return withRls(viewer.claims, async (tx) => {
+    const counts = await tx
+      .select({ listId: bookmarks.listId, value: count() })
+      .from(bookmarks)
+      .innerJoin(stories, eq(stories.id, bookmarks.storyId))
+      .where(and(eq(bookmarks.userId, viewer.id), isNull(stories.deletedAt), notRemoved))
+      .groupBy(bookmarks.listId);
+    const byList = new Map(counts.map((row) => [row.listId, row.value]));
+    const lists = await tx
+      .select({ id: readingLists.id, name: readingLists.name })
+      .from(readingLists)
+      .where(eq(readingLists.userId, viewer.id))
+      .orderBy(asc(readingLists.createdAt));
+    return {
+      savedCount: byList.get(null) ?? 0,
+      lists: lists.map((list) => ({ ...list, count: byList.get(list.id) ?? 0 })),
+    };
+  });
+}
+
+/** For the save menu on a story: every list the reader has and whether the story is in it. */
+export async function getSaveState(viewer: Viewer, storyId: string) {
+  return withRls(viewer.claims, async (tx) => {
+    const lists = await tx
+      .select({ id: readingLists.id, name: readingLists.name })
+      .from(readingLists)
+      .where(eq(readingLists.userId, viewer.id))
+      .orderBy(asc(readingLists.createdAt));
+    const rows = await tx
+      .select({ listId: bookmarks.listId })
+      .from(bookmarks)
+      .where(and(eq(bookmarks.userId, viewer.id), eq(bookmarks.storyId, storyId)));
+    return { lists, inLists: rows.map((row) => row.listId) };
+  });
+}
+
+/** Stories in one of the reader's lists (null: the default Saved list), newest first. */
+export async function listSaved(viewer: Viewer, listId: string | null = null) {
   return withRls(viewer.claims, async (tx) => {
     const rows = await tx
       .select({
@@ -205,7 +247,14 @@ export async function listSaved(viewer: Viewer) {
       .from(bookmarks)
       .innerJoin(stories, eq(stories.id, bookmarks.storyId))
       .innerJoin(profiles, eq(profiles.id, stories.authorId))
-      .where(and(eq(bookmarks.userId, viewer.id), isNull(stories.deletedAt), notRemoved))
+      .where(
+        and(
+          eq(bookmarks.userId, viewer.id),
+          listId ? eq(bookmarks.listId, listId) : isNull(bookmarks.listId),
+          isNull(stories.deletedAt),
+          notRemoved,
+        ),
+      )
       .orderBy(desc(bookmarks.createdAt))
       .limit(200);
     return rows.map((row) => ({

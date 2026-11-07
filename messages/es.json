@@ -767,7 +767,10 @@
       "not_allowed": "No puedes hacer eso aquí.",
       "empty": "Escribe algo primero.",
       "tooLong": "Las respuestas pueden tener hasta 4000 caracteres.",
-      "rateLimited": "Llegaste al límite por ahora. Espera un poco y vuelve a intentarlo. (Las cuentas nuevas tienen límites más bajos su primer día)."
+      "rateLimited": "Llegaste al límite por ahora. Espera un poco y vuelve a intentarlo. (Las cuentas nuevas tienen límites más bajos su primer día).",
+      "listName": "Los nombres de lista llevan de 1 a 60 caracteres.",
+      "listExists": "Ya tienes una lista con ese nombre.",
+      "tooManyLists": "Puedes tener hasta 50 listas."
     },
     "notifications": "Notificaciones",
     "notificationsUnread": "{count, plural, one {Notificaciones, # sin leer} other {Notificaciones, # sin leer}}",
@@ -791,7 +794,7 @@
       "circle_owner": "{actor} te entregó {circle}. Ahora lo administras tú."
     },
     "savedTitle": "Leña guardada",
-    "savedLede": "Historias que guardaste para después. Solo tú puedes ver esta lista.",
+    "savedLede": "Historias que guardaste para después. Solo tú puedes ver tus listas.",
     "savedEmpty": "Aún no guardas nada. Usa el marcador en cualquier historia para guardarla aquí.",
     "emailSettings": "Ajustes de correo",
     "share": "Compartir",
@@ -818,7 +821,22 @@
     "passageCopied": "Enlace a este pasaje copiado.",
     "quoteCardSaved": "Tarjeta guardada.",
     "quoteCardSavedLinkCopied": "Tarjeta guardada. También copiamos el enlace al pasaje.",
-    "quoteCardFailed": "No se pudo crear la tarjeta. Inténtalo de nuevo."
+    "quoteCardFailed": "No se pudo crear la tarjeta. Inténtalo de nuevo.",
+    "saveTo": "Guardar en",
+    "savedChangeLists": "Guardada. Cambiar listas",
+    "newList": "Nueva lista",
+    "newListName": "Nombre de la nueva lista",
+    "createList": "Crear",
+    "listCreatedToast": "Guardada en {name}.",
+    "done": "Listo",
+    "listsNav": "Tus listas",
+    "renameList": "Cambiar nombre",
+    "listName": "Nombre de la lista",
+    "deleteList": "Eliminar lista",
+    "deleteListConfirm": "¿Eliminar «{name}»? Sus historias siguen en las demás listas donde estén.",
+    "listEmpty": "Esta lista está vacía. Usa el marcador en cualquier historia para sumarla aquí.",
+    "listRenamedToast": "Nombre cambiado.",
+    "listDeletedToast": "Lista eliminada."
   },
   "Circles": {
     "title": "Círculos",

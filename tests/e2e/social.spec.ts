@@ -34,9 +34,11 @@ test("readers spark, save, follow and respond; writers get grouped notifications
   await reader.reload();
   await expect(reader.getByTestId("spark-total")).toContainText("3 sparks");
 
-  // Save for later.
+  // Save for later: one tap saves (and opens the lists menu).
   await reader.getByTestId("save-button").click();
-  await expect(reader.getByTestId("save-button")).toHaveAttribute("aria-pressed", "true");
+  await expect(reader.getByTestId("save-button")).toHaveAttribute("data-saved", "true");
+  await expect(reader.getByTestId("save-menu").getByRole("checkbox", { name: "Saved" })).toBeChecked();
+  await reader.keyboard.press("Escape");
 
   // Follow the writer.
   await reader.getByRole("complementary", { name: "About the writer" }).getByTestId("follow-button").click();

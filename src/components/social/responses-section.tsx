@@ -242,6 +242,14 @@ function ResponseItem({
   const format = useFormatter();
   const [editing, setEditing] = useState(false);
   const editButton = useRef<HTMLButtonElement>(null);
+  const returnFocus = useRef(false);
+  // After saving or cancelling an edit, focus goes back to the Edit button once it's rendered again.
+  useEffect(() => {
+    if (!editing && returnFocus.current) {
+      returnFocus.current = false;
+      editButton.current?.focus();
+    }
+  }, [editing]);
   const [sparked, setSparked] = useState(item.sparkedByViewer);
   const [count, setCount] = useState(item.sparks);
   const isWriter = item.author.id === storyAuthorId;
@@ -303,9 +311,9 @@ function ResponseItem({
           id={item.id}
           initialBody={item.body}
           onDone={(body) => {
+            returnFocus.current = true;
             setEditing(false);
             if (body !== null) onEdited(item.id, body);
-            setTimeout(() => editButton.current?.focus(), 0);
           }}
         />
       ) : (
