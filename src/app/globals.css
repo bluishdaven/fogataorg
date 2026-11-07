@@ -481,3 +481,10 @@ html[data-reader-font="readable"] .prose-fogata :is(h2, h3, blockquote, figcapti
     box-shadow: 0 0 0 0.4em transparent;
   }
 }
+
+/* Listen mode: the paragraph being read aloud. */
+.prose-fogata [data-listening] {
+  border-radius: var(--radius-sm);
+  background-color: var(--ember-soft);
+  box-shadow: 0 0 0 0.4em var(--ember-soft);
+}

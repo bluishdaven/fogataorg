@@ -573,6 +573,17 @@
       "system": "Sistema"
     }
   },
+  "Listen": {
+    "listen": "Escuchar",
+    "label": "Escuchar esta historia",
+    "player": "Escuchando",
+    "pause": "Pausar",
+    "resume": "Continuar",
+    "stop": "Dejar de escuchar",
+    "speed": "Velocidad",
+    "progress": "Párrafo {current} de {total}",
+    "paused": "En pausa"
+  },
   "Settings": {
     "title": "Tu perfil",
     "lede": "Así apareces en tus historias y en tu página de perfil.",

@@ -573,6 +573,17 @@
       "system": "System"
     }
   },
+  "Listen": {
+    "listen": "Listen",
+    "label": "Listen to this story",
+    "player": "Listening",
+    "pause": "Pause",
+    "resume": "Resume",
+    "stop": "Stop listening",
+    "speed": "Speed",
+    "progress": "Paragraph {current} of {total}",
+    "paused": "Paused"
+  },
   "Settings": {
     "title": "Your profile",
     "lede": "This is how you appear on your stories and your profile page.",

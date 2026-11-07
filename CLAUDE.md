@@ -84,6 +84,11 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   (`recordVersion()` updates the newest draft version until it's ten minutes old) and every publish
   adds one; a trigger keeps the newest 50. Restoring keeps the replaced text first, then writes into
   the draft (or pending changes of a live story) and reloads the editor.
+- **Listen mode** (`src/components/listen-mode.tsx`, `src/lib/domain/listen.ts`). The browser's
+  Web Speech API (free, on-device) reads the story block by block in sentence-sized pieces
+  (`speechChunks()`), in the story's language, marking the block with `data-listening` and keeping
+  it in view; pause cancels and resume restarts the sentence (steadier than `speechSynthesis.pause`).
+  Hidden where speech isn't available. The e2e test swaps in a silent fake `speechSynthesis`.
 - **Circles** (`src/lib/data/circles.ts`, `src/app/actions/circles.ts`, `src/components/circles/`).
   `circles` (accent color, optional header), `circle_members` (one owner created by trigger, editors,
   writers) and `circle_submissions` (pending → accepted/declined; one active circle per story; members'
@@ -349,8 +354,8 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
 
 - Seed stories are short essays (150–335 words); none is long enough to show the table of
   contents (the e2e test writes its own).
-- Not built yet from the spec's Writing/Reading lists: embeds, draft sharing, keyboard shortcuts
-  and listen mode (later phases).
+- Not built yet from the spec's Writing/Reading lists: embeds, draft sharing and keyboard shortcuts
+  (later phases).
 - Uploaded images skip Next's image optimizer.
 - `drizzle-kit generate --custom` can reuse a timestamp from a migration generated the same second;
   Supabase treats equal timestamps as one version, so rename the newer file (and its journal tag).

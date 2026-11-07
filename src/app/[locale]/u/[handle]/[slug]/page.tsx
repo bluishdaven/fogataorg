@@ -9,6 +9,7 @@ import { AdminModeration } from "@/components/moderation/admin-moderation";
 import { NsfwGate } from "@/components/moderation/nsfw-gate";
 import { RemovedNotice } from "@/components/moderation/removed-notice";
 import { UserBadges } from "@/components/badges/user-badges";
+import { ListenMode } from "@/components/listen-mode";
 import { ReaderControls } from "@/components/reader-controls";
 import { ReadTracker } from "@/components/read-tracker";
 import { ReadingProgress } from "@/components/reading-progress";
@@ -230,6 +231,7 @@ async function Story({ params }: Pick<Props, "params">) {
               </span>
             </p>
           </div>
+          <ListenMode lang={story.language} />
           <ReaderControls />
         </div>
       </header>
