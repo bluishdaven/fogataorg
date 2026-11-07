@@ -607,14 +607,6 @@
     "onlineHint": "Las voces en línea suelen sonar más naturales, pero tu navegador envía lo que se lee a su fabricante para pronunciarlo.",
     "deviceNote": "Estas voces vienen con tu dispositivo y leen la historia ahí mismo."
   },
-  "Resume": {
-    "label": "Seguir leyendo",
-    "resume": "Sigue donde te quedaste ({percent}%)",
-    "dismiss": "Empezar desde arriba",
-    "heading": "Sigue leyendo",
-    "progress": "{percent}% leído",
-    "by": "de {name}"
-  },
   "Settings": {
     "title": "Tu perfil",
     "lede": "Así apareces en tus historias y en tu página de perfil.",

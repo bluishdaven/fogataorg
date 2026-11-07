@@ -607,14 +607,6 @@
     "onlineHint": "Online voices often sound more natural, but your browser sends what's being read to its maker to speak it.",
     "deviceNote": "These voices come with your device and read the story right there."
   },
-  "Resume": {
-    "label": "Continue reading",
-    "resume": "Pick up where you left off ({percent}%)",
-    "dismiss": "Start from the top",
-    "heading": "Continue reading",
-    "progress": "{percent}% read",
-    "by": "by {name}"
-  },
   "Settings": {
     "title": "Your profile",
     "lede": "This is how you appear on your stories and your profile page.",

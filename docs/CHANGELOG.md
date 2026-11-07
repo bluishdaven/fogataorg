@@ -1,5 +1,11 @@
 # Changelog
 
+## Continue reading removed (2026-11-07)
+
+- No more "Pick up where you left off" on story pages or **Continue reading** on the home page, and
+  story pages no longer save where readers stop (in their account or their browser). Places saved
+  before are still stored, in the data download and the privacy policy, until they're deleted.
+
 ## Better voices in listen mode (2026-11-07)
 
 Later the same day: the **Listen** button is in the ember colors, the player shows a small fire

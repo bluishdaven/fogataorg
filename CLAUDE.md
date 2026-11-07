@@ -102,14 +102,9 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   localStorage) or the best voice on the device. Online voices (`localService: false`) are only
   used when picked, with a note that the browser sends the text to their maker; the privacy policy
   says so. Paid TTS was declined by the owner.
-- **Continue reading** (`reading_positions`, `src/lib/domain/reading-position.ts`,
-  `src/components/resume-reading.tsx`). The read beacon also carries the paragraph at the top of the
-  screen and the current progress; `/api/reads` saves it for signed-in readers when the read counts
-  (not in their own stories; RLS own-only, live
-  stories; reaching 95% counts as finished = 1), and `ReadTracker` keeps visitors' newest 50 places
-  in localStorage (`fogata:positions`). Story pages offer a fixed "Pick up where you left off" pill
-  (not on passage links or once scrolled); the home page lists up to three unfinished stories from
-  the last 30 days. In the data download and the privacy policy.
+- **Continue reading was removed** (2026-11-07, owner's call): no resume pill, no home section, and
+  the read beacon no longer sends positions. The `reading_positions` table (RLS own-only) still holds
+  places saved before; it stays in the data download and the privacy policy until it's dropped.
 - **Weekly spark** (`prompts`, `stories.prompt_id`, `/[locale]/prompts[/week]`, `/admin/prompts`).
   Admins write one prompt per week (Monday, UTC; EN + ES) ahead of time; RLS shows readers only
   sparks whose week has started, and triggers stop stories answering a future one. The home page
