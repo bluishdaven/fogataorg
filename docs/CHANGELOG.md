@@ -1,5 +1,21 @@
 # Changelog
 
+## Import, series, contents and version history (2026-11-07)
+
+**Demo**: My stories now has **Import stories** and **Series**. Upload a Medium, Substack or
+WordPress export and pick posts to bring over as drafts. Group stories into a series and readers
+see "Part 2 of 3" with the next part. In the editor, the clock button opens **Version history**.
+
+- **Import**: the export is read in the browser; each chosen post becomes a draft with its
+  pictures copied to Fogata (pictures that can't be copied stay as links), its language guessed
+  and, optionally, a canonical link to the original. Nothing is published or announced.
+- **Series**: create, rename, reorder and delete series on /me/series. Story pages show where a
+  story sits and link the neighbors; each series has a page at `/@name/series/…`; profiles list
+  them.
+- **Table of contents**: stories with three or more headings get a Contents list under the header.
+- **Version history**: one version per ten minutes of writing plus every publish (newest 50).
+  Preview any version and restore it; the replaced text stays in the history.
+
 ## Onboarding, home feeds, Burning now, embers and quote cards (2026-11-07)
 
 **Demo**: sign up with a new address and you're asked for your languages, three or more topics
