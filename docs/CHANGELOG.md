@@ -1,5 +1,25 @@
 # Changelog
 
+## Ready for launch: legal pages, your data, abuse limits, real 404s (2026-11-07)
+
+**Demo**: the footer links **Terms**, **Privacy** and **Content policy**; Settings → **Account** has
+"Download my data" and "Delete my account"; `fogata.org/@nobody_here` answers with a 404; change
+your username and your old links still open your profile and stories.
+
+- **Legal pages** in English and Spanish, written to match what Fogata actually does (contact
+  hola@fogata.org). The sign-in form links to the terms and privacy policy.
+- **Your data**: one JSON download of your profile, stories (with drafts), responses, sparks, saved
+  stories, follows and circles. Deleting your account removes your uploaded files and everything
+  tied to you, right away.
+- **Abuse limits**: hourly and daily caps on publishing, responses, new circles, join requests,
+  follows and photo searches, lower on an account's first day; sign-in links are capped per
+  address. An optional Cloudflare Turnstile check on sign-in once its keys are set.
+- **Real 404s** for missing stories and profiles (and stories that aren't public), so search
+  engines and link previews see them as gone.
+- **Old usernames redirect** to the new one, and stay reserved for their owner (the newest five).
+- **Unused uploads** (pictures dropped from stories, replaced covers, deleted stories' pictures)
+  are removed by the daily job once Supabase's secret key is set in Vercel.
+
 ## Manifesto, Fogata.org wordmark, Stories link (2026-11-06)
 
 **Demo**: the footer now links to the **Manifesto** next to Topics; the header reads "Fogata.org";
