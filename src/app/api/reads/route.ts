@@ -43,10 +43,13 @@ export async function POST(request: NextRequest) {
   const day = new Date().toISOString().slice(0, 10);
   const hash = readerHash(emailSigningSecret() ?? "fogata-local-reads", day, identity);
   const { storyId, ratio, seconds, position } = parsed.data;
-  await asAnon((tx) =>
-    tx.execute(sql`select public.record_read(${storyId}::uuid, ${hash}, ${ratio}::real, ${seconds}::integer, ${viewer?.id ?? null}::uuid)`),
+  const [read] = await asAnon((tx) =>
+    tx.execute<{ counted: boolean }>(
+      sql`select public.record_read(${storyId}::uuid, ${hash}, ${ratio}::real, ${seconds}::integer, ${viewer?.id ?? null}::uuid) as counted`,
+    ),
   );
-  if (viewer && position) {
+  // Only readers' places are kept (record_read skips writers in their own stories and stories that aren't live).
+  if (viewer && position && read?.counted) {
     await savePosition(viewer, storyId, { blockId: position.blockId, progress: storedProgress(position.progress, ratio) }).catch(() => undefined);
   }
   return noContent();

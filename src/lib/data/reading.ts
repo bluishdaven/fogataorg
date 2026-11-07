@@ -1,5 +1,5 @@
 import "server-only";
-import { and, desc, eq, gte, isNull, lt, lte, sql } from "drizzle-orm";
+import { and, desc, eq, gte, isNull, lt, lte, ne, sql } from "drizzle-orm";
 import type { Viewer } from "@/lib/auth";
 import { withRls } from "@/lib/db/rls";
 import { profiles, readingPositions, stories } from "@/lib/db/schema";
@@ -49,6 +49,7 @@ export async function listContinueReading(viewer: Viewer, limit = 3) {
       .where(
         and(
           eq(readingPositions.userId, viewer.id),
+          ne(stories.authorId, viewer.id),
           gte(readingPositions.progress, 0.05),
           lt(readingPositions.progress, 0.95),
           sql`${readingPositions.updatedAt} > now() - interval '30 days'`,
