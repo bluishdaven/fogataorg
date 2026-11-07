@@ -81,6 +81,7 @@ export type ResponseView = {
   body: string;
   createdAt: Date;
   pinned: boolean;
+  edited: boolean;
   author: { id: string; username: string; displayName: string; avatarUrl: string | null; pronouns: string; badges: BadgeData };
   sparks: number;
   sparkedByViewer: boolean;
@@ -97,6 +98,7 @@ export async function listResponses(viewer: Viewer | null, storyId: string): Pro
         body: responses.body,
         createdAt: responses.createdAt,
         pinnedAt: responses.pinnedAt,
+        editedAt: responses.editedAt,
         authorId: profiles.id,
         username: profiles.username,
         displayName: profiles.displayName,
@@ -139,6 +141,7 @@ export async function listResponses(viewer: Viewer | null, storyId: string): Pro
         body: row.body,
         createdAt: row.createdAt,
         pinned: Boolean(row.pinnedAt),
+        edited: Boolean(row.editedAt),
         author: {
           id: row.authorId,
           username: row.username,

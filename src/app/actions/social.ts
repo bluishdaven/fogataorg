@@ -10,6 +10,7 @@ import {
   blockTexts,
   bookmarkSchema,
   followSchema,
+  responseEditSchema,
   responseIdSchema,
   responseSchema,
   sparksSchema,
@@ -150,6 +151,27 @@ export async function postResponse(input: ResponseInput): Promise<Ok<{ response:
         },
       },
     };
+  });
+}
+
+/** Authors change their own response's text; it shows as edited. */
+export async function editResponse(input: unknown): Promise<Ok<{ body: string }> | Fail> {
+  const parsed = responseEditSchema.safeParse(input);
+  if (!parsed.success) {
+    const message = parsed.error.issues[0]?.message;
+    return { ok: false, error: message === "empty" || message === "tooLong" ? message : "invalid" };
+  }
+  const { id, body } = parsed.data;
+  return asViewer(async (viewer) => {
+    if (!(await allowAction(viewer, "respond"))) return { ok: false as const, error: "rateLimited" as const };
+    const rows = await withRls(viewer.claims, (tx) =>
+      tx
+        .update(responses)
+        .set({ body })
+        .where(and(eq(responses.id, id), eq(responses.authorId, viewer.id), isNull(responses.deletedAt)))
+        .returning({ id: responses.id }),
+    );
+    return rows.length ? { ok: true as const, body } : { ok: false as const, error: "not_allowed" as const };
   });
 }
 

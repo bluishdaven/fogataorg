@@ -546,6 +546,8 @@ export const responses = pgTable(
     blockId: text("block_id"),
     body: text("body").notNull(),
     pinnedAt: timestamp("pinned_at", { withTimezone: true }),
+    // Set by a trigger when the author changes the text (users can't write it).
+    editedAt: timestamp("edited_at", { withTimezone: true }),
     ...timestamps,
     deletedAt: timestamp("deleted_at", { withTimezone: true }),
   },

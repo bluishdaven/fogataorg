@@ -19,16 +19,21 @@ export const sparksSchema = z.object({
 
 export const bookmarkSchema = z.object({ storyId: z.uuid(), saved: z.boolean() });
 
+const responseBody = z
+  .string()
+  .transform((value) => value.replace(/\r\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim())
+  .pipe(z.string().min(1, { message: "empty" }).max(RESPONSE_MAX, { message: "tooLong" }));
+
 export const responseSchema = z.object({
   storyId: z.uuid(),
   parentId: z.uuid().nullable(),
   blockId: z.string().regex(BLOCK_ID).nullable(),
-  body: z
-    .string()
-    .transform((value) => value.replace(/\r\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim())
-    .pipe(z.string().min(1, { message: "empty" }).max(RESPONSE_MAX, { message: "tooLong" })),
+  body: responseBody,
 });
 export type ResponseInput = z.input<typeof responseSchema>;
+
+/** An author changing their response's text (same rules as posting). */
+export const responseEditSchema = z.object({ id: z.uuid(), body: responseBody });
 
 export const responseIdSchema = z.uuid();
 

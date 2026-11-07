@@ -1,7 +1,7 @@
 import { and, eq, notInArray } from "drizzle-orm";
 import { afterAll, describe, expect, it } from "vitest";
-import { notifications, responses, responseSparks, sparks, stories } from "@/lib/db/schema";
-import { closeDb, scenario, type Harness } from "./harness";
+import { notifications, profiles, responses, responseSparks, sparks, stories } from "@/lib/db/schema";
+import { closeDb, expectPgError, PG, scenario, type Harness } from "./harness";
 
 afterAll(closeDb);
 
@@ -84,6 +84,42 @@ describe("taking sparks back", () => {
 
       await h.as(h.claimsFor(reader), (tx) => tx.delete(responseSparks).where(eq(responseSparks.userId, reader)));
       expect(await socialNotifications(h, responder)).toHaveLength(0);
+    });
+  });
+});
+
+describe("editing responses", () => {
+  it("lets authors change their own text, stamps edited_at and tells newly mentioned people once", async () => {
+    await scenario(async (h) => {
+      const writer = await h.createUser();
+      const responder = await h.createUser();
+      const friend = await h.createUser();
+      const other = await h.createUser();
+      const story = await makeStory(h, writer);
+      const [friendProfile] = await h.tx.select({ username: profiles.username }).from(profiles).where(eq(profiles.id, friend));
+      const [response] = await h.as(h.claimsFor(responder), (tx) =>
+        tx.insert(responses).values({ storyId: story.id, authorId: responder, body: "Primera versión." }).returning(),
+      );
+      expect(response!.editedAt).toBeNull();
+
+      const edit = (body: string) =>
+        h.as(h.claimsFor(responder), (tx) => tx.update(responses).set({ body }).where(eq(responses.id, response!.id)).returning());
+      const [edited] = await edit(`Segunda versión, @${friendProfile!.username}.`);
+      expect(edited!.editedAt).not.toBeNull();
+      await edit(`Tercera versión, sigo con @${friendProfile!.username}.`);
+      const mentions = (await socialNotifications(h, friend)).filter((n) => n.type === "mention");
+      expect(mentions).toHaveLength(1);
+      expect(mentions[0]!.actorCount).toBe(1);
+
+      // Someone else can't edit it, and nobody can write edited_at themselves.
+      const changed = await h.as(h.claimsFor(other), (tx) =>
+        tx.update(responses).set({ body: "Hackeado" }).where(eq(responses.id, response!.id)).returning(),
+      );
+      expect(changed).toHaveLength(0);
+      await expectPgError(
+        h.as(h.claimsFor(responder), (tx) => tx.update(responses).set({ editedAt: null }).where(eq(responses.id, response!.id))),
+        PG.insufficientPrivilege,
+      );
     });
   });
 });

@@ -1,12 +1,13 @@
 "use client";
 
-import { Pin, Sparkles, Trash2, X } from "lucide-react";
+import { Pencil, Pin, Sparkles, Trash2, X } from "lucide-react";
 import NextLink from "next/link";
 import { useFormatter, useTranslations } from "next-intl";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import {
   deleteResponse,
+  editResponse,
   postResponse,
   setResponsePinned,
   setResponseSpark,
@@ -24,7 +25,7 @@ import { RESPOND_TO_BLOCK_EVENT, SHOW_BLOCK_EVENT } from "./paragraph-anchors";
 type Viewer = { id: string; username: string; displayName: string } | null;
 
 function fromPosted(posted: PostedResponse): ResponseView {
-  return { ...posted, createdAt: new Date(posted.createdAt), pinned: false, sparks: 0, sparkedByViewer: false, replies: [] };
+  return { ...posted, createdAt: new Date(posted.createdAt), pinned: false, edited: false, sparks: 0, sparkedByViewer: false, replies: [] };
 }
 
 function quote(text: string): string {
@@ -97,6 +98,15 @@ export function ResponsesSection({
     );
   };
 
+  const edited = (id: string, body: string) =>
+    setItems((current) =>
+      current.map((item) =>
+        item.id === id
+          ? { ...item, body, edited: true }
+          : { ...item, replies: item.replies.map((r) => (r.id === id ? { ...r, body, edited: true } : r)) },
+      ),
+    );
+
   const togglePin = async (item: ResponseView) => {
     const result = await setResponsePinned(item.id, !item.pinned);
     if (!result.ok) {
@@ -165,6 +175,7 @@ export function ResponsesSection({
               storyAuthorId={storyAuthorId}
               anchorText={item.blockId ? blockTexts[item.blockId] : undefined}
               onDelete={remove}
+              onEdited={edited}
               onTogglePin={togglePin}
               loginHref={loginHref}
             />
@@ -177,6 +188,7 @@ export function ResponsesSection({
                       viewer={viewer}
                       storyAuthorId={storyAuthorId}
                       onDelete={remove}
+                      onEdited={edited}
                       loginHref={loginHref}
                     />
                   </li>
@@ -213,6 +225,7 @@ function ResponseItem({
   storyAuthorId,
   anchorText,
   onDelete,
+  onEdited,
   onTogglePin,
   loginHref,
 }: {
@@ -221,11 +234,14 @@ function ResponseItem({
   storyAuthorId: string;
   anchorText?: string;
   onDelete: (id: string) => void;
+  onEdited: (id: string, body: string) => void;
   onTogglePin?: (item: ResponseView) => void;
   loginHref: string;
 }) {
   const t = useTranslations("Social");
   const format = useFormatter();
+  const [editing, setEditing] = useState(false);
+  const editButton = useRef<HTMLButtonElement>(null);
   const [sparked, setSparked] = useState(item.sparkedByViewer);
   const [count, setCount] = useState(item.sparks);
   const isWriter = item.author.id === storyAuthorId;
@@ -271,13 +287,30 @@ function ResponseItem({
         <time className="text-xs text-muted-foreground" dateTime={item.createdAt.toISOString()}>
           {format.dateTime(item.createdAt, { dateStyle: "medium" })}
         </time>
+        {item.edited ? (
+          <span className="text-xs text-muted-foreground" data-testid="response-edited">
+            {t("edited")}
+          </span>
+        ) : null}
       </header>
       {anchorText ? (
         <blockquote className="mt-2 border-l-2 border-ember pl-3 font-serif text-sm text-muted-foreground italic">
           “{quote(anchorText)}”
         </blockquote>
       ) : null}
-      <Body text={item.body} />
+      {editing ? (
+        <EditForm
+          id={item.id}
+          initialBody={item.body}
+          onDone={(body) => {
+            setEditing(false);
+            if (body !== null) onEdited(item.id, body);
+            setTimeout(() => editButton.current?.focus(), 0);
+          }}
+        />
+      ) : (
+        <Body text={item.body} />
+      )}
       <div className="mt-2 -ml-2 flex items-center gap-1 text-sm text-muted-foreground sm:text-xs">
         <button
           type="button"
@@ -302,6 +335,17 @@ function ResponseItem({
             {item.pinned ? t("unpin") : t("pin")}
           </button>
         ) : null}
+        {own && !editing ? (
+          <button
+            ref={editButton}
+            type="button"
+            onClick={() => setEditing(true)}
+            className="flex min-h-10 items-center gap-1 rounded-full px-3 transition-colors hover:bg-accent hover:text-foreground sm:min-h-8 sm:px-2"
+          >
+            <Pencil className="size-3.5" aria-hidden />
+            {t("edit")}
+          </button>
+        ) : null}
         {own ? (
           <button
             type="button"
@@ -314,6 +358,58 @@ function ResponseItem({
         ) : null}
       </div>
     </article>
+  );
+}
+
+/** Changing a posted response in place; `onDone(null)` means the author cancelled. */
+function EditForm({ id, initialBody, onDone }: { id: string; initialBody: string; onDone: (body: string | null) => void }) {
+  const t = useTranslations("Social");
+  const [body, setBody] = useState(initialBody);
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const submit = async (event: FormEvent) => {
+    event.preventDefault();
+    if (body.trim() === initialBody.trim()) {
+      onDone(null);
+      return;
+    }
+    setPending(true);
+    setError(null);
+    const result = await editResponse({ id, body });
+    setPending(false);
+    if (result.ok) onDone(result.body);
+    else setError(t(`errors.${result.error}`));
+  };
+
+  return (
+    <form onSubmit={submit} className="mt-2 flex flex-col gap-2" data-testid="edit-response-form">
+      <textarea
+        value={body}
+        onChange={(event) => setBody(event.target.value)}
+        aria-label={t("editLabel")}
+        maxLength={RESPONSE_MAX}
+        rows={3}
+        autoFocus
+        onKeyDown={(event) => {
+          if (event.key === "Escape") onDone(null);
+        }}
+        className="field-sizing-content min-h-20 resize-none rounded-lg border border-input bg-transparent px-3 py-2 text-[0.95rem] focus-visible:border-ring"
+      />
+      {error ? (
+        <p role="alert" className="text-sm text-destructive">
+          {error}
+        </p>
+      ) : null}
+      <div className="flex items-center justify-end gap-2">
+        <Button type="button" variant="ghost" size="sm" onClick={() => onDone(null)}>
+          {t("cancel")}
+        </Button>
+        <Button type="submit" size="sm" disabled={pending || !body.trim()}>
+          {pending ? t("saving") : t("saveEdit")}
+        </Button>
+      </div>
+    </form>
   );
 }
 

@@ -351,6 +351,20 @@
       "when": 1794070931353,
       "tag": "20261107170211_undo_sparks",
       "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1794071066677,
+      "tag": "20261107170426_response_edits",
+      "breakpoints": true
+    },
+    {
+      "idx": 51,
+      "version": "7",
+      "when": 1794071066997,
+      "tag": "20261107170427_response_edit_triggers",
+      "breakpoints": true
     }
   ]
 }
