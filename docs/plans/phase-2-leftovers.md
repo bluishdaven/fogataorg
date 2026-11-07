@@ -1,5 +1,12 @@
 # Phase 2 leftovers
 
+## Status (2026-11-07)
+
+All six shipped. Differences from the plan below: blocks are enforced by security-definer
+triggers instead of insert policies (the blocked person can't read the blocker's rows, so a policy
+subquery would never see the block), and a note on a pending submission is dropped by the decision
+trigger rather than rejected.
+
 The social features Phase 2 left for later, approved by the owner ("ok to all"). Built in this
 order, one commit each.
 

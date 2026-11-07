@@ -1,5 +1,26 @@
 # Changelog
 
+## Reading lists, undo sparks, editing responses, mute and block, circle ownership (2026-11-07)
+
+**Demo**: tap the bookmark on a story: it's saved, and a small menu lets you tick other lists or
+start one (**Saved** shows a chip per list). Sparked by mistake? The little arrow next to the count
+takes them back. Your own responses have **Edit**. On anyone's profile, **…** mutes or blocks them.
+Circle owners find **Ownership** at the bottom of the manage page, and declining a story asks for
+an optional note.
+
+- **Reading lists**: up to 50 private lists next to Saved; a story can sit in several. Rename or
+  delete a list on the Saved page. One save per reader still counts once in `story_heat()`.
+- **Undo sparks**: takes back all your sparks on a story and removes you from the writer's unread
+  spark notification.
+- **Edit responses**: shown as "edited"; people mentioned for the first time in an edit are told.
+- **Mute and block** (private, nobody is told): their activity never notifies you, their stories
+  leave your home feeds and their responses fold away. Blocking also ends follows both ways and
+  stops them following you, responding to, replying to or sparking your writing. Listed under
+  Settings → Account; in the data download and the privacy policy.
+- **Circles**: owners hand a circle to another member (who is told) or delete it after typing its
+  name; stories stay with their writers. Editors can add a note when they decline a story; the
+  writer sees it in notifications and the weekly email.
+
 ## Listen mode, continue reading, weekly spark, easy-to-read typeface (2026-11-07)
 
 **Demo**: on any story, **Listen** reads it aloud and **Aa → Easy to read** switches to a

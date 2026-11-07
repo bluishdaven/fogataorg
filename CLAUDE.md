@@ -40,7 +40,15 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   `ON CONFLICT` targets in `notify()` and `notify_badge()` must list exactly the
   `notifications_unread_group_key` expressions; change all three together), and pushed to the bell
   through Supabase Realtime. Per-reader data on story pages loads in its own `<Suspense>` so the cached
-  story text never waits for it. Pinning goes through `public.set_response_pinned()`.
+  story text never waits for it. Pinning goes through `public.set_response_pinned()`. Deleting a
+  spark or response spark calls `public.unnotify()` (removes the actor from the unread group without
+  re-dating it). Responses can be edited (`edited_at` stamped by trigger; new mentions notify).
+  **Reading lists** (`reading_lists`, `bookmarks.list_id`, null = Saved; ≤ 50 per reader): the
+  bookmark saves to Saved in one tap and opens a Popover to tick lists. **Mute/block**
+  (`user_blocks`, private): `notify()` skips muted/blocked actors, home feeds and responses hide
+  them (cached lists like topics, circles and search don't), and blocks are enforced by
+  `prevent_blocked_interaction()` triggers (follows, responses, sparks, response sparks) because a
+  policy can't read another person's blocks. Settings → Account lists them.
 - **Home feeds and onboarding** (`src/components/home-feed.tsx`, `src/lib/data/feeds.ts`,
   `src/app/[locale]/welcome/`, plan in `docs/plans/phase-3.md`). Two tabs by `?feed=` inside
   Suspense, decided by the owner: **Latest** (default; for signed-in readers only their
@@ -108,7 +116,10 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   writers) and `circle_submissions` (pending → accepted/declined; one active circle per story; members'
   submissions are auto-accepted by an AFTER INSERT trigger because RLS checks run after BEFORE
   triggers). Editors decide; `decided_by/at` are stamped by trigger. The creator is the owner: an
-  editor who also adds and removes people. Text on an accent always uses `readableTextOn()` (white
+  editor who also adds and removes people; owners can hand the circle to a member
+  (`transfer_circle()`, `circle_owner` notification) or delete it (typed-name confirmation).
+  Declines can carry `circle_submissions.decline_note`, shown under the writer's notification.
+  Text on an accent always uses `readableTextOn()` (white
   or pure black, ≥ 4.58:1). Circle pages live at `/{locale}/circles/{slug}`.
   **Private circles** (`circles.is_private`) stay listed and readable; only members can submit (the
   submissions insert policy checks it). Others ask to join (`circle_join_requests`: pending or
@@ -380,8 +391,7 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
 - Some corporate mail scanners prefetch links and can burn a magic link. If reported, switch
   `/auth/confirm` to a confirm-button page.
 - Google sign-in doesn't yet save the reader's locale on first sign-in (magic links do).
-- Phase 2 leftovers: reading lists beyond one "Saved" list, undoing sparks, editing responses, blocking and
-  muting, rate limits, deleting or transferring circles, a decline note for writers, and circle RSS.
+- Phase 2 leftovers: circle RSS. Muting doesn't filter cached lists (topics, circles, search).
 - Unsplash thumbnails in lists show without a credit line (the credit is on the story page). Check
   this is acceptable when applying for Unsplash production access.
 - A long-running `next dev` can lose track of routes after many new route folders are added (all
