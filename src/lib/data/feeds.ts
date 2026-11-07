@@ -21,6 +21,7 @@ export async function getFollowingStories(viewer: Viewer, limit = FEED_SIZE): Pr
       .where(
         and(
           inFeeds,
+          sql`not exists (select 1 from public.user_blocks b where b.blocker_id = ${viewer.id} and b.blocked_id = "stories"."author_id")`,
           sql`(
             exists (select 1 from public.follows f where f.follower_id = ${viewer.id} and f.followed_user_id = "stories"."author_id")
             or exists (

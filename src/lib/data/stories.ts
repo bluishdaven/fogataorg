@@ -28,6 +28,7 @@ export const cardColumns = {
   contentText: sql<string>`left(${stories.contentText}, 400)`,
   thumbnailUrl: stories.thumbnailUrl,
   thumbnailAlt: stories.thumbnailAlt,
+  authorId: profiles.id,
   authorUsername: profiles.username,
   authorDisplayName: profiles.displayName,
   authorAvatarUrl: profiles.avatarUrl,
@@ -47,6 +48,7 @@ type CardRow = {
   contentText: string;
   thumbnailUrl: string | null;
   thumbnailAlt: string;
+  authorId: string;
   authorUsername: string;
   authorDisplayName: string;
   authorAvatarUrl: string | null;
@@ -66,6 +68,7 @@ export function toCard(row: CardRow) {
     publishedAt: row.publishedAt,
     excerpt: excerpt(row.contentText),
     nsfw: row.moderation === "nsfw",
+    authorId: row.authorId,
     // NSFW stories never show a picture in lists.
     thumbnail:
       row.moderation !== "nsfw" && row.thumbnailUrl && isAllowedStoryImage(row.thumbnailUrl)

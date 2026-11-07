@@ -70,3 +70,7 @@ export function blockTexts(doc: { content?: { attrs?: Record<string, unknown>; c
   }
   return out;
 }
+
+/** Muting or blocking someone (null undoes either). */
+export const blockSchema = z.object({ userId: z.uuid(), kind: z.enum(["mute", "block"]).nullable() });
+export type BlockKind = "mute" | "block";

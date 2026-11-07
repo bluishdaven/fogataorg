@@ -836,7 +836,24 @@
     "deleteListConfirm": "¿Eliminar «{name}»? Sus historias siguen en las demás listas donde estén.",
     "listEmpty": "Esta lista está vacía. Usa el marcador en cualquier historia para sumarla aquí.",
     "listRenamedToast": "Nombre cambiado.",
-    "listDeletedToast": "Lista eliminada."
+    "listDeletedToast": "Lista eliminada.",
+    "hiddenResponse": "Una respuesta de alguien que silenciaste o bloqueaste.",
+    "showHiddenResponse": "Mostrarla",
+    "moreActions": "Más opciones para {name}",
+    "mute": "Silenciar",
+    "unmute": "Dejar de silenciar",
+    "block": "Bloquear",
+    "unblock": "Desbloquear",
+    "mutedToast": "Silenciaste esta cuenta. Sus historias salen de tu inicio, sus respuestas se pliegan y no te llegan avisos de su actividad. No se le avisa.",
+    "unmutedToast": "Ya no silencias esta cuenta.",
+    "blockedToast": "Bloqueaste esta cuenta. No puede seguirte ni responder a lo que escribes, y no se le avisa.",
+    "unblockedToast": "Desbloqueaste esta cuenta.",
+    "blockTitle": "¿Bloquear a {name}?",
+    "blockDescription": "No podrá seguirte, responder ni dar chispas a tus historias y respuestas, y dejarán de seguirse. Sus historias salen de tu inicio y no te llegará nada suyo. No se le avisa, y tus historias públicas siguen siendo públicas.",
+    "blockConfirm": "Bloquear",
+    "mutedBadge": "Cuenta silenciada",
+    "blockedBadge": "Cuenta bloqueada",
+    "blockFailed": "No funcionó. Vuelve a intentarlo."
   },
   "Circles": {
     "title": "Círculos",
@@ -1249,7 +1266,7 @@
           "items": [
             "Tu correo electrónico, para que entres con un enlace de un solo uso. Si eliges entrar con Google, Google nos comparte tu correo y tu nombre.",
             "Lo que decides mostrar en tu perfil: nombre de usuario, nombre, biografía corta, foto, enlaces, pronombres, tu línea de «Ahora» y tus referencias. Todo esto es público.",
-            "Lo que publicas y haces: historias, respuestas, chispas, brasas (pasajes que destacas), a quién sigues, círculos a los que perteneces y solicitudes para unirte. Las historias y respuestas publicadas son públicas; tus borradores, tus historias guardadas, tus brasas y tus notificaciones son privados.",
+            "Lo que publicas y haces: historias, respuestas, chispas, brasas (pasajes que destacas), a quién sigues, círculos a los que perteneces y solicitudes para unirte, tus listas de lectura y las cuentas que silencias o bloqueas. Las historias y respuestas publicadas son públicas; tus borradores, tus historias guardadas y listas, tus brasas, las cuentas que silencias o bloqueas y tus notificaciones son privados.",
             "Tus preferencias: idioma de la interfaz y con qué frecuencia podemos escribirte. El tema y las preferencias de lectura se quedan en tu propio navegador.",
             "Las fotos que subes. Tu navegador las redimensiona y les quita los datos de ubicación y de cámara (EXIF/GPS) antes de que nos lleguen.",
             "Conteo anónimo de lecturas: cuando lees una historia, anotamos hasta dónde llegaste y cuánto tiempo, más o menos, con un código que cambia cada día, así que tus lecturas no se pueden enlazar con el tiempo. No guardamos tu dirección IP con eso. Quienes escriben solo ven totales, nunca quién leyó.",
@@ -1392,6 +1409,9 @@
       "unauthorized": "Tu sesión terminó. Vuelve a entrar.",
       "mismatch": "Ese no es tu nombre de usuario.",
       "failed": "No se pudo borrar tu cuenta. Inténtalo de nuevo o escribe a hola@fogata.org."
-    }
+    },
+    "blockedTitle": "Cuentas silenciadas y bloqueadas",
+    "blockedBody": "Lo que hagan las cuentas que silencias o bloqueas no llega a tus avisos, tu inicio ni las respuestas de las historias. Las bloqueadas además no pueden seguirte ni responder a lo que escribes. No se le avisa a nadie. Usa el menú … del perfil de una cuenta para sumarla aquí.",
+    "blockedEmpty": "No has silenciado ni bloqueado a nadie."
   }
 }

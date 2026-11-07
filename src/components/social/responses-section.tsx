@@ -25,7 +25,7 @@ import { RESPOND_TO_BLOCK_EVENT, SHOW_BLOCK_EVENT } from "./paragraph-anchors";
 type Viewer = { id: string; username: string; displayName: string } | null;
 
 function fromPosted(posted: PostedResponse): ResponseView {
-  return { ...posted, createdAt: new Date(posted.createdAt), pinned: false, edited: false, sparks: 0, sparkedByViewer: false, replies: [] };
+  return { ...posted, createdAt: new Date(posted.createdAt), pinned: false, edited: false, hidden: false, sparks: 0, sparkedByViewer: false, replies: [] };
 }
 
 function quote(text: string): string {
@@ -240,6 +240,7 @@ function ResponseItem({
 }) {
   const t = useTranslations("Social");
   const format = useFormatter();
+  const [revealed, setRevealed] = useState(false);
   const [editing, setEditing] = useState(false);
   const editButton = useRef<HTMLButtonElement>(null);
   const returnFocus = useRef(false);
@@ -269,6 +270,21 @@ function ResponseItem({
       setCount((c) => c + (next ? -1 : 1));
     }
   };
+
+  if (item.hidden && !revealed) {
+    return (
+      <p className="flex flex-wrap items-center gap-x-2 text-sm text-muted-foreground" data-testid="hidden-response">
+        {t("hiddenResponse")}
+        <button
+          type="button"
+          onClick={() => setRevealed(true)}
+          className="flex min-h-10 items-center font-medium text-foreground underline underline-offset-4 sm:min-h-8"
+        >
+          {t("showHiddenResponse")}
+        </button>
+      </p>
+    );
+  }
 
   return (
     <article aria-label={t("responseBy", { name: item.author.displayName })} data-testid="response">

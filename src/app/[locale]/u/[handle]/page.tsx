@@ -9,8 +9,11 @@ import { JsonLd } from "@/components/json-ld";
 import { NowLine } from "@/components/profile/now-line";
 import { StoryCard } from "@/components/story-card";
 import { StoryListSkeleton } from "@/components/story-list-skeleton";
+import { BlockMenu } from "@/components/social/block-menu";
 import { FollowButton } from "@/components/social/toggle-buttons";
+import { Toaster } from "@/components/ui/sonner";
 import { getViewer } from "@/lib/auth";
+import { getBlockState } from "@/lib/data/blocks";
 import { getFollowState } from "@/lib/data/social";
 import { badgeData } from "@/lib/domain/badges";
 import { listProfileSeries } from "@/lib/data/series";
@@ -183,7 +186,7 @@ async function Profile({ params }: Pick<Props, "params">) {
           </section>
         ) : null}
         <Suspense fallback={<div className="h-11 w-48 animate-pulse rounded-full bg-muted sm:h-9" aria-hidden />}>
-          <ProfileFollow userId={profile.id} username={profile.username} />
+          <ProfileFollow userId={profile.id} username={profile.username} name={name} />
         </Suspense>
       </header>
       <ProfileSeries handle={profile.username} />
@@ -222,23 +225,40 @@ async function ProfileSeries({ handle }: { handle: string }) {
   );
 }
 
-async function ProfileFollow({ userId, username }: { userId: string; username: string }) {
+async function ProfileFollow({ userId, username, name }: { userId: string; username: string; name: string }) {
   const viewer = await getViewer();
-  const [state, t, locale] = await Promise.all([getFollowState(viewer, { userId }), getTranslations("Social"), getLocale()]);
+  const own = viewer?.id === userId;
+  const [state, t, locale, blocked] = await Promise.all([
+    getFollowState(viewer, { userId }),
+    getTranslations("Social"),
+    getLocale(),
+    viewer && !own ? getBlockState(viewer, userId) : null,
+  ]);
   return (
-    <div className="mt-2 flex flex-wrap items-center gap-4">
+    <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2">
       <p className="text-sm text-muted-foreground" data-testid="follower-count">
         {t("followers", { count: state.followers })}
         {state.following !== null ? ` · ${t("followingCount", { count: state.following })}` : ""}
       </p>
-      {viewer?.id === userId ? null : (
-        <FollowButton
-          target="user"
-          id={userId}
-          initialFollowing={state.isFollowing}
-          signedIn={state.signedIn}
-          loginHref={`/${locale}/login?next=${encodeURIComponent(`/@${username}`)}`}
-        />
+      {own ? null : (
+        <span className="flex items-center gap-2">
+          {blocked ? (
+            <span className="rounded-full border border-border px-3 py-1 text-sm text-muted-foreground" data-testid="block-state">
+              {blocked === "block" ? t("blockedBadge") : t("mutedBadge")}
+            </span>
+          ) : null}
+          {blocked === "block" ? null : (
+            <FollowButton
+              target="user"
+              id={userId}
+              initialFollowing={state.isFollowing}
+              signedIn={state.signedIn}
+              loginHref={`/${locale}/login?next=${encodeURIComponent(`/@${username}`)}`}
+            />
+          )}
+          {viewer ? <BlockMenu userId={userId} name={name} initialKind={blocked} /> : null}
+          <Toaster position="bottom-center" />
+        </span>
       )}
     </div>
   );

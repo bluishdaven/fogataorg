@@ -3,6 +3,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { StoryCard } from "@/components/story-card";
 import { Link } from "@/i18n/navigation";
 import { getViewer } from "@/lib/auth";
+import { hiddenPeople } from "@/lib/data/blocks";
 import { getFollowingStories, getReaderSettings } from "@/lib/data/feeds";
 import { listContinueReading } from "@/lib/data/reading";
 import { getLatestStories } from "@/lib/data/stories";
@@ -19,17 +20,21 @@ import { cn } from "@/lib/utils";
 export async function HomeFeed({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const [params, viewer, locale, t] = await Promise.all([searchParams, getViewer(), getLocale(), getTranslations("Home")]);
   const feed = parseFeed(params.feed);
-  const [settings, unfinished, r] = await Promise.all([
+  const [settings, unfinished, r, hidden] = await Promise.all([
     viewer ? getReaderSettings(viewer) : null,
     viewer ? listContinueReading(viewer) : [],
     getTranslations("Resume"),
+    hiddenPeople(viewer),
   ]);
   const stories =
     feed === "following"
       ? viewer
         ? await getFollowingStories(viewer)
         : null
-      : await getLatestStories(20, settings && settings.readingLanguages.length < 2 ? settings.readingLanguages : undefined);
+      : // Latest is cached for everyone: leave out the reader's muted and blocked writers here.
+        (await getLatestStories(20, settings && settings.readingLanguages.length < 2 ? settings.readingLanguages : undefined)).filter(
+          (story) => !hidden.has(story.authorId),
+        );
 
   return (
     <>

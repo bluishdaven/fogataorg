@@ -836,7 +836,24 @@
     "deleteListConfirm": "Delete “{name}”? Its stories stay in any other list they're in.",
     "listEmpty": "This list is empty. Use the bookmark on any story to add it here.",
     "listRenamedToast": "List renamed.",
-    "listDeletedToast": "List deleted."
+    "listDeletedToast": "List deleted.",
+    "hiddenResponse": "A response from someone you muted or blocked.",
+    "showHiddenResponse": "Show it",
+    "moreActions": "More options for {name}",
+    "mute": "Mute",
+    "unmute": "Unmute",
+    "block": "Block",
+    "unblock": "Unblock",
+    "mutedToast": "Muted. Their stories leave your home page, their responses fold away and you won't be notified about them. They aren't told.",
+    "unmutedToast": "Unmuted.",
+    "blockedToast": "Blocked. They can't follow you or respond to your writing, and they aren't told.",
+    "unblockedToast": "Unblocked.",
+    "blockTitle": "Block {name}?",
+    "blockDescription": "They won't be able to follow you, respond to or spark your stories and responses, and you'll stop following each other. Their stories leave your home page and you won't hear from them. They aren't told, and your public stories stay public.",
+    "blockConfirm": "Block",
+    "mutedBadge": "Muted",
+    "blockedBadge": "Blocked",
+    "blockFailed": "That didn't work. Try again."
   },
   "Circles": {
     "title": "Circles",
@@ -1249,7 +1266,7 @@
           "items": [
             "Your email address, to sign you in with a one-time link. If you choose Google sign-in, Google shares your email address and name with us.",
             "What you choose to show on your profile: username, name, short bio, photo, links, pronouns, your \"Now\" line and your influences. All of it is public.",
-            "What you publish and do: stories, responses, sparks, embers (passages you highlight), follows, circle memberships and requests to join. Published stories and responses are public; drafts, your saved stories, your embers and your notifications are private.",
+            "What you publish and do: stories, responses, sparks, embers (passages you highlight), follows, circle memberships and requests to join, reading lists, and the people you mute or block. Published stories and responses are public; drafts, your saved stories and reading lists, your embers, the people you mute or block and your notifications are private.",
             "Your preferences: interface language and how often we may email you. Theme and reading preferences stay in your own browser.",
             "Photos you upload. Your browser resizes them and removes location and camera data (EXIF/GPS) before they reach us.",
             "Anonymous reading counts: when you read a story, we note how far you got and roughly for how long, under a code that changes every day, so your reads can't be linked over time. We don't store your IP address with it. Writers only ever see totals, never who read.",
@@ -1392,6 +1409,9 @@
       "unauthorized": "Your session ended. Sign in again.",
       "mismatch": "That isn't your username.",
       "failed": "Your account couldn't be deleted. Try again, or write to hola@fogata.org."
-    }
+    },
+    "blockedTitle": "Muted and blocked",
+    "blockedBody": "People you mute or block can't reach your notifications, home page or story responses. Blocked people also can't follow you or respond to your writing. Nobody is told. Use the … menu on someone's profile to add them here.",
+    "blockedEmpty": "You haven't muted or blocked anyone."
   }
 }

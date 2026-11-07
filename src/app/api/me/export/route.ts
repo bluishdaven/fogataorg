@@ -16,6 +16,7 @@ import {
   stories,
   storyTopics,
   topics,
+  userBlocks,
 } from "@/lib/db/schema";
 import { profilePath, storyPath } from "@/lib/domain/handle-routes";
 import { publicEnv } from "@/lib/env";
@@ -72,6 +73,11 @@ export async function GET() {
       .innerJoin(stories, eq(stories.id, sparks.storyId))
       .innerJoin(profiles, eq(profiles.id, stories.authorId))
       .where(eq(sparks.userId, viewer.id));
+    const blocks = await tx
+      .select({ kind: userBlocks.kind, since: userBlocks.createdAt, username: profiles.username })
+      .from(userBlocks)
+      .innerJoin(profiles, eq(profiles.id, userBlocks.blockedId))
+      .where(eq(userBlocks.blockerId, viewer.id));
     // listName null is the default Saved list.
     const saved = await tx
       .select({ savedAt: bookmarks.createdAt, listName: readingLists.name, ...ref })
@@ -154,6 +160,8 @@ export async function GET() {
         circles: followRows.flatMap((f) => (f.circle ? [f.circle] : [])),
       },
       circles: memberships,
+      muted: blocks.filter((b) => b.kind === "mute").map((b) => ({ username: b.username, since: b.since })),
+      blocked: blocks.filter((b) => b.kind === "block").map((b) => ({ username: b.username, since: b.since })),
     };
   });
 

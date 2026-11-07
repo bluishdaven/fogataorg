@@ -13,6 +13,7 @@ import {
   sparks,
   stories,
   topics,
+  userBlocks,
 } from "@/lib/db/schema";
 import { badgeData, type BadgeData } from "@/lib/domain/badges";
 import { excerpt } from "@/lib/domain/content";
@@ -83,6 +84,8 @@ export type ResponseView = {
   createdAt: Date;
   pinned: boolean;
   edited: boolean;
+  /** Written by someone the reader muted or blocked: shown collapsed. */
+  hidden: boolean;
   author: { id: string; username: string; displayName: string; avatarUrl: string | null; pronouns: string; badges: BadgeData };
   sparks: number;
   sparkedByViewer: boolean;
@@ -116,6 +119,11 @@ export async function listResponses(viewer: Viewer | null, storyId: string): Pro
     if (!rows.length) return [];
 
     const ids = rows.map((r) => r.id);
+    const hidden = viewer
+      ? new Set(
+          (await tx.select({ id: userBlocks.blockedId }).from(userBlocks).where(eq(userBlocks.blockerId, viewer.id))).map((r) => r.id),
+        )
+      : new Set<string>();
     const sparkCounts = await tx
       .select({ responseId: responseSparks.responseId, value: count() })
       .from(responseSparks)
@@ -143,6 +151,7 @@ export async function listResponses(viewer: Viewer | null, storyId: string): Pro
         createdAt: row.createdAt,
         pinned: Boolean(row.pinnedAt),
         edited: Boolean(row.editedAt),
+        hidden: hidden.has(row.authorId),
         author: {
           id: row.authorId,
           username: row.username,

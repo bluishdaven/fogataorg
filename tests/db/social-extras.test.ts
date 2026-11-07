@@ -1,6 +1,6 @@
 import { and, eq, isNull, notInArray, sql } from "drizzle-orm";
 import { afterAll, describe, expect, it } from "vitest";
-import { bookmarks, notifications, profiles, readingLists, responses, responseSparks, sparks, stories } from "@/lib/db/schema";
+import { bookmarks, follows, notifications, profiles, readingLists, responses, responseSparks, sparks, stories, userBlocks } from "@/lib/db/schema";
 import { closeDb, expectPgError, PG, scenario, type Harness } from "./harness";
 
 afterAll(closeDb);
@@ -181,6 +181,73 @@ describe("reading lists", () => {
         h.as(h.claimsFor(reader), (tx) => tx.insert(readingLists).values({ userId: reader, name: "Una más" })),
         "54000",
       );
+    });
+  });
+});
+
+describe("muting and blocking", () => {
+  it("are private, never yourself, and keep a muted person's activity out of your notifications", async () => {
+    await scenario(async (h) => {
+      const writer = await h.createUser();
+      const pest = await h.createUser();
+      const story = await makeStory(h, writer);
+      await h.as(h.claimsFor(writer), (tx) => tx.insert(userBlocks).values({ blockerId: writer, blockedId: pest, kind: "mute" }));
+      await expectPgError(
+        h.savepoint(() => h.as(h.claimsFor(writer), (tx) => tx.insert(userBlocks).values({ blockerId: writer, blockedId: writer, kind: "mute" }))),
+        PG.checkViolation,
+      );
+      await expectPgError(
+        h.savepoint(() => h.as(h.claimsFor(pest), (tx) => tx.insert(userBlocks).values({ blockerId: writer, blockedId: pest, kind: "block" }))),
+        PG.insufficientPrivilege,
+      );
+      // The muted person can't see that they're muted.
+      expect(await h.as(h.claimsFor(pest), (tx) => tx.select().from(userBlocks))).toHaveLength(0);
+
+      // Muted: they can still spark and respond, but the writer hears nothing.
+      await h.as(h.claimsFor(pest), (tx) => tx.insert(sparks).values({ userId: pest, storyId: story.id, count: 5 }));
+      await h.as(h.claimsFor(pest), (tx) => tx.insert(responses).values({ storyId: story.id, authorId: pest, body: "Hola, hola." }));
+      await h.as(h.claimsFor(pest), (tx) => tx.insert(follows).values({ followerId: pest, followedUserId: writer }));
+      expect(await socialNotifications(h, writer)).toHaveLength(0);
+    });
+  });
+
+  it("stops blocked people following, responding, replying and sparking, and ends follows both ways", async () => {
+    await scenario(async (h) => {
+      const writer = await h.createUser();
+      const pest = await h.createUser();
+      const friend = await h.createUser();
+      const story = await makeStory(h, writer);
+      const [writerResponse] = await h.as(h.claimsFor(writer), (tx) =>
+        tx.insert(responses).values({ storyId: (story).id, authorId: writer, body: "Gracias por leer." }).returning(),
+      );
+      const otherStory = await makeStory(h, friend);
+      const [ownResponse] = await h.as(h.claimsFor(writer), (tx) =>
+        tx.insert(responses).values({ storyId: otherStory.id, authorId: writer, body: "Me encantó." }).returning(),
+      );
+      await h.as(h.claimsFor(pest), (tx) => tx.insert(follows).values({ followerId: pest, followedUserId: writer }));
+      await h.as(h.claimsFor(writer), (tx) => tx.insert(follows).values({ followerId: writer, followedUserId: pest }));
+
+      await h.as(h.claimsFor(writer), (tx) => tx.insert(userBlocks).values({ blockerId: writer, blockedId: pest, kind: "block" }));
+      const remaining = await h.tx.select().from(follows).where(eq(follows.followedUserId, writer));
+      expect(remaining.filter((f) => f.followerId === pest)).toHaveLength(0);
+      expect(await h.tx.select().from(follows).where(eq(follows.followedUserId, pest))).toHaveLength(0);
+
+      const asPest = <T>(fn: Parameters<typeof h.as<T>>[1]) => h.savepoint(() => h.as(h.claimsFor(pest), fn));
+      await expectPgError(asPest((tx) => tx.insert(follows).values({ followerId: pest, followedUserId: writer })), PG.insufficientPrivilege);
+      await expectPgError(asPest((tx) => tx.insert(responses).values({ storyId: story.id, authorId: pest, body: "Oye." })), PG.insufficientPrivilege);
+      await expectPgError(
+        asPest((tx) => tx.insert(responses).values({ storyId: otherStory.id, authorId: pest, parentId: ownResponse!.id, body: "Oye." })),
+        PG.insufficientPrivilege,
+      );
+      await expectPgError(asPest((tx) => tx.insert(sparks).values({ userId: pest, storyId: story.id, count: 1 })), PG.insufficientPrivilege);
+      await expectPgError(asPest((tx) => tx.insert(responseSparks).values({ userId: pest, responseId: writerResponse!.id })), PG.insufficientPrivilege);
+
+      // Others' stories are fine, and the writer can still act on the pest's work.
+      await h.as(h.claimsFor(pest), (tx) => tx.insert(responses).values({ storyId: otherStory.id, authorId: pest, body: "Bonito." }));
+
+      // Unblocking lets them back in.
+      await h.as(h.claimsFor(writer), (tx) => tx.delete(userBlocks).where(eq(userBlocks.blockerId, writer)));
+      await h.as(h.claimsFor(pest), (tx) => tx.insert(sparks).values({ userId: pest, storyId: story.id, count: 1 }));
     });
   });
 });

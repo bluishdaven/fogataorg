@@ -1,5 +1,22 @@
-import { expect, test } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
+import { expect, test, type Page } from "@playwright/test";
+import { deleteFromMyStories, publishStory } from "./helpers";
 import { signInWithMagicLink } from "./sign-in";
+
+async function usernameOf(page: Page): Promise<string> {
+  await page.getByTestId("account-menu").click();
+  const handle = (await page.getByText(/^@e2e[a-z0-9_]+$/).textContent())!.slice(1);
+  await page.keyboard.press("Escape");
+  return handle;
+}
+
+async function axeSerious(page: Page) {
+  const results = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+    .exclude("[data-sonner-toaster]")
+    .analyze();
+  return results.violations.filter((v) => v.impact === "serious" || v.impact === "critical").map((v) => v.id);
+}
 
 const STORY = "/@danawrites/the-heron-knows-something-i-dont";
 
@@ -103,4 +120,62 @@ test("readers keep stories in reading lists, then rename and delete a list", asy
   // Back on the story, nothing holds it any more.
   await page.goto(STORY);
   await expect(page.getByTestId("save-button")).toHaveAttribute("data-saved", "false");
+});
+
+test("writers mute and block people: responses fold away, blocked people can't respond", async ({ browser }) => {
+  test.setTimeout(150_000);
+  const writerContext = await browser.newContext();
+  const pestContext = await browser.newContext();
+  const writer = await writerContext.newPage();
+  const pest = await pestContext.newPage();
+
+  await signInWithMagicLink(writer, "en");
+  const title = `Quiet please ${Date.now()}`;
+  const storyUrl = await publishStory(writer, title);
+  await signInWithMagicLink(pest, "en");
+  const pestHandle = await usernameOf(pest);
+  await pest.goto(storyUrl);
+  await pest.getByLabel("Your response").fill("First! Read my stuff.");
+  await pest.getByRole("button", { name: "Respond", exact: true }).click();
+  await expect(pest.getByTestId("response").filter({ hasText: "First! Read my stuff." })).toBeVisible();
+
+  // Mute from the profile menu.
+  await writer.goto(`/@${pestHandle}`);
+  await writer.getByTestId("block-menu").click();
+  await writer.getByRole("menuitem", { name: "Mute" }).click();
+  await expect(writer.getByTestId("block-state")).toHaveText("Muted");
+  expect(await axeSerious(writer)).toEqual([]);
+
+  // Their response is folded away on the writer's story, and can be shown.
+  await writer.goto(storyUrl);
+  const folded = writer.getByTestId("hidden-response");
+  await expect(folded).toHaveText(/A response from someone you muted or blocked\./);
+  await folded.getByRole("button", { name: "Show it" }).click();
+  await expect(writer.getByTestId("response").filter({ hasText: "First! Read my stuff." })).toBeVisible();
+
+  // Block: confirm first; then they can't respond or follow.
+  await writer.goto(`/@${pestHandle}`);
+  await writer.getByTestId("block-menu").click();
+  await writer.getByRole("menuitem", { name: "Block" }).click();
+  await expect(writer.getByRole("dialog")).toContainText("They aren't told");
+  await writer.getByTestId("confirm-block").click();
+  await expect(writer.getByTestId("block-state")).toHaveText("Blocked");
+  await expect(writer.getByTestId("follow-button")).toHaveCount(0);
+
+  await pest.reload();
+  await pest.getByLabel("Your response").fill("Hello again?");
+  await pest.getByRole("button", { name: "Respond", exact: true }).click();
+  await expect(pest.getByTestId("response-form").getByRole("alert")).toBeVisible();
+  await expect(pest.getByTestId("response").filter({ hasText: "Hello again?" })).toHaveCount(0);
+
+  // Settings lists them, with a way back.
+  await writer.goto("/en/settings/account");
+  const row = writer.getByTestId("blocked-people").getByRole("listitem").filter({ hasText: `@${pestHandle}` });
+  await expect(row).toContainText("Blocked");
+  await row.getByRole("button", { name: "Unblock" }).click();
+  await expect(writer.getByText("You haven't muted or blocked anyone.")).toBeVisible();
+
+  await deleteFromMyStories(writer, title);
+  await writerContext.close();
+  await pestContext.close();
 });

@@ -4,10 +4,11 @@ import { and, eq, isNull, sql } from "drizzle-orm";
 import { allowAction } from "@/lib/limits";
 import { getViewer } from "@/lib/auth";
 import { withRls } from "@/lib/db/rls";
-import { bookmarks, follows, notifications, readingLists, responses, responseSparks, sparks, stories } from "@/lib/db/schema";
+import { bookmarks, follows, notifications, readingLists, responses, responseSparks, sparks, stories, userBlocks } from "@/lib/db/schema";
 import { getSaveState } from "@/lib/data/social";
 import type { TiptapDoc } from "@/lib/domain/content";
 import {
+  blockSchema,
   blockTexts,
   bookmarkSchema,
   createReadingListSchema,
@@ -311,5 +312,26 @@ export async function getUnreadNotificationCount(): Promise<number> {
       .where(and(eq(notifications.userId, viewer.id), isNull(notifications.readAt)))
       .limit(100);
     return rows.length;
+  });
+}
+
+/** Mutes or blocks someone, or undoes it (kind null). Private: they aren't told. */
+export async function setBlock(input: unknown): Promise<Ok<{ kind: "mute" | "block" | null }> | Fail> {
+  const parsed = blockSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: "invalid" };
+  const { userId, kind } = parsed.data;
+  return asViewer(async (viewer) => {
+    if (userId === viewer.id) return { ok: false as const, error: "invalid" as const };
+    await withRls(viewer.claims, async (tx) => {
+      if (kind) {
+        await tx
+          .insert(userBlocks)
+          .values({ blockerId: viewer.id, blockedId: userId, kind })
+          .onConflictDoUpdate({ target: [userBlocks.blockerId, userBlocks.blockedId], set: { kind } });
+      } else {
+        await tx.delete(userBlocks).where(and(eq(userBlocks.blockerId, viewer.id), eq(userBlocks.blockedId, userId)));
+      }
+    });
+    return { ok: true as const, kind };
   });
 }

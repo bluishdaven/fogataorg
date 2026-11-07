@@ -6,6 +6,8 @@ import { SettingsNav } from "@/components/settings-nav";
 import { buttonVariants } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { getViewer } from "@/lib/auth";
+import { listBlocked } from "@/lib/data/blocks";
+import { BlockedPeople } from "./blocked-people";
 import { DeleteAccountForm } from "./delete-account-form";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -31,7 +33,7 @@ async function Sections() {
   const viewer = await getViewer();
   const locale = await getLocale();
   if (!viewer) redirect(`/${locale}/login?next=${encodeURIComponent(`/${locale}/settings/account`)}`);
-  const t = await getTranslations("Account");
+  const [t, blocked] = await Promise.all([getTranslations("Account"), listBlocked(viewer)]);
   return (
     <div className="flex flex-col gap-10">
       <section aria-labelledby="feed-heading" className="flex flex-col gap-3">
@@ -48,6 +50,13 @@ async function Sections() {
             {t("feedButton")}
           </Link>
         </div>
+      </section>
+      <section aria-labelledby="blocked-heading" className="flex flex-col gap-3">
+        <h2 id="blocked-heading" className="font-serif text-2xl font-semibold">
+          {t("blockedTitle")}
+        </h2>
+        <p className="text-sm text-pretty">{t("blockedBody")}</p>
+        <BlockedPeople people={blocked} />
       </section>
       <section aria-labelledby="export-heading" className="flex flex-col gap-3">
         <h2 id="export-heading" className="font-serif text-2xl font-semibold">

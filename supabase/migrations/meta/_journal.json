@@ -407,6 +407,20 @@
       "when": 1794071765967,
       "tag": "20261107171605_reading_lists_grants",
       "breakpoints": true
+    },
+    {
+      "idx": 58,
+      "version": "7",
+      "when": 1794072123554,
+      "tag": "20261107172203_user_blocks",
+      "breakpoints": true
+    },
+    {
+      "idx": 59,
+      "version": "7",
+      "when": 1794072124917,
+      "tag": "20261107172204_user_blocks_enforcement",
+      "breakpoints": true
     }
   ]
 }

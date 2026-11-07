@@ -413,6 +413,42 @@ export const sparks = pgTable(
 );
 
 /** Private reading list ("Saved" / "Leña guardada"). */
+export const blockKind = pgEnum("block_kind", ["mute", "block"]);
+
+/**
+ * Muting and blocking, private to the person who did it. Both keep the other person's activity
+ * out of your notifications, home feeds and story responses; blocking also stops them following
+ * you, responding to or sparking your writing (triggers), and removes follows both ways.
+ */
+export const userBlocks = pgTable(
+  "user_blocks",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    blockerId: uuid("blocker_id")
+      .notNull()
+      .references(() => profiles.id, { onDelete: "cascade" }),
+    blockedId: uuid("blocked_id")
+      .notNull()
+      .references(() => profiles.id, { onDelete: "cascade" }),
+    kind: blockKind("kind").notNull(),
+    ...timestamps,
+  },
+  (t) => [
+    uniqueIndex("user_blocks_pair_key").on(t.blockerId, t.blockedId),
+    index("user_blocks_blocked_idx").on(t.blockedId),
+    check("user_blocks_not_self", sql`${t.blockerId} <> ${t.blockedId}`),
+    pgPolicy("user_blocks_select_own", { for: "select", to: authenticatedRole, using: sql`${t.blockerId} = ${authUid}` }),
+    pgPolicy("user_blocks_insert_own", { for: "insert", to: authenticatedRole, withCheck: sql`${t.blockerId} = ${authUid}` }),
+    pgPolicy("user_blocks_update_own", {
+      for: "update",
+      to: authenticatedRole,
+      using: sql`${t.blockerId} = ${authUid}`,
+      withCheck: sql`${t.blockerId} = ${authUid}`,
+    }),
+    pgPolicy("user_blocks_delete_own", { for: "delete", to: authenticatedRole, using: sql`${t.blockerId} = ${authUid}` }),
+  ],
+);
+
 /** A reader's own named reading lists, next to the default "Saved" list. Private. */
 export const readingLists = pgTable(
   "reading_lists",
