@@ -9,7 +9,6 @@ import {
   highlights,
   profiles,
   readingLists,
-  readingPositions,
   responses,
   series,
   sparks,
@@ -94,12 +93,6 @@ export async function GET() {
       .select({ seriesId: stories.seriesId, position: stories.seriesPosition, title: stories.title })
       .from(stories)
       .where(and(eq(stories.authorId, viewer.id), isNull(stories.deletedAt)));
-    const places = await tx
-      .select({ progress: readingPositions.progress, updatedAt: readingPositions.updatedAt, ...ref })
-      .from(readingPositions)
-      .innerJoin(stories, eq(stories.id, readingPositions.storyId))
-      .innerJoin(profiles, eq(profiles.id, stories.authorId))
-      .where(eq(readingPositions.userId, viewer.id));
     const embers = await tx
       .select({ quote: highlights.quote, keptAt: highlights.createdAt, ...ref })
       .from(highlights)
@@ -153,7 +146,6 @@ export async function GET() {
       })),
       embers: embers.map((e) => ({ quote: e.quote, keptAt: e.keptAt, story: { title: e.title, url: link(e.author, e.slug) } })),
       readingLanguages: profile?.readingLanguages ?? null,
-      readingPlaces: places.map((p) => ({ progress: p.progress, updatedAt: p.updatedAt, story: { title: p.title, url: link(p.author, p.slug) } })),
       following: {
         writers: followRows.flatMap((f) => (f.user ? [f.user] : [])),
         topics: followRows.flatMap((f) => (f.topic ? [f.topic] : [])),

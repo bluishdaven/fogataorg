@@ -421,6 +421,13 @@
       "when": 1794072124917,
       "tag": "20261107172204_user_blocks_enforcement",
       "breakpoints": true
+    },
+    {
+      "idx": 60,
+      "version": "7",
+      "when": 1794092315045,
+      "tag": "20261107225835_drop_reading_positions",
+      "breakpoints": true
     }
   ]
 }

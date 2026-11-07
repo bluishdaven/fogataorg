@@ -3,8 +3,9 @@
 ## Continue reading removed (2026-11-07)
 
 - No more "Pick up where you left off" on story pages or **Continue reading** on the home page, and
-  story pages no longer save where readers stop (in their account or their browser). Places saved
-  before are still stored, in the data download and the privacy policy, until they're deleted.
+  story pages no longer save where readers stop (in their account or their browser).
+- The places saved before were deleted (the `reading_positions` table is dropped), and they're gone
+  from the data download and the privacy policy.
 
 ## Better voices in listen mode (2026-11-07)
 
