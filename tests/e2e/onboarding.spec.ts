@@ -39,11 +39,10 @@ test("new readers pick their languages, topics and writers, then land on their f
   expect(await seriousViolations(page)).toEqual([]);
   await page.getByTestId("onboarding-done").click();
 
-  // Home, on For you; Following has the topics they picked.
-  await expect(page).toHaveURL(/\/en$/);
-  await expect(page.getByTestId("feed-tabs").getByRole("link", { name: "For you" })).toHaveAttribute("aria-current", "page");
+  // Home, on Following, with the topics they picked.
+  await expect(page).toHaveURL(/\/en\?feed=following$/);
+  await expect(page.getByTestId("feed-tabs").getByRole("link", { name: "Following" })).toHaveAttribute("aria-current", "page");
   await expect(page.getByTestId("onboarding-nudge")).toHaveCount(0);
-  await page.getByTestId("feed-tabs").getByRole("link", { name: "Following" }).click();
   await expect(page.getByTestId("story-list")).toHaveAttribute("data-feed", "following");
   await expect(page.getByTestId("story-list").getByRole("link", { name: "The heron knows something I don't" })).toBeVisible();
 
@@ -54,18 +53,35 @@ test("new readers pick their languages, topics and writers, then land on their f
   await expect(page.getByRole("group", { name: "I read stories in" }).getByRole("checkbox", { name: "English" })).toBeChecked();
 });
 
-test("visitors get Latest and Burning now, in their language", async ({ page }) => {
+test("the home page has Latest and Following; visitors are asked to sign in for Following", async ({ page }) => {
   await page.goto("/en");
   const tabs = page.getByTestId("feed-tabs").getByRole("link");
-  await expect(tabs).toHaveText(["Latest", "Burning now"]);
+  await expect(tabs).toHaveText(["Latest", "Following"]);
   await expect(tabs.first()).toHaveAttribute("aria-current", "page");
+  await expect(page.getByTestId("story-list")).toHaveAttribute("data-feed", "latest");
   await tabs.nth(1).click();
-  await expect(page).toHaveURL(/\/en\?feed=burning$/);
-  await expect(page.getByTestId("story-list")).toHaveAttribute("data-feed", "burning");
+  await expect(page).toHaveURL(/\/en\?feed=following$/);
+  await expect(page.getByTestId("feed-empty")).toContainText("Sign in to see new stories");
+  // Retired tabs fall back to Latest.
+  await page.goto("/en?feed=burning");
+  await expect(page.getByTestId("story-list")).toHaveAttribute("data-feed", "latest");
 
   await page.goto("/es");
-  await expect(page.getByTestId("feed-tabs").getByRole("link")).toHaveText(["Recientes", "Lo que arde"]);
+  await expect(page.getByTestId("feed-tabs").getByRole("link")).toHaveText(["Recientes", "Siguiendo"]);
   expect(await seriousViolations(page)).toEqual([]);
+});
+
+test("signed-in readers see Latest in the languages they read", async ({ page }) => {
+  test.setTimeout(90_000);
+  await signInWithMagicLink(page, "en", undefined, { onboarding: "keep" });
+  await page.getByRole("group", { name: "I read stories in" }).getByText("English").click();
+  await page.getByTestId("onboarding-continue").click();
+  await expect(page).toHaveURL(/step=topics/);
+  await page.getByTestId("onboarding-skip").click();
+  await page.goto("/en");
+  const languages = page.getByTestId("story-list").getByRole("article").getByText(/^(EN|ES)$/);
+  await expect(languages.first()).toBeVisible();
+  expect(new Set(await languages.allTextContents())).toEqual(new Set(["ES"]));
 });
 
 test("reading past half a story counts as a read, without cookies", async ({ page }) => {

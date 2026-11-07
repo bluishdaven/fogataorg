@@ -1,30 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { feedQuery, feedsFor, fillFeed, parseFeed } from "@/lib/domain/feeds";
+import { FEEDS, feedQuery, parseFeed } from "@/lib/domain/feeds";
 import { languagesSchema, parseStep, swapLocale, topicsSchema, welcomePath } from "@/lib/domain/onboarding";
 import { looksAutomated, readerHash } from "@/lib/domain/reads";
 
 describe("home feeds", () => {
-  it("offer Latest and Burning now to visitors, all four to readers", () => {
-    expect(feedsFor(false)).toEqual(["latest", "burning"]);
-    expect(feedsFor(true)).toEqual(["for-you", "following", "burning", "latest"]);
-  });
-
-  it("fall back to the first available tab", () => {
-    expect(parseFeed(undefined, true)).toBe("for-you");
-    expect(parseFeed("following", false)).toBe("latest");
-    expect(parseFeed("burning", false)).toBe("burning");
-    expect(parseFeed(["burning"], true)).toBe("for-you");
-  });
-
-  it("keep the default tab on the plain home URL", () => {
-    expect(feedQuery("for-you", true)).toEqual({});
-    expect(feedQuery("latest", false)).toEqual({});
-    expect(feedQuery("latest", true)).toEqual({ feed: "latest" });
-  });
-
-  it("top up a thin feed without repeating stories", () => {
-    const item = (key: string) => ({ key });
-    expect(fillFeed([item("a"), item("b")], [item("b"), item("c"), item("d")], 3).map((i) => i.key)).toEqual(["a", "b", "c"]);
+  it("are Latest (the default, on the plain home URL) and Following", () => {
+    expect(FEEDS).toEqual(["latest", "following"]);
+    expect(parseFeed(undefined)).toBe("latest");
+    expect(parseFeed("following")).toBe("following");
+    expect(parseFeed("burning")).toBe("latest");
+    expect(parseFeed(["following"])).toBe("latest");
+    expect(feedQuery("latest")).toEqual({});
+    expect(feedQuery("following")).toEqual({ feed: "following" });
   });
 });
 

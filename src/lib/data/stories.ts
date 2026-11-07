@@ -1,5 +1,5 @@
 import "server-only";
-import { and, desc, eq, isNull, lte, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, isNull, lte, sql } from "drizzle-orm";
 import { cacheLife, cacheTag } from "next/cache";
 import { asAnon } from "@/lib/db/rls";
 import { profiles, stories, storyTopics, topics } from "@/lib/db/schema";
@@ -90,7 +90,8 @@ const listed = and(
 /** Feeds (home, topics) also leave out NSFW stories. */
 export const inFeeds = and(listed, notModerated);
 
-export async function getLatestStories(limit = 20) {
+/** The newest stories, optionally only in some languages (a signed-in reader's reading languages). */
+export async function getLatestStories(limit = 20, languages?: ("en" | "es")[]) {
   "use cache";
   cacheLife("minutes");
   cacheTag("stories");
@@ -100,7 +101,7 @@ export async function getLatestStories(limit = 20) {
       .select(cardColumns)
       .from(stories)
       .innerJoin(profiles, eq(profiles.id, stories.authorId))
-      .where(inFeeds)
+      .where(languages?.length ? and(inFeeds, inArray(stories.language, languages)) : inFeeds)
       .orderBy(desc(stories.publishedAt))
       .limit(limit),
   );

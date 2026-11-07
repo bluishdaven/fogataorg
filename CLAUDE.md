@@ -41,22 +41,22 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   `notifications_unread_group_key` expressions; change all three together), and pushed to the bell
   through Supabase Realtime. Per-reader data on story pages loads in its own `<Suspense>` so the cached
   story text never waits for it. Pinning goes through `public.set_response_pinned()`.
-- **Home feeds and onboarding** (`src/lib/data/feeds.ts`, `src/components/home-feed.tsx`,
-  `src/app/[locale]/welcome/`, plan in `docs/plans/phase-3.md`). Tabs by `?feed=` inside Suspense:
-  visitors get Latest and Burning now, readers For you, Following, Burning now and Latest.
-  Burning now ranks `public.story_heat()` (security definer, one score per story: sparkers, others'
-  responses, saves, reads past half, halving every 36 hours over 14 days), cached 15 minutes per
-  set of `profiles.reading_languages`. For you scores the last 30 days per reader (freshness,
-  followed writers/topics/circles, heat, new voices: ≤ 3 stories, first week) and never shows the
-  reader's own stories; both top up with Latest so they're never empty. New accounts
-  (`profiles.onboarded_at` null) go to `/welcome` from `/auth/confirm` and `/auth/callback`
-  (`afterSignInPath()`); the e2e sign-in helper skips it unless `onboarding: "keep"`. Settings →
-  Account links back to it.
+- **Home feeds and onboarding** (`src/components/home-feed.tsx`, `src/lib/data/feeds.ts`,
+  `src/app/[locale]/welcome/`, plan in `docs/plans/phase-3.md`). Two tabs by `?feed=` inside
+  Suspense, decided by the owner: **Latest** (default; for signed-in readers only their
+  `profiles.reading_languages`) and **Following** (writers, topics and circles they follow, newest
+  first; visitors get a sign-in invitation). Unknown `?feed=` values show Latest. For you and
+  Burning now were built and then retired; `public.story_heat()` (one score per story from
+  sparkers, others' responses, saves, embers, reads past half) stays in the database for writer
+  stats later. New accounts (`profiles.onboarded_at` null) go to `/welcome` from `/auth/confirm`
+  and `/auth/callback` (`afterSignInPath()`) and land on Following when done; the e2e sign-in
+  helper skips it unless `onboarding: "keep"`. Settings → Account links back to it.
 - **Reads** (`read_events`, hand-written migration, no grants). The story page's `ReadTracker`
   beacons `POST /api/reads` (text/plain JSON) at half the story and on leaving; the route stores,
   through `record_read()`, a daily HMAC (`readerHash()`, keyed from `EMAIL_SIGNING_SECRET`) of the
   user id or IP, never the IP itself, and skips writers' own reads. The daily cron prunes reads
-  after 13 months. The privacy policy describes this: keep the two in step.
+  after 13 months. The privacy policy describes this: keep the two in step. Nothing shows reads yet
+  (writer stats will).
 - **Embers and quote cards** (`highlights`, `src/components/social/selection-toolbar.tsx`,
   `src/lib/domain/highlights.ts`, `/[locale]/me/embers`). Selecting words inside one paragraph
   of a story opens a toolbar: Highlight (keep as an ember; private to the reader, RLS own-only,
@@ -66,7 +66,7 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   the CSS Custom Highlight API (`::highlight(ember)`), never by changing the DOM. Blocks carry
   `id="p-<block id>"`; passage links are `#p-<id>:~:text=…` (anchor for every browser, text
   fragment where supported; `:target` glows). Link to passages with a plain `<a>`, since client
-  navigations don't apply text fragments. Embers count once per reader toward `story_heat()`.
+  navigations don't apply text fragments. Embers count once per reader in `story_heat()`.
 - **Import** (`/[locale]/write/import`, `src/lib/domain/import/`, `src/app/actions/import.ts`, plan in
   `docs/plans/import.md`). Medium and Substack zips, WordPress WXR or one HTML file are read in the
   browser (own zip reader on `DecompressionStream`, `DOMParser`), converted by `htmlToDoc()` into

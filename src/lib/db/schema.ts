@@ -77,7 +77,7 @@ export const profiles = pgTable(
     badgeTierNotified: integer("badge_tier_notified").notNull().default(0),
     // Set when the person finishes or skips onboarding (/welcome); null sends them there after sign-in.
     onboardedAt: timestamp("onboarded_at", { withTimezone: true }),
-    // Languages they read; feeds (For you, Burning now) show stories in these.
+    // Languages they read; Latest shows stories in these when they're signed in.
     readingLanguages: localeCode("reading_languages").array().notNull().default(sql`'{es,en}'::locale_code[]`),
     ...timestamps,
   },
@@ -435,7 +435,7 @@ export const storyVersions = pgTable(
 
 /**
  * Embers (Brasas): passages a reader keeps from a story. Private to the reader; they count,
- * anonymously, toward Burning now. Offsets are into the block's text (`blockTexts()`), and the
+ * anonymously, in `story_heat()`. Offsets are into the block's text (`blockTexts()`), and the
  * quote is kept so the ember survives small edits around it.
  */
 export const highlights = pgTable(

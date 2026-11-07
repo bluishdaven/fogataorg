@@ -75,14 +75,14 @@
     "lede": "Fogata es un hogar cálido para la escritura larga. Sin anuncios, sin feeds hechos para que no dejes de deslizar: solo historias y la gente que las cuenta.",
     "feeds": {
       "label": "Secciones",
-      "for-you": "Para ti",
-      "following": "Siguiendo",
-      "burning": "Lo que arde",
       "latest": "Recientes",
-      "pickTopics": "Esta sección se llena con los temas y las personas que sigues.",
+      "following": "Siguiendo",
+      "pickTopics": "Siguiendo se llena con las personas, temas y círculos que sigues.",
       "pickTopicsLink": "Elige algunos temas",
       "followingEmpty": "Sigue a personas, temas o círculos y aquí aparecerán sus historias nuevas.",
-      "browseTopics": "Explorar temas"
+      "browseTopics": "Explorar temas",
+      "signInForFollowing": "Entra para ver las historias nuevas de las personas, temas y círculos que sigues.",
+      "signIn": "Entrar"
     },
     "empty": "Todavía no hay historias. La fogata acaba de encenderse y la tuya puede ser la primera."
   },
@@ -96,7 +96,7 @@
       "lede": "Un par de elecciones para que Fogata se sienta tuya. Puedes cambiarlas cuando quieras.",
       "interface": "Mostrar Fogata en",
       "reading": "Leo historias en",
-      "readingHint": "Tus secciones muestran historias en estos idiomas.",
+      "readingHint": "Recientes muestra historias en estos idiomas.",
       "continue": "Continuar",
       "errors": {
         "readingLanguages": "Elige al menos un idioma en el que lees.",
@@ -105,7 +105,7 @@
     },
     "topics": {
       "title": "¿Qué te gusta leer?",
-      "lede": "Elige al menos tres temas. Con ellos armamos tu sección Para ti.",
+      "lede": "Elige al menos tres temas. Sus historias nuevas aparecen en Siguiendo.",
       "legend": "Temas",
       "needMore": "{count, plural, one {Elige # más} other {Elige # más}}",
       "picked": "{count, plural, one {# tema elegido} other {# temas elegidos}}",
@@ -1274,7 +1274,7 @@
     "title": "Tu cuenta",
     "lede": "Da forma a tus secciones, llévate una copia de todo lo que has hecho en Fogata, o vete para siempre.",
     "feedTitle": "Tus secciones",
-    "feedBody": "Los idiomas en los que lees y los temas que sigues dan forma a Para ti y Lo que arde.",
+    "feedBody": "Los idiomas en los que lees dan forma a Recientes; los temas que sigues llenan Siguiendo.",
     "feedButton": "Cambiar idiomas y temas",
     "exportTitle": "Descarga tus datos",
     "exportBody": "Un archivo con tu perfil, tus historias (borradores incluidos, con su texto completo), tus respuestas, chispas, historias guardadas, brasas, a quién sigues y tus círculos.",

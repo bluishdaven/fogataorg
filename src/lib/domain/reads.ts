@@ -1,6 +1,6 @@
 import { createHmac } from "node:crypto";
 
-/** A read counts toward Burning now once the reader got past half the story. */
+/** A read counts (in `story_heat()` and, later, writer stats) once the reader got past half the story. */
 export const READ_THRESHOLD = 0.5;
 
 /**

@@ -1,6 +1,6 @@
 # Changelog
 
-## Import, series, contents and version history (2026-11-07)
+## Import, series, contents, version history and two home tabs (2026-11-07)
 
 **Demo**: My stories now has **Import stories** and **Series**. Upload a Medium, Substack or
 WordPress export and pick posts to bring over as drafts. Group stories into a series and readers
@@ -15,6 +15,9 @@ see "Part 2 of 3" with the next part. In the editor, the clock button opens **Ve
 - **Table of contents**: stories with three or more headings get a Contents list under the header.
 - **Version history**: one version per ten minutes of writing plus every publish (newest 50).
   Preview any version and restore it; the replaced text stays in the history.
+- **Home tabs**: just **Latest** (the default; signed-in readers see the languages they read) and
+  **Following**. For you and Burning now are gone from the home page; onboarding now lands on
+  Following.
 
 ## Onboarding, home feeds, Burning now, embers and quote cards (2026-11-07)
 

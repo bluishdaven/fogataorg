@@ -88,5 +88,7 @@ export async function finishOnboarding(formData: FormData): Promise<void> {
     tx.update(profiles).set({ onboardedAt: new Date() }).where(eq(profiles.id, viewer.id)),
   );
   const locale = String(formData.get("locale") ?? "en");
-  redirect(nextOf(formData) ?? `/${isLocale(locale) ? locale : "en"}`);
+  // Fresh from picking topics and writers, Following is where their stories are; skipping goes home.
+  const home = `/${isLocale(locale) ? locale : "en"}`;
+  redirect(nextOf(formData) ?? (formData.get("landing") === "following" ? `${home}?feed=following` : home));
 }

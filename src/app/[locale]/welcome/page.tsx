@@ -144,6 +144,7 @@ async function WritersStep({
       )}
       <form action={finishOnboarding}>
         <input type="hidden" name="locale" value={locale} />
+        <input type="hidden" name="landing" value="following" />
         {next ? <input type="hidden" name="next" value={next} /> : null}
         <Button type="submit" size="lg" data-testid="onboarding-done">
           {t("writers.done")}

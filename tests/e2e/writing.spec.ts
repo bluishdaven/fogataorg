@@ -68,8 +68,7 @@ test("write, autosave, add an image, publish, then delete", async ({ page }) => 
   expect(preview.status()).toBe(200);
   expect(preview.headers()["content-type"]).toBe("image/jpeg");
 
-  // The home page's Latest list shows the story with a thumbnail of its first picture (For you
-  // leaves out the reader's own stories).
+  // The home page's Latest list shows the story with a thumbnail of its first picture.
   await page.goto("/en?feed=latest");
   await expect(page.getByRole("link", { name: title })).toBeVisible();
   await expect(page.getByRole("article").filter({ hasText: title }).getByTestId("story-thumbnail")).toBeVisible();

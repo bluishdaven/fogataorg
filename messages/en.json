@@ -75,14 +75,14 @@
     "lede": "Fogata is a warm home for long-form writing. No ads, no feeds built to keep you scrolling, just stories and the people who tell them.",
     "feeds": {
       "label": "Feeds",
-      "for-you": "For you",
-      "following": "Following",
-      "burning": "Burning now",
       "latest": "Latest",
-      "pickTopics": "This feed fills up with the topics and writers you follow.",
+      "following": "Following",
+      "pickTopics": "Following fills up with the writers, topics and circles you follow.",
       "pickTopicsLink": "Pick a few topics",
       "followingEmpty": "Follow writers, topics or circles and their new stories show up here.",
-      "browseTopics": "Browse topics"
+      "browseTopics": "Browse topics",
+      "signInForFollowing": "Sign in to see new stories from the writers, topics and circles you follow.",
+      "signIn": "Sign in"
     },
     "empty": "No stories yet. The fire has just been lit, and yours could be the first."
   },
@@ -96,7 +96,7 @@
       "lede": "A couple of choices so Fogata feels like yours. You can change them any time.",
       "interface": "Show Fogata in",
       "reading": "I read stories in",
-      "readingHint": "Your feeds show stories in these languages.",
+      "readingHint": "Latest shows stories in these languages.",
       "continue": "Continue",
       "errors": {
         "readingLanguages": "Pick at least one language you read.",
@@ -105,7 +105,7 @@
     },
     "topics": {
       "title": "What do you like to read?",
-      "lede": "Pick at least three topics. They shape your For you feed.",
+      "lede": "Pick at least three topics. Their new stories show up under Following.",
       "legend": "Topics",
       "needMore": "{count, plural, one {Pick # more} other {Pick # more}}",
       "picked": "{count, plural, one {# topic picked} other {# topics picked}}",
@@ -1274,7 +1274,7 @@
     "title": "Your account",
     "lede": "Shape your feeds, take a copy of everything you've done on Fogata, or leave for good.",
     "feedTitle": "Your feeds",
-    "feedBody": "The languages you read and the topics you follow shape For you and Burning now.",
+    "feedBody": "The languages you read shape Latest; the topics you follow fill Following.",
     "feedButton": "Change languages and topics",
     "exportTitle": "Download your data",
     "exportBody": "One file with your profile, your stories (drafts included, with their full text), your responses, sparks, saved stories, embers, who you follow and your circles.",

@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { READ_THRESHOLD } from "@/lib/domain/reads";
 
 /**
- * Tells the server how far the reader got (for Burning now): once when they pass half the story,
+ * Tells the server how far the reader got (anonymous reading counts): once when they pass half the story,
  * and again when they leave with the furthest point and the seconds the page was visible. No
  * cookies, nothing stored in the browser.
  */
