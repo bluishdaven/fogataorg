@@ -35,6 +35,7 @@
     "saved": "Saved",
     "notifications": "Notifications",
     "circles": "Circles",
+    "manifesto": "Manifesto",
     "merch": "Merch",
     "comingSoon": "Coming soon",
     "donors": "Donors",
@@ -838,5 +839,42 @@
     "byOn": "by {name}, {date}",
     "myRemoved": "Removed by moderation: {reason}",
     "myNsfw": "Marked NSFW: {reason}"
+  },
+  "Manifesto": {
+    "title": "Manifesto",
+    "description": "What we believe at Fogata: reading comes first, your words are yours, and this fire isn't for sale.",
+    "lede": "There is something very old about sitting around a fire to hear someone tell a story. Before algorithms, before metrics and screens that never end, there was a flame, a circle of half-lit faces and a voice holding up the whole night. Fogata is born from that memory. We aren't trying to invent anything... we want to give words back the place that was taken from them.",
+    "sections": [
+      {
+        "title": "Reading comes first",
+        "body": "The internet learned to shout. Every page fills up with windows that jump, ads that follow you around and counters that demand attention as if it were a debt. Not here. When you open a story on Fogata, the text is the only thing that matters: type that breathes, margins that let your eyes rest, quiet around every line. Nothing will pop up over what you're reading. Ever."
+      },
+      {
+        "title": "A .org, not an ad network",
+        "body": "We don't sell ads, we don't sell your data, and we don't build traps to keep you here longer than you want to stay. We know how the machinery on the other side works: it turns attention into merchandise, outrage into fuel and people into numbers someone else cashes in. We won't play that game. Fogata lives on donations from people who think this fire is worth keeping, and that is enough."
+      },
+      {
+        "title": "Your words are yours",
+        "body": "What you write here belongs to you. It isn't raw material for training machines or inventory to package and resell. We ask AI crawlers to keep their distance, we reserve your rights on every page, and every story carries your name and its year [as it should]. Your words will never be anyone's hostage."
+      },
+      {
+        "title": "Everyone gets everything",
+        "body": "There is no premium Fogata, no front row around the fire. Someone publishing their first piece and someone with a thousand stories behind them have exactly the same tools. Badges are a thank-you, not a key: they unlock nothing, they only say that someone is still here, feeding the flame."
+      },
+      {
+        "title": "Quiet by design",
+        "body": "We don't want your addiction. No endless walls, no alerts buzzing every five minutes to drag you back. We send two kinds of email and nothing else: the link to sign in and, if you want it, one summary a week. Everything else can wait until you come back, whenever you choose to."
+      },
+      {
+        "title": "Two languages, one flame",
+        "body": "Spanish and English are equal citizens here. Neither is a translation of the other, neither is second-class: the interface, the stories and search speak both in the same voice. Telling a story shouldn't depend on the language you learned to dream in."
+      },
+      {
+        "title": "New voices burn too",
+        "body": "A first story deserves to be read. We want new writers to find readers in days, not years, circles to gather people around what they care about, and every response to be written with the care of someone sharing the same fire. There are no audiences here... there is company."
+      }
+    ],
+    "closing": "This is what we believe. Everything else is kindling: tools, pages, code that can change tomorrow. What doesn't change is the fire, and the promise to tend it together.",
+    "signature": "Fogata.org"
   }
 }

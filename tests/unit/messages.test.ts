@@ -2,15 +2,20 @@ import { describe, expect, it } from "vitest";
 import en from "../../messages/en.json";
 import es from "../../messages/es.json";
 
-type Tree = { [key: string]: string | string[] | Tree };
+type Tree = { [key: string]: string | (string | Tree)[] | Tree };
 
+/** Every message as "path.to.key" (array items by index, objects inside arrays too). */
 function flatten(tree: Tree, prefix = ""): Map<string, string> {
   const out = new Map<string, string>();
   for (const [key, value] of Object.entries(tree)) {
     const path = prefix ? `${prefix}.${key}` : key;
     if (typeof value === "string") out.set(path, value);
-    else if (Array.isArray(value)) value.forEach((item, index) => out.set(`${path}.${index}`, item));
-    else for (const [k, v] of flatten(value, path)) out.set(k, v);
+    else if (Array.isArray(value)) {
+      value.forEach((item, index) => {
+        if (typeof item === "string") out.set(`${path}.${index}`, item);
+        else for (const [k, v] of flatten(item, `${path}.${index}`)) out.set(k, v);
+      });
+    } else for (const [k, v] of flatten(value, path)) out.set(k, v);
   }
   return out;
 }

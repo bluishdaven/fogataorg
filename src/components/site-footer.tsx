@@ -34,6 +34,13 @@ export function SiteFooter() {
           <Link href="/topics" className="inline-flex min-h-11 items-center underline-offset-4 hover:text-foreground hover:underline sm:min-h-0">
             {t("Nav.topics")}
           </Link>
+          <Link
+            href="/manifesto"
+            className="inline-flex min-h-11 items-center underline-offset-4 hover:text-foreground hover:underline sm:min-h-0"
+            data-testid="manifesto-link"
+          >
+            {t("Nav.manifesto")}
+          </Link>
           {/* Placeholder until the shop opens: disabled, so it can't be activated and reads as unavailable. */}
           <button
             type="button"

@@ -17,6 +17,7 @@ const pages = [
   ["style guide", "/en/design"],
   ["story", "/@lucia_ortega/el-mole-de-mi-abuela-no-tiene-receta"],
   ["profile", "/@danawrites"],
+  ["manifesto", "/es/manifesto"],
 ] as const;
 
 for (const theme of ["light", "dark", "sepia"] as const) {

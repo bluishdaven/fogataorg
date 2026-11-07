@@ -35,6 +35,7 @@
     "saved": "Leña guardada",
     "notifications": "Notificaciones",
     "circles": "Círculos",
+    "manifesto": "Manifiesto",
     "merch": "Merch",
     "comingSoon": "Próximamente",
     "donors": "Mecenas",
@@ -838,5 +839,42 @@
     "byOn": "por {name}, {date}",
     "myRemoved": "Retirada por moderación: {reason}",
     "myNsfw": "Marcada como NSFW: {reason}"
+  },
+  "Manifesto": {
+    "title": "Manifiesto",
+    "description": "Lo que creemos en Fogata: leer va primero, tus palabras son tuyas y este fuego no se vende.",
+    "lede": "Hay algo muy viejo en sentarse alrededor del fuego a escuchar a alguien contar una historia. Antes de los algoritmos, antes de las métricas y de las pantallas que nunca terminan, había una llama, un círculo de rostros a medio iluminar y una voz que sostenía la noche entera. Fogata nace de esa memoria. No queremos inventar nada nuevo... queremos devolverle a la palabra el lugar que le quitaron.",
+    "sections": [
+      {
+        "title": "Leer va primero",
+        "body": "Internet aprendió a gritar. Cada página se llena de ventanas que saltan, anuncios que te persiguen y contadores que exigen atención como si fuera una deuda. Aquí no. Cuando abres una historia en Fogata, el texto es lo único que importa: letras que respiran, márgenes que dejan descansar la vista, silencio alrededor de cada línea. Nada va a aparecer encima de lo que estás leyendo. Nunca."
+      },
+      {
+        "title": "Un .org, no una red de anuncios",
+        "body": "No vendemos anuncios, no vendemos tus datos y no diseñamos trampas para que te quedes más tiempo del que quieres. Sabemos cómo funciona la maquinaria del otro lado: convierte la atención en mercancía, la indignación en combustible y a las personas en números que alguien más cobra. No vamos a jugar ese juego. Fogata vive de las donaciones de quienes creen que este fuego vale la pena, y con eso nos basta."
+      },
+      {
+        "title": "Tus palabras son tuyas",
+        "body": "Lo que escribes aquí te pertenece. No es materia prima para entrenar máquinas ni inventario para empaquetar y revender. Les pedimos a los rastreadores de inteligencia artificial que se mantengan lejos, reservamos tus derechos en cada página y cada historia lleva tu nombre y su año [como debe ser]. Tus palabras nunca van a ser rehenes de nadie."
+      },
+      {
+        "title": "Todos tienen todo",
+        "body": "No existe una Fogata premium ni una primera fila alrededor del fuego. Quien publica su primer texto y quien ya lleva mil historias tienen exactamente las mismas herramientas. Las insignias son un agradecimiento, no una llave: no desbloquean nada, solo dicen que alguien sigue aquí, alimentando la lumbre."
+      },
+      {
+        "title": "Silencio por diseño",
+        "body": "No queremos tu adicción. No hay muros infinitos ni avisos que vibran cada cinco minutos para arrastrarte de vuelta. Te escribimos dos tipos de correo y nada más: el enlace para entrar y, si lo quieres, un resumen a la semana. Todo lo demás puede esperar a que vuelvas, cuando tú quieras volver."
+      },
+      {
+        "title": "Dos idiomas, una misma lumbre",
+        "body": "El español y el inglés son ciudadanos iguales aquí. Ninguno es traducción del otro ni idioma de segunda: la interfaz, las historias y la búsqueda hablan los dos con la misma voz. Contar una historia no debería depender del idioma en el que aprendiste a soñar."
+      },
+      {
+        "title": "Las voces nuevas también arden",
+        "body": "Una primera historia merece ser leída. Queremos que quien empieza encuentre lectores en días y no en años, que los círculos reúnan a la gente alrededor de lo que le importa y que cada respuesta se escriba con el cuidado de quien comparte el mismo fuego. Aquí no hay audiencias... hay compañía."
+      }
+    ],
+    "closing": "Esto es lo que creemos. Lo demás es leña: herramientas, páginas, código que mañana puede cambiar. Lo que no cambia es el fuego, y la promesa de cuidarlo entre todos.",
+    "signature": "Fogata.org"
   }
 }

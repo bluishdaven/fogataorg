@@ -20,6 +20,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...localized("", newest),
     ...localized("/topics", newest),
     ...localized("/circles"),
+    ...localized("/manifesto"),
     ...data.topics.flatMap((topic) => localized(`/topics/${topic.slug}`, topic.lastModified)),
     ...data.circles.flatMap((circle) => localized(`/circles/${circle.slug}`, circle.lastModified)),
     ...data.profiles.map((profile) => ({ url: `${site}${profilePath(profile.username)}`, lastModified: profile.lastModified })),
