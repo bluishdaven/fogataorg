@@ -102,6 +102,26 @@ export const profiles = pgTable(
   ],
 );
 
+/**
+ * Usernames people used before, so old /@name links redirect to the current one. Written only by
+ * the profiles trigger (record_previous_username); the newest five per person stay reserved for them.
+ */
+export const previousUsernames = pgTable(
+  "previous_usernames",
+  {
+    username: text("username").primaryKey(),
+    profileId: uuid("profile_id")
+      .notNull()
+      .references(() => profiles.id, { onDelete: "cascade" }),
+    changedAt: timestamp("changed_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index("previous_usernames_profile_idx").on(t.profileId, t.changedAt.desc()),
+    check("previous_usernames_lowercase", sql`${t.username} = lower(${t.username})`),
+    pgPolicy("previous_usernames_select_public", { for: "select", to: everyone, using: sql`true` }),
+  ],
+);
+
 export const topics = pgTable(
   "topics",
   {

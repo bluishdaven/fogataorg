@@ -93,6 +93,11 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   `/@handle/slug` have no prefix: `src/proxy.ts` rewrites them to `/{locale}/u/...` using the
   `NEXT_LOCALE` cookie, then `Accept-Language`. Link to them with `next/link` and
   `storyPath()` / `profilePath()`, **not** the i18n `Link` (which would add a prefix).
+  On page loads (not the app's own fetches) the proxy first checks the share URL as an anonymous
+  visitor (`src/lib/handle-status.ts`, one query, nothing cached): a miss is rewritten to
+  `/{locale}/__missing` (the catch-all, a real 404), and an old username gets a 308 to the current
+  one. `previous_usernames` is written by a profiles trigger; each person's newest five old names
+  stay reserved for them (renames and sign-ups skip them).
 - **i18n.** next-intl v4 with `next/root-params` for the locale. Messages in `messages/{en,es}.json`
   (typed from `en.json`; a test enforces key and ICU-argument parity). Server Actions and Route
   Handlers can't read root params: pass `locale` explicitly to `getTranslations`.
@@ -249,7 +254,11 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   changes after that.
 - **Images.** Uploads are resized to ≤2400px WebP in the browser (strips EXIF/GPS) and stored in the
   `story-images` bucket under `<user id>/` (storage policies enforce the folder). They're served as-is
-  (no Next image optimization yet). Unsplash images follow the rules above.
+  (no Next image optimization yet). Unsplash images follow the rules above. Files nothing points
+  to (`public.orphaned_uploads()`: stories that aren't deleted, pending changes, circle headers,
+  profile photos; older than a day) are removed by the daily cron through the Storage API with
+  `SUPABASE_SECRET_KEY`; without the key that step is skipped. A new column that stores an upload
+  URL must be added to that function.
 
 ## Conventions
 
@@ -296,18 +305,16 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   contents lands.
 - Not built yet from the spec's Writing/Reading lists: embeds, version history, series, draft
   sharing, import, table of contents, keyboard shortcuts and listen mode (later phases).
-- Removed or replaced images stay in storage; a cleanup job for orphaned uploads is needed before
-  launch. Uploaded images skip Next's image optimizer.
+- Uploaded images skip Next's image optimizer.
 - `drizzle-kit generate --custom` can reuse a timestamp from a migration generated the same second;
   Supabase treats equal timestamps as one version, so rename the newer file (and its journal tag).
 - `'use cache'` listings don't know about seed runs: restart `npm run dev` after `npm run db:seed`.
   Phase 1 publish actions must call `revalidateTag("stories")` and the story/profile tags.
-- Story/profile 404s inside Suspense are soft 404s (HTTP 200 + noindex). Revisit with
-  `generateStaticParams` for popular stories in Phase 1.
+- Client-side navigations to a missing story or profile show the not-found view without a 404
+  status (only page loads go through the proxy check); internal links always use current names.
 - Some corporate mail scanners prefetch links and can burn a magic link. If reported, switch
   `/auth/confirm` to a confirm-button page.
 - Google sign-in doesn't yet save the reader's locale on first sign-in (magic links do).
-- Changing a username breaks old `/@old/...` links; add redirects from previous usernames.
 - Phase 2 leftovers: reading lists beyond one "Saved" list, undoing sparks, editing responses, blocking and
   muting, rate limits, deleting or transferring circles, a decline note for writers, and circle RSS.
 - Unsplash thumbnails in lists show without a credit line (the credit is on the story page). Check

@@ -246,6 +246,20 @@
       "when": 1794017155626,
       "tag": "20261107020555_rate_limits",
       "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1794017901606,
+      "tag": "20261107021821_previous_usernames",
+      "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1794017906324,
+      "tag": "20261107021826_previous_username_triggers_and_orphaned_uploads",
+      "breakpoints": true
     }
   ]
 }
