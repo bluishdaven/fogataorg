@@ -187,3 +187,27 @@ test.describe("on a phone", () => {
     await expect(page.getByTestId("selection-toolbar")).toBeVisible();
   });
 });
+
+test.describe("on a touch screen", () => {
+  test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+
+  test("the formatting bar sits below the selection, clear of the phone's own Cut / Copy menu", async ({ page }) => {
+    test.setTimeout(90_000);
+    await signInWithMagicLink(page, "en");
+    await startDraft(page);
+    const body = page.getByTestId("editor-body");
+    await body.locator("p").last().click();
+    await page.keyboard.type("Embers in the dark");
+    await page.keyboard.press("Shift+Home");
+    const toolbar = page.getByTestId("selection-toolbar");
+    await expect(toolbar).toBeVisible();
+    const selection = await page.evaluate(() => {
+      const rect = window.getSelection()!.getRangeAt(0).getBoundingClientRect();
+      return { top: rect.top, bottom: rect.bottom };
+    });
+    // Below the selected line, with room for the selection handles in between.
+    await expect.poll(async () => (await toolbar.boundingBox())!.y).toBeGreaterThan(selection.bottom + 16);
+    await toolbar.getByRole("button", { name: "Bold" }).click();
+    await expect(body.locator("strong")).toHaveText("Embers in the dark");
+  });
+});

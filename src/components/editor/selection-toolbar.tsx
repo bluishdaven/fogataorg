@@ -5,13 +5,23 @@ import { useEditorState } from "@tiptap/react";
 import { BubbleMenu } from "@tiptap/react/menus";
 import { Bold, Heading2, Heading3, Italic, Link2, Quote, Strikethrough } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useMemo, useState, useSyncExternalStore, type FormEvent, type ReactNode } from "react";
+import { COARSE, subscribe } from "@/components/social/share-button";
 import { safeHref } from "@/lib/domain/story-doc";
 import { cn } from "@/lib/utils";
 
-/** Formatting toolbar that appears only when text is selected. */
+const isCoarse = () => window.matchMedia(COARSE).matches;
+
+/**
+ * Formatting toolbar that appears only when text is selected. Phones show their own Cut / Copy /
+ * Paste menu above a selection, so there ours goes below it (clear of the selection handles), like
+ * the reader's toolbar on stories.
+ */
 export function SelectionToolbar({ editor }: { editor: Editor }) {
   const t = useTranslations("Editor");
+  const coarse = useSyncExternalStore(subscribe, isCoarse, () => false);
+  // Memoized: a new object would push new options into the plugin on every render.
+  const placement = useMemo(() => (coarse ? { placement: "bottom" as const, offset: 28 } : { placement: "top" as const, offset: 8 }), [coarse]);
   const [linking, setLinking] = useState(false);
   const [href, setHref] = useState("");
   const state = useEditorState({
@@ -40,6 +50,7 @@ export function SelectionToolbar({ editor }: { editor: Editor }) {
   return (
     <BubbleMenu
       editor={editor}
+      options={placement}
       // Only for text the writer selected: a new editor can start with everything selected
       // (and unfocused), which must not open the toolbar over an empty draft.
       shouldShow={({ editor: e, view, element, state: s, from, to }) =>
