@@ -134,6 +134,50 @@
     "removed": "Brasa quitada.",
     "failed": "No se pudo quitar. Inténtalo de nuevo."
   },
+  "Import": {
+    "title": "Trae tus historias",
+    "lede": "Muda tu archivo desde Medium, Substack o WordPress. Cada publicación llega como borrador, para que la revises y la publiques cuando quieras.",
+    "howTitle": "Primero, descarga tu exportación",
+    "howMedium": "Settings → Security and apps → Download your information. Sube el .zip que te envía Medium.",
+    "howSubstack": "Settings → Exports → New export. Sube el .zip.",
+    "howWordPress": "Herramientas → Exportar → Entradas → Descargar archivo de exportación. Sube el .xml.",
+    "fileLabel": "Archivo de exportación (.zip, .xml o .html)",
+    "privacyNote": "El archivo se lee en tu navegador. Solo se envían a Fogata las publicaciones que elijas.",
+    "reading": "Leyendo tu archivo…",
+    "found": "{count, plural, one {# publicación de {source}} other {# publicaciones de {source}}}",
+    "foundHint": "Los borradores de tu sitio anterior empiezan sin marcar. Revisa el idioma de cada una: de eso depende cómo la encuentran los lectores.",
+    "sources": {
+      "medium": "Medium",
+      "substack": "Substack",
+      "wordpress": "WordPress",
+      "html": "tu archivo"
+    },
+    "canonical": "Seguir indicando a los buscadores los originales",
+    "canonicalHint": "Cada historia enlaza a donde apareció primero, para que los buscadores no la traten como copia. Desmárcalo si dejas el sitio anterior.",
+    "untitled": "Sin título",
+    "words": "{count, plural, one {# palabra} other {# palabras}}",
+    "draft": "Borrador allá",
+    "languageOf": "Idioma de {title}",
+    "run": "{count, plural, =0 {Elige publicaciones para importar} one {Importar # publicación como borrador} other {Importar # publicaciones como borradores}}",
+    "chooseAnother": "Elegir otro archivo",
+    "importing": "Importando…",
+    "progress": "{done} de {total} listas",
+    "done": "{count, plural, one {# borrador listo} other {# borradores listos}}",
+    "doneHint": "Todavía no se publica nada. Revísalos en",
+    "myStories": "Mis historias",
+    "imagesFailed": "{count, plural, one {# imagen no se pudo copiar (quedó como enlace)} other {# imágenes no se pudieron copiar (quedaron como enlaces)}}",
+    "errors": {
+      "notZip": "Ese .zip parece dañado. Descarga la exportación de nuevo.",
+      "unsupported": "Ese .zip usa un formato que no podemos abrir. Descarga la exportación de nuevo.",
+      "tooLarge": "Un archivo dentro de la exportación es demasiado grande para leerlo.",
+      "empty": "No encontramos publicaciones en ese archivo.",
+      "unknownFormat": "No pudimos leer ese archivo. Sube el .zip de Medium o Substack, o el .xml de WordPress.",
+      "unauthorized": "Tu sesión terminó. Vuelve a entrar.",
+      "invalid": "Esta publicación no se pudo importar.",
+      "storyTooLong": "Esta publicación es demasiado larga para importarla.",
+      "rateLimited": "Importaste mucho hoy. Espera un poco e intenta con el resto."
+    }
+  },
   "StoryCard": {
     "byline": "{name}",
     "readStory": "Leer «{title}»"
@@ -435,7 +479,8 @@
     "delete": "Eliminar",
     "deleteConfirm": "¿Eliminar esta historia? No se puede deshacer desde Fogata.",
     "emptyTitle": "Tu primera historia empieza aquí.",
-    "emptyBody": "Los borradores se guardan mientras escribes. Nada es público hasta que lo publicas."
+    "emptyBody": "Los borradores se guardan mientras escribes. Nada es público hasta que lo publicas.",
+    "import": "Importar historias"
   },
   "Reader": {
     "label": "Opciones de lectura",

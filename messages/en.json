@@ -134,6 +134,50 @@
     "removed": "Ember removed.",
     "failed": "Couldn't remove it. Try again."
   },
+  "Import": {
+    "title": "Bring your stories",
+    "lede": "Move your archive from Medium, Substack or WordPress. Every post arrives as a draft, so you can read it over and publish it when you're ready.",
+    "howTitle": "First, download your export",
+    "howMedium": "Settings → Security and apps → Download your information. Upload the .zip Medium emails you.",
+    "howSubstack": "Settings → Exports → New export. Upload the .zip.",
+    "howWordPress": "Tools → Export → Posts → Download Export File. Upload the .xml.",
+    "fileLabel": "Export file (.zip, .xml or .html)",
+    "privacyNote": "The file is read in your browser. Only the posts you choose are sent to Fogata.",
+    "reading": "Reading your file…",
+    "found": "{count, plural, one {# post from {source}} other {# posts from {source}}}",
+    "foundHint": "Drafts from your old site start unticked. Check the language of each one: it decides how readers find it.",
+    "sources": {
+      "medium": "Medium",
+      "substack": "Substack",
+      "wordpress": "WordPress",
+      "html": "your file"
+    },
+    "canonical": "Keep pointing search engines to the originals",
+    "canonicalHint": "Each story links to where it first appeared, so search engines don't treat it as a copy. Untick if you're leaving the old site.",
+    "untitled": "Untitled",
+    "words": "{count, plural, one {# word} other {# words}}",
+    "draft": "Draft there",
+    "languageOf": "Language of {title}",
+    "run": "{count, plural, =0 {Pick posts to import} one {Import # post as a draft} other {Import # posts as drafts}}",
+    "chooseAnother": "Choose another file",
+    "importing": "Importing…",
+    "progress": "{done} of {total} done",
+    "done": "{count, plural, one {# draft is ready} other {# drafts are ready}}",
+    "doneHint": "Nothing is published yet. Review them in",
+    "myStories": "My stories",
+    "imagesFailed": "{count, plural, one {# picture couldn't be copied (left as a link)} other {# pictures couldn't be copied (left as links)}}",
+    "errors": {
+      "notZip": "That zip file looks damaged. Download the export again.",
+      "unsupported": "That zip uses a format we can't open. Download the export again.",
+      "tooLarge": "A file inside the export is too large to read.",
+      "empty": "We didn't find any posts in that file.",
+      "unknownFormat": "We couldn't read that file. Upload the .zip from Medium or Substack, or the .xml from WordPress.",
+      "unauthorized": "Your session ended. Sign in again.",
+      "invalid": "This post couldn't be imported.",
+      "storyTooLong": "This post is too long to import.",
+      "rateLimited": "You've imported a lot today. Wait a little and try the rest again."
+    }
+  },
   "StoryCard": {
     "byline": "{name}",
     "readStory": "Read “{title}”"
@@ -435,7 +479,8 @@
     "delete": "Delete",
     "deleteConfirm": "Delete this story? This can't be undone from Fogata.",
     "emptyTitle": "Your first story starts here.",
-    "emptyBody": "Drafts save as you type. Nothing is public until you publish it."
+    "emptyBody": "Drafts save as you type. Nothing is public until you publish it.",
+    "import": "Import stories"
   },
   "Reader": {
     "label": "Reading settings",

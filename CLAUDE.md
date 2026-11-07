@@ -67,6 +67,14 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   `id="p-<block id>"`; passage links are `#p-<id>:~:text=…` (anchor for every browser, text
   fragment where supported; `:target` glows). Link to passages with a plain `<a>`, since client
   navigations don't apply text fragments. Embers count once per reader toward `story_heat()`.
+- **Import** (`/[locale]/write/import`, `src/lib/domain/import/`, `src/app/actions/import.ts`, plan in
+  `docs/plans/import.md`). Medium and Substack zips, WordPress WXR or one HTML file are read in the
+  browser (own zip reader on `DecompressionStream`, `DOMParser`), converted by `htmlToDoc()` into
+  the sanitizer's document shape with block ids, and sent one post at a time to `importStory`,
+  which copies pictures into the writer's folder (`src/lib/import/copy-image.ts`: public addresses
+  only per `isPublicAddress()`, redirects re-checked, 10 s, 15 MB, `sharp` to WebP), turns the rest
+  into links, sanitizes and inserts a draft (optional https canonical link to the original).
+  Never publishes. Rate limit `importStory`.
 - **Circles** (`src/lib/data/circles.ts`, `src/app/actions/circles.ts`, `src/components/circles/`).
   `circles` (accent color, optional header), `circle_members` (one owner created by trigger, editors,
   writers) and `circle_submissions` (pending → accepted/declined; one active circle per story; members'
@@ -331,7 +339,7 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
 - Seed stories are short essays (150–335 words); add a few 1,500+ word pieces when the table of
   contents lands.
 - Not built yet from the spec's Writing/Reading lists: embeds, version history, series, draft
-  sharing, import, table of contents, keyboard shortcuts and listen mode (later phases).
+  sharing, table of contents, keyboard shortcuts and listen mode (later phases).
 - Uploaded images skip Next's image optimizer.
 - `drizzle-kit generate --custom` can reuse a timestamp from a migration generated the same second;
   Supabase treats equal timestamps as one version, so rename the newer file (and its journal tag).
