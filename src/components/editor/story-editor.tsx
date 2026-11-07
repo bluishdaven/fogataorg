@@ -43,6 +43,7 @@ import { storyPath } from "@/lib/domain/handle-routes";
 import { storyState, type StoryState } from "@/lib/domain/stories";
 import { creditFromPhoto, type UnsplashPhoto } from "@/lib/domain/unsplash";
 import { Callout, Figure, PullQuote } from "./nodes";
+import { VersionHistory } from "./version-history";
 import { PublishDialog, type PublishDialogStory, type TopicOption } from "./publish-dialog";
 import { SelectionToolbar } from "./selection-toolbar";
 import { SlashCommand, type SlashItem } from "./slash-command";
@@ -318,6 +319,7 @@ export function StoryEditor({
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            <VersionHistory storyId={story.id} language={story.language} live={live} />
             {live ? (
               <NextLink href={storyPath(username, story.slug)} className="hidden text-muted-foreground hover:text-foreground sm:inline">
                 {t("viewLive")}

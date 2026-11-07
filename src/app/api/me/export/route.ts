@@ -9,6 +9,7 @@ import {
   highlights,
   profiles,
   responses,
+  series,
   sparks,
   stories,
   storyTopics,
@@ -75,6 +76,14 @@ export async function GET() {
       .innerJoin(stories, eq(stories.id, bookmarks.storyId))
       .innerJoin(profiles, eq(profiles.id, stories.authorId))
       .where(eq(bookmarks.userId, viewer.id));
+    const mySeries = await tx
+      .select({ id: series.id, title: series.title, slug: series.slug, description: series.description })
+      .from(series)
+      .where(eq(series.authorId, viewer.id));
+    const seriesParts = await tx
+      .select({ seriesId: stories.seriesId, position: stories.seriesPosition, title: stories.title })
+      .from(stories)
+      .where(and(eq(stories.authorId, viewer.id), isNull(stories.deletedAt)));
     const embers = await tx
       .select({ quote: highlights.quote, keptAt: highlights.createdAt, ...ref })
       .from(highlights)
@@ -121,6 +130,11 @@ export async function GET() {
       responses: myResponses.map((r) => ({ body: r.body, createdAt: r.createdAt, reply: Boolean(r.isReply), story: { title: r.title, url: link(r.author, r.slug) } })),
       sparks: mySparks.map((s) => ({ count: s.count, story: { title: s.title, url: link(s.author, s.slug) } })),
       saved: saved.map((s) => ({ savedAt: s.savedAt, story: { title: s.title, url: link(s.author, s.slug) } })),
+      series: mySeries.map(({ id, ...item }) => ({
+        ...item,
+        url: `${site}/@${viewer.username}/series/${item.slug}`,
+        parts: seriesParts.filter((part) => part.seriesId === id).sort((a, b) => (a.position ?? 0) - (b.position ?? 0)).map((part) => part.title),
+      })),
       embers: embers.map((e) => ({ quote: e.quote, keptAt: e.keptAt, story: { title: e.title, url: link(e.author, e.slug) } })),
       readingLanguages: profile?.readingLanguages ?? null,
       following: {

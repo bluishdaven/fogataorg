@@ -26,3 +26,21 @@ describe("share URL status", () => {
     expect(wantsHandleCheck("empty")).toBe(false);
   });
 });
+
+describe("series addresses", () => {
+  it("route /@handle/series/slug to the series page and back", async () => {
+    const { matchPublicHandlePath, toInternalHandlePath, matchInternalHandlePath, publicHandlePath } = await import("@/lib/domain/handle-routes");
+    const route = matchPublicHandlePath("/@ana/series/the-river");
+    expect(route).toEqual({ handle: "ana", series: "the-river" });
+    expect(toInternalHandlePath("es", route!)).toBe("/es/u/ana/series/the-river");
+    expect(matchInternalHandlePath("/es/u/ana/series/the-river")).toEqual({ locale: "es", route: { handle: "ana", series: "the-river" } });
+    expect(publicHandlePath(route!)).toBe("/@ana/series/the-river");
+    // A story called "series" is still a story.
+    expect(matchPublicHandlePath("/@ana/series")).toEqual({ handle: "ana", slug: "series" });
+  });
+
+  it("call a missing series missing", () => {
+    expect(handleStatusFromRow({ username: "ana", moved_to: null, story: null, series: false }, { handle: "ana", series: "x" })).toEqual({ kind: "missing" });
+    expect(handleStatusFromRow({ username: "ana", moved_to: null, story: null, series: true }, { handle: "ana", series: "x" })).toEqual({ kind: "found" });
+  });
+});

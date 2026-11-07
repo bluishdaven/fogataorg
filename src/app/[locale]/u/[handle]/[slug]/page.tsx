@@ -14,6 +14,8 @@ import { ReadTracker } from "@/components/read-tracker";
 import { ReadingProgress } from "@/components/reading-progress";
 import { StoryTitleBar } from "@/components/story-title-bar";
 import { StoryBody } from "@/components/story-body";
+import { StoryContents } from "@/components/story-contents";
+import { StorySeriesNav } from "@/components/story-series-nav";
 import { StoryResponses } from "@/components/social/story-responses";
 import { StorySocial } from "@/components/social/story-social";
 import { UnsplashCredit } from "@/components/unsplash/unsplash-credit";
@@ -237,6 +239,8 @@ async function Story({ params }: Pick<Props, "params">) {
       {(() => {
         const content = (
           <>
+            <StorySeriesNav seriesId={story.seriesId} handle={story.authorUsername} slug={story.slug} placement="top" locale={locale} />
+            <StoryContents doc={story.content} lang={story.language} />
             {story.coverUrl && isAllowedStoryImage(story.coverUrl) ? (
               <StoryCover url={story.coverUrl} alt={story.coverAlt} credit={story.coverCredit} />
             ) : null}
@@ -248,6 +252,7 @@ async function Story({ params }: Pick<Props, "params">) {
         );
         return nsfw ? <NsfwGate reason={story.moderationReason ?? ""}>{content}</NsfwGate> : content;
       })()}
+      <StorySeriesNav seriesId={story.seriesId} handle={story.authorUsername} slug={story.slug} placement="bottom" locale={locale} />
       {/* The writer owns their work; say so plainly (and in the structured data above). */}
       {story.publishedAt ? (
         <p className="mx-auto mt-10 max-w-[var(--measure)] text-sm text-muted-foreground" lang={locale} data-testid="story-copyright">

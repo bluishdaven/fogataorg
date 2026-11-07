@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import NextLink from "next/link";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -12,8 +13,9 @@ import { FollowButton } from "@/components/social/toggle-buttons";
 import { getViewer } from "@/lib/auth";
 import { getFollowState } from "@/lib/data/social";
 import { badgeData } from "@/lib/domain/badges";
+import { listProfileSeries } from "@/lib/data/series";
 import { getProfileWithStories } from "@/lib/data/stories";
-import { profilePath } from "@/lib/domain/handle-routes";
+import { profilePath, seriesPath } from "@/lib/domain/handle-routes";
 import { isAvatarUrl } from "@/lib/domain/avatars";
 import { OG_SIZE, ogPaths, previewVersion } from "@/lib/domain/og";
 import { publicEnv } from "@/lib/env";
@@ -184,6 +186,7 @@ async function Profile({ params }: Pick<Props, "params">) {
           <ProfileFollow userId={profile.id} username={profile.username} />
         </Suspense>
       </header>
+      <ProfileSeries handle={profile.username} />
       <h2 className="sr-only">{t("stories")}</h2>
       {profile.stories.length === 0 ? (
         <p className="text-muted-foreground">{t("noStories", { name })}</p>
@@ -191,6 +194,31 @@ async function Profile({ params }: Pick<Props, "params">) {
         profile.stories.map((story) => <StoryCard key={story.slug} story={story} />)
       )}
     </>
+  );
+}
+
+/** The writer's series (only those with a part readers can see). */
+async function ProfileSeries({ handle }: { handle: string }) {
+  const list = await listProfileSeries(handle);
+  if (!list.length) return null;
+  const t = await getTranslations("Series");
+  return (
+    <section aria-labelledby="series-heading" className="mb-8 flex flex-col gap-3" data-testid="profile-series">
+      <h2 id="series-heading" className="text-sm font-semibold tracking-wide text-muted-foreground uppercase">
+        {t("profileHeading")}
+      </h2>
+      <ul className="grid gap-3 sm:grid-cols-2">
+        {list.map((item) => (
+          <li key={item.slug}>
+            <NextLink href={seriesPath(handle, item.slug)} className="flex h-full flex-col rounded-xl border border-border p-4 hover:border-ember">
+              <span className="font-serif text-lg font-semibold">{item.title}</span>
+              {item.description ? <span className="line-clamp-2 text-sm text-muted-foreground">{item.description}</span> : null}
+              <span className="mt-auto pt-2 text-sm text-ember-text">{t("parts", { count: item.parts })}</span>
+            </NextLink>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 

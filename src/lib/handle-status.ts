@@ -21,7 +21,11 @@ export async function handleStatus(route: HandleRoute): Promise<HandleStatus> {
         case when ${slug}::text is null then null else exists (
           select 1 from public.stories s join public.profiles p on p.id = s.author_id
           where lower(p.username) = lower(${route.handle}) and s.slug = ${slug}::text
-        ) end as story
+        ) end as story,
+        case when ${route.series ?? null}::text is null then null else exists (
+          select 1 from public.series se join public.profiles p on p.id = se.author_id
+          where lower(p.username) = lower(${route.handle}) and se.slug = ${route.series ?? null}::text
+        ) end as series
     `),
   );
   return handleStatusFromRow(row ?? null, route);

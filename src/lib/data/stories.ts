@@ -140,6 +140,7 @@ export async function getStory(handle: string, slug: string) {
         authorBio: profiles.bio,
         authorPronouns: profiles.pronouns,
         wordCount: sql<number>`"stories"."word_count"`,
+        seriesId: stories.seriesId,
         authorNowFocus: profiles.nowFocus,
         authorNowText: profiles.nowText,
         moderation: moderationStatusSql,

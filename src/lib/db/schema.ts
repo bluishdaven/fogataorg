@@ -142,6 +142,31 @@ export const topics = pgTable(
   ],
 );
 
+/** A writer's series: an ordered run of their stories (`stories.series_id` / `series_position`). */
+export const series = pgTable(
+  "series",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    authorId: uuid("author_id")
+      .notNull()
+      .references(() => profiles.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    slug: text("slug").notNull(),
+    description: text("description").notNull().default(""),
+    ...timestamps,
+  },
+  (t) => [
+    uniqueIndex("series_author_slug_key").on(t.authorId, t.slug),
+    check("series_title_length", sql`char_length(btrim(${t.title})) between 1 and 120`),
+    check("series_slug_format", sql`${t.slug} ~ '^[a-z0-9]+(-[a-z0-9]+)*$'`),
+    check("series_description_length", sql`char_length(${t.description}) <= 280`),
+    pgPolicy("series_select_public", { for: "select", to: everyone, using: sql`true` }),
+    pgPolicy("series_insert_own", { for: "insert", to: authenticatedRole, withCheck: sql`${t.authorId} = ${authUid}` }),
+    pgPolicy("series_update_own", { for: "update", to: authenticatedRole, using: sql`${t.authorId} = ${authUid}`, withCheck: sql`${t.authorId} = ${authUid}` }),
+    pgPolicy("series_delete_own", { for: "delete", to: authenticatedRole, using: sql`${t.authorId} = ${authUid}` }),
+  ],
+);
+
 export const stories = pgTable(
   "stories",
   {
@@ -170,6 +195,9 @@ export const stories = pgTable(
     thumbnailUrl: text("thumbnail_url"),
     thumbnailAlt: text("thumbnail_alt").notNull().default(""),
     canonicalUrl: text("canonical_url"),
+    // Series (set from /me/series): which one, and where in it (1, 2, 3…).
+    seriesId: uuid("series_id").references((): AnyPgColumn => series.id, { onDelete: "set null" }),
+    seriesPosition: integer("series_position"),
     seoTitle: text("seo_title").notNull().default(""),
     seoDescription: text("seo_description").notNull().default(""),
     // Edits to a published story wait here until the writer publishes them.
@@ -185,6 +213,7 @@ export const stories = pgTable(
       .on(t.publishedAt.desc())
       .where(sql`${t.status} = 'published' and ${t.deletedAt} is null`),
     index("stories_author_idx").on(t.authorId),
+    index("stories_series_idx").on(t.seriesId, t.seriesPosition),
     // Drafts may be untitled; anything live needs a title.
     check(
       "stories_title_length",
@@ -262,6 +291,9 @@ export const storyTopics = pgTable(
 // ---------------------------------------------------------------------------
 // Phase 2: social
 // ---------------------------------------------------------------------------
+
+const OWN_STORY = (storyId: AnyPgColumn) =>
+  sql`exists (select 1 from public.stories s where s.id = ${storyId} and s.author_id = ${authUid})`;
 
 const LIVE_STORY = (storyId: AnyPgColumn) =>
   sql`exists (select 1 from public.stories s where s.id = ${storyId} and s.deleted_at is null and s.status in ('published', 'unlisted') and s.published_at <= now())`;
@@ -373,6 +405,34 @@ export const bookmarks = pgTable(
 );
 
 /** Responses: top-level or one-level replies, optionally anchored to a paragraph (block id). */
+/**
+ * Version history: what a story looked like as it was written (one snapshot per ten minutes of
+ * writing) and every time it was published. Only the writer sees them; the newest 50 are kept.
+ */
+export const storyVersionKind = pgEnum("story_version_kind", ["draft", "published"]);
+
+export const storyVersions = pgTable(
+  "story_versions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    storyId: uuid("story_id")
+      .notNull()
+      .references(() => stories.id, { onDelete: "cascade" }),
+    kind: storyVersionKind("kind").notNull(),
+    title: text("title").notNull().default(""),
+    subtitle: text("subtitle").notNull().default(""),
+    content: jsonb("content").$type<TiptapDoc>().notNull(),
+    wordCount: integer("word_count").notNull().default(0),
+    ...timestamps,
+  },
+  (t) => [
+    index("story_versions_story_idx").on(t.storyId, t.createdAt.desc()),
+    pgPolicy("story_versions_select_own", { for: "select", to: authenticatedRole, using: OWN_STORY(t.storyId) }),
+    pgPolicy("story_versions_insert_own", { for: "insert", to: authenticatedRole, withCheck: OWN_STORY(t.storyId) }),
+    pgPolicy("story_versions_update_own", { for: "update", to: authenticatedRole, using: OWN_STORY(t.storyId), withCheck: OWN_STORY(t.storyId) }),
+  ],
+);
+
 /**
  * Embers (Brasas): passages a reader keeps from a story. Private to the reader; they count,
  * anonymously, toward Burning now. Offsets are into the block's text (`blockTexts()`), and the

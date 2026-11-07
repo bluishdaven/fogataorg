@@ -5,6 +5,7 @@ import { limitFor } from "@/lib/domain/limits";
 import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { getViewer } from "@/lib/auth";
+import { recordVersion } from "@/lib/data/versions";
 import { withRls } from "@/lib/db/rls";
 import { stories, storyTopics, topics } from "@/lib/db/schema";
 import { countWords, readingTimeMinutes, tiptapToText, type TiptapDoc } from "@/lib/domain/content";
@@ -91,6 +92,7 @@ export async function saveDraft(input: SaveDraftInput): Promise<SaveDraftResult>
       .where(and(eq(stories.id, id), eq(stories.revision, revision)))
       .returning({ revision: stories.revision, updatedAt: stories.updatedAt });
     if (!row) return { ok: false, error: "conflict" };
+    await recordVersion(tx, id, { title, subtitle, content }, "draft");
     return { ok: true, revision: row.revision, savedAt: row.updatedAt.toISOString() };
   });
 }
@@ -207,6 +209,7 @@ export async function publishStory(input: PublishInput): Promise<PublishResult> 
         revision: sql`${stories.revision} + 1`,
       })
       .where(eq(stories.id, story.id));
+    await recordVersion(tx, story.id, { title, subtitle: source.subtitle.trim(), content }, "published");
 
     const previousTopics = await tx
       .select({ slug: topics.slug })

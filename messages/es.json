@@ -178,6 +178,63 @@
       "rateLimited": "Importaste mucho hoy. Espera un poco e intenta con el resto."
     }
   },
+  "History": {
+    "open": "Historial de versiones",
+    "title": "Historial de versiones",
+    "description": "Fogata guarda una versión por cada diez minutos de escritura y cada vez que publicas (las últimas 50).",
+    "list": "Versiones",
+    "empty": "Todavía no hay versiones. Aparecen mientras escribes.",
+    "published": "Publicada",
+    "words": "{count, plural, one {# palabra} other {# palabras}}",
+    "pick": "Elige una versión para leerla.",
+    "untitled": "Sin título",
+    "restore": "Restaurar esta versión",
+    "close": "Cerrar",
+    "confirm": "¿Reemplazar el borrador con esta versión? Lo que tienes ahora queda en el historial.",
+    "confirmLive": "¿Traer esta versión como cambios sin publicar? Los lectores la verán solo cuando publiques los cambios.",
+    "failed": "No se pudo restaurar esa versión. Inténtalo de nuevo."
+  },
+  "Series": {
+    "manageTitle": "Tus series",
+    "manageLede": "Agrupa historias que van juntas. Los lectores las ven en orden, con un enlace a la siguiente parte.",
+    "newTitle": "Empezar una serie",
+    "titleLabel": "Título",
+    "descriptionLabel": "Descripción breve (opcional)",
+    "create": "Crear serie",
+    "created": "Serie creada.",
+    "none": "Todavía no tienes series.",
+    "view": "Ver la página de la serie",
+    "edit": "Editar",
+    "save": "Guardar",
+    "saved": "Guardado.",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "deleteConfirm": "¿Eliminar «{title}»? Sus historias se quedan; solo dejan de estar agrupadas.",
+    "deleted": "Serie eliminada.",
+    "noParts": "Esta serie todavía no tiene historias.",
+    "addLabel": "Agrega una de tus historias",
+    "add": "Agregar",
+    "moveUp": "Subir {title}",
+    "moveDown": "Bajar {title}",
+    "remove": "Quitar {title} de la serie",
+    "untitled": "Sin título",
+    "draft": "borrador",
+    "partOf": "Parte {position} de {total} de <series>{title}</series>",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "nextUp": "Sigue en {title}",
+    "navLabel": "Serie",
+    "by": "Una serie de {name}",
+    "parts": "{count, plural, one {# parte} other {# partes}}",
+    "partLabel": "Parte {position}",
+    "empty": "Todavía no hay partes publicadas.",
+    "profileHeading": "Series",
+    "errors": {
+      "title": "Ponle título a la serie (hasta 120 caracteres).",
+      "description": "La descripción debe tener menos de 280 caracteres.",
+      "failed": "Eso no funcionó. Inténtalo de nuevo."
+    }
+  },
   "StoryCard": {
     "byline": "{name}",
     "readStory": "Leer «{title}»"
@@ -188,7 +245,9 @@
     "writtenIn": "Escrita en {language}",
     "notFoundTitle": "Historia no encontrada",
     "moreFrom": "Más de {name}",
-    "copyright": "© {year} {name}. Todos los derechos reservados."
+    "copyright": "© {year} {name}. Todos los derechos reservados.",
+    "contents": "Contenido",
+    "sections": "{count, plural, one {# sección} other {# secciones}}"
   },
   "Profile": {
     "stories": "Historias",
@@ -480,7 +539,8 @@
     "deleteConfirm": "¿Eliminar esta historia? No se puede deshacer desde Fogata.",
     "emptyTitle": "Tu primera historia empieza aquí.",
     "emptyBody": "Los borradores se guardan mientras escribes. Nada es público hasta que lo publicas.",
-    "import": "Importar historias"
+    "import": "Importar historias",
+    "series": "Series"
   },
   "Reader": {
     "label": "Opciones de lectura",

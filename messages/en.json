@@ -178,6 +178,63 @@
       "rateLimited": "You've imported a lot today. Wait a little and try the rest again."
     }
   },
+  "History": {
+    "open": "Version history",
+    "title": "Version history",
+    "description": "Fogata keeps a version for every ten minutes of writing and every time you publish (the latest 50).",
+    "list": "Versions",
+    "empty": "No versions yet. They appear as you write.",
+    "published": "Published",
+    "words": "{count, plural, one {# word} other {# words}}",
+    "pick": "Pick a version to read it.",
+    "untitled": "Untitled",
+    "restore": "Restore this version",
+    "close": "Close",
+    "confirm": "Replace the draft with this version? What you have now is kept in the history.",
+    "confirmLive": "Bring this version back as unpublished changes? Readers see it only after you publish the changes.",
+    "failed": "Couldn't restore that version. Try again."
+  },
+  "Series": {
+    "manageTitle": "Your series",
+    "manageLede": "Group stories that belong together. Readers see them in order, with a link to the next part.",
+    "newTitle": "Start a series",
+    "titleLabel": "Title",
+    "descriptionLabel": "Short description (optional)",
+    "create": "Create series",
+    "created": "Series created.",
+    "none": "No series yet.",
+    "view": "See the series page",
+    "edit": "Edit",
+    "save": "Save",
+    "saved": "Saved.",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deleteConfirm": "Delete “{title}”? Its stories stay; they just won't be grouped any more.",
+    "deleted": "Series deleted.",
+    "noParts": "No stories in this series yet.",
+    "addLabel": "Add one of your stories",
+    "add": "Add",
+    "moveUp": "Move {title} up",
+    "moveDown": "Move {title} down",
+    "remove": "Remove {title} from the series",
+    "untitled": "Untitled",
+    "draft": "draft",
+    "partOf": "Part {position} of {total} in <series>{title}</series>",
+    "previous": "Previous",
+    "next": "Next",
+    "nextUp": "Next in {title}",
+    "navLabel": "Series",
+    "by": "A series by {name}",
+    "parts": "{count, plural, one {# part} other {# parts}}",
+    "partLabel": "Part {position}",
+    "empty": "No parts are published yet.",
+    "profileHeading": "Series",
+    "errors": {
+      "title": "Give the series a title (up to 120 characters).",
+      "description": "Keep the description under 280 characters.",
+      "failed": "That didn't work. Try again."
+    }
+  },
   "StoryCard": {
     "byline": "{name}",
     "readStory": "Read “{title}”"
@@ -188,7 +245,9 @@
     "writtenIn": "Written in {language}",
     "notFoundTitle": "Story not found",
     "moreFrom": "More from {name}",
-    "copyright": "© {year} {name}. All rights reserved."
+    "copyright": "© {year} {name}. All rights reserved.",
+    "contents": "Contents",
+    "sections": "{count, plural, one {# section} other {# sections}}"
   },
   "Profile": {
     "stories": "Stories",
@@ -480,7 +539,8 @@
     "deleteConfirm": "Delete this story? This can't be undone from Fogata.",
     "emptyTitle": "Your first story starts here.",
     "emptyBody": "Drafts save as you type. Nothing is public until you publish it.",
-    "import": "Import stories"
+    "import": "Import stories",
+    "series": "Series"
   },
   "Reader": {
     "label": "Reading settings",

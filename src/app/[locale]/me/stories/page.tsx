@@ -26,9 +26,14 @@ export default async function MyStoriesPage() {
     <div className="mx-auto max-w-3xl px-4 py-12">
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <h1 className="font-serif text-4xl font-semibold">{t("title")}</h1>
-        <Link href="/write/import" className={buttonVariants({ variant: "outline" })} data-testid="import-link">
-          {t("import")}
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link href="/me/series" className={buttonVariants({ variant: "outline" })} data-testid="series-link">
+            {t("series")}
+          </Link>
+          <Link href="/write/import" className={buttonVariants({ variant: "outline" })} data-testid="import-link">
+            {t("import")}
+          </Link>
+        </div>
       </div>
       <Suspense fallback={<StoryListSkeleton count={3} />}>
         <MyStories />

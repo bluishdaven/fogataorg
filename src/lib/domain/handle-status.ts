@@ -10,10 +10,16 @@ export type HandleStatusRow = {
   moved_to: string | null;
   /** Whether the story is visible (null when there's no slug). */
   story: boolean | null;
+  /** Whether the series exists (null when it isn't a series address). */
+  series?: boolean | null;
 };
 
 export function handleStatusFromRow(row: HandleStatusRow | null, route: HandleRoute): HandleStatus {
-  if (row?.username) return route.slug && !row.story ? { kind: "missing" } : { kind: "found" };
+  if (row?.username) {
+    if (route.slug && !row.story) return { kind: "missing" };
+    if (route.series && !row.series) return { kind: "missing" };
+    return { kind: "found" };
+  }
   // Old usernames move to the new one; the story check happens again on the new URL.
   if (row?.moved_to) return { kind: "moved", to: { ...route, handle: row.moved_to } };
   return { kind: "missing" };

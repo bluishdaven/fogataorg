@@ -75,6 +75,15 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   only per `isPublicAddress()`, redirects re-checked, 10 s, 15 MB, `sharp` to WebP), turns the rest
   into links, sanitizes and inserts a draft (optional https canonical link to the original).
   Never publishes. Rate limit `importStory`.
+- **Series, contents, version history** (`series` + `stories.series_id/series_position`,
+  `/me/series`, `/@handle/series/<slug>` routed by the proxy like stories; `story_versions`;
+  `src/components/story-contents.tsx`). A trigger keeps stories in their own writer's series;
+  series changes call `updateTag("series:<id>")`. Story pages show "Part N of M" with neighbors
+  (counting only published, visible parts) and a "Next in …" link. Stories with ≥ 3 headings get a
+  "Contents" disclosure linking to `#p-<id>`. Saves record a version per ten minutes of writing
+  (`recordVersion()` updates the newest draft version until it's ten minutes old) and every publish
+  adds one; a trigger keeps the newest 50. Restoring keeps the replaced text first, then writes into
+  the draft (or pending changes of a live story) and reloads the editor.
 - **Circles** (`src/lib/data/circles.ts`, `src/app/actions/circles.ts`, `src/components/circles/`).
   `circles` (accent color, optional header), `circle_members` (one owner created by trigger, editors,
   writers) and `circle_submissions` (pending → accepted/declined; one active circle per story; members'
@@ -336,10 +345,10 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
 
 ## Known gaps / follow-ups
 
-- Seed stories are short essays (150–335 words); add a few 1,500+ word pieces when the table of
-  contents lands.
-- Not built yet from the spec's Writing/Reading lists: embeds, version history, series, draft
-  sharing, table of contents, keyboard shortcuts and listen mode (later phases).
+- Seed stories are short essays (150–335 words); none is long enough to show the table of
+  contents (the e2e test writes its own).
+- Not built yet from the spec's Writing/Reading lists: embeds, draft sharing, keyboard shortcuts
+  and listen mode (later phases).
 - Uploaded images skip Next's image optimizer.
 - `drizzle-kit generate --custom` can reuse a timestamp from a migration generated the same second;
   Supabase treats equal timestamps as one version, so rename the newer file (and its journal tag).
