@@ -1,5 +1,26 @@
 # Changelog
 
+## Onboarding, home feeds, Burning now, embers and quote cards (2026-11-07)
+
+**Demo**: sign up with a new address and you're asked for your languages, three or more topics
+and a few writers; the home page then opens on **For you**, with **Following**, **Burning now**
+and **Latest** beside it. In any story, select a few words: **Highlight**, **Respond**,
+**Quote card** or **Copy link**. Your highlights live under **Embers** in the account menu.
+
+- **Onboarding** (`/welcome`): languages you read, topics, suggested writers (new voices marked).
+  Skippable; Settings → Account leads back to it. Existing accounts skip it.
+- **Home feeds**: For you (follows, freshness, what's burning, new voices; never your own
+  stories), Following (newest first), Burning now and Latest. Visitors get Latest and Burning now.
+- **Burning now**: sparkers, responses, saves, embers and reads past half the story over the last
+  days, fading by half every 36 hours.
+- **Anonymous reading counts**: the story page notes how far a reader got under a code that
+  changes daily (no IP stored, no cookie). The privacy policy says so.
+- **Embers**: highlights you keep, private to you, marked in the story when you come back.
+- **Quote cards**: a portrait image of the passage with the writer and story, shared on phones or
+  downloaded, with a link to the passage copied in the same tap.
+- **Passage links** open the story at the paragraph, which glows; most browsers also mark the
+  exact words.
+
 ## Ready for launch: legal pages, your data, abuse limits, real 404s (2026-11-07)
 
 **Demo**: the footer links **Terms**, **Privacy** and **Content policy**; Settings → **Account** has
