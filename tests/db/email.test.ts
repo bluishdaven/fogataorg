@@ -188,7 +188,10 @@ describe("weekly activity summaries", () => {
       expect((await notificationsOf(h, writer))[0]!.emailedAt).toBeNull();
 
       const { send } = inbox();
-      expect((await run(h, send, new Date(thursday.getTime() + HOUR), [writer])).sent).toBe(1);
+      // The next run, still on Thursday (an hour later would be Friday late in the UTC day).
+      const retry = new Date(thursday.getTime() + HOUR);
+      if (retry.getUTCDay() !== 4) retry.setTime(thursday.getTime() + MINUTE);
+      expect((await run(h, send, retry, [writer])).sent).toBe(1);
     });
   });
 
