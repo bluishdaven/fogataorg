@@ -6,7 +6,7 @@
 
 export const NEW_ACCOUNT_HOURS = 24;
 
-export type LimitedAction = "publish" | "respond" | "createCircle" | "joinRequest" | "follow" | "photoSearch" | "signInLink";
+export type LimitedAction = "publish" | "respond" | "createCircle" | "joinRequest" | "follow" | "photoSearch" | "signInLink" | "highlight";
 
 export type Limit = { max: number; per: "1 hour" | "1 day" };
 
@@ -21,6 +21,7 @@ export const LIMITS: Record<LimitedAction, { regular: Limit; newAccount?: Limit 
   photoSearch: { regular: { max: 20, per: "1 hour" }, newAccount: { max: 10, per: "1 hour" } },
   // Per IP address (hashed): sign-in links cost email quota and can be used to spam inboxes.
   signInLink: { regular: { max: 10, per: "1 hour" } },
+  highlight: { regular: { max: 300, per: "1 hour" }, newAccount: { max: 100, per: "1 hour" } },
 };
 
 export function isNewAccount(createdAt: Date | null | undefined, now: Date): boolean {

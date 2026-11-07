@@ -34,6 +34,7 @@
     "topics": "Topics",
     "footer": "Footer",
     "saved": "Saved",
+    "embers": "Embers",
     "notifications": "Notifications",
     "circles": "Circles",
     "manifesto": "Manifesto",
@@ -121,6 +122,17 @@
       "none": "No suggestions yet. Your feed will fill up as people write about your topics.",
       "done": "Take me to my feed"
     }
+  },
+  "Embers": {
+    "title": "Embers",
+    "lede": "Passages you highlighted, kept like embers from the fire. Only you see them.",
+    "empty": "No embers yet. Select a few words in any story and choose Highlight.",
+    "from": "From {title}, by {author}",
+    "open": "Open at this passage",
+    "remove": "Remove",
+    "removeLabel": "Remove the ember from {title}",
+    "removed": "Ember removed.",
+    "failed": "Couldn't remove it. Try again."
   },
   "StoryCard": {
     "byline": "{name}",
@@ -642,7 +654,20 @@
     "storyImageSaved": "Image saved. Add it to your Story with the link.",
     "storyLinkCopied": "Link copied. Paste it into a link sticker on your Story.",
     "storyImageSavedLinkCopied": "Image saved and link copied. Add the image to your Story and paste the link into a link sticker.",
-    "storyImageFailed": "Couldn't create the image. Try again."
+    "storyImageFailed": "Couldn't create the image. Try again.",
+    "selectionActions": "Actions for the selected text",
+    "highlight": "Highlight",
+    "unhighlight": "Remove highlight",
+    "quoteCard": "Quote card",
+    "copyPassage": "Copy link",
+    "highlightSaved": "Kept as an ember. Find it under Embers in your menu.",
+    "highlightRemoved": "Highlight removed.",
+    "highlightFailed": "Couldn't keep that highlight. Try again.",
+    "highlightTooLong": "That's a long passage. Highlight up to {max} characters.",
+    "passageCopied": "Link to this passage copied.",
+    "quoteCardSaved": "Quote card saved.",
+    "quoteCardSavedLinkCopied": "Quote card saved. The link to the passage is copied too.",
+    "quoteCardFailed": "Couldn't make the quote card. Try again."
   },
   "Circles": {
     "title": "Circles",
@@ -1016,7 +1041,7 @@
           "items": [
             "Your email address, to sign you in with a one-time link. If you choose Google sign-in, Google shares your email address and name with us.",
             "What you choose to show on your profile: username, name, short bio, photo, links, pronouns, your \"Now\" line and your influences. All of it is public.",
-            "What you publish and do: stories, responses, sparks, follows, circle memberships and requests to join. Published stories and responses are public; drafts, your saved stories and your notifications are private.",
+            "What you publish and do: stories, responses, sparks, embers (passages you highlight), follows, circle memberships and requests to join. Published stories and responses are public; drafts, your saved stories, your embers and your notifications are private.",
             "Your preferences: interface language and how often we may email you. Theme and reading preferences stay in your own browser.",
             "Photos you upload. Your browser resizes them and removes location and camera data (EXIF/GPS) before they reach us.",
             "Anonymous reading counts: when you read a story, we note how far you got and roughly for how long, under a code that changes every day, so your reads can't be linked over time. We don't store your IP address with it. Writers only ever see totals, never who read.",
@@ -1147,7 +1172,7 @@
     "feedBody": "The languages you read and the topics you follow shape For you and Burning now.",
     "feedButton": "Change languages and topics",
     "exportTitle": "Download your data",
-    "exportBody": "One file with your profile, your stories (drafts included, with their full text), your responses, sparks, saved stories, who you follow and your circles.",
+    "exportBody": "One file with your profile, your stories (drafts included, with their full text), your responses, sparks, saved stories, embers, who you follow and your circles.",
     "exportButton": "Download my data",
     "deleteTitle": "Delete your account",
     "deleteBody": "This deletes your profile, your stories, your responses, your photos and everything else tied to your account, right away and for good. Circles you own are deleted too. Consider downloading your data first.",

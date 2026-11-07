@@ -34,6 +34,7 @@
     "topics": "Temas",
     "footer": "Pie de página",
     "saved": "Leña guardada",
+    "embers": "Brasas",
     "notifications": "Notificaciones",
     "circles": "Círculos",
     "manifesto": "Manifiesto",
@@ -121,6 +122,17 @@
       "none": "Todavía no hay sugerencias. Tu sección se irá llenando a medida que la gente escriba sobre tus temas.",
       "done": "Llévame a mis historias"
     }
+  },
+  "Embers": {
+    "title": "Brasas",
+    "lede": "Pasajes que destacaste, guardados como brasas del fuego. Solo tú los ves.",
+    "empty": "Todavía no tienes brasas. Selecciona unas palabras en cualquier historia y elige Destacar.",
+    "from": "De {title}, por {author}",
+    "open": "Abrir en este pasaje",
+    "remove": "Quitar",
+    "removeLabel": "Quitar la brasa de {title}",
+    "removed": "Brasa quitada.",
+    "failed": "No se pudo quitar. Inténtalo de nuevo."
   },
   "StoryCard": {
     "byline": "{name}",
@@ -642,7 +654,20 @@
     "storyImageSaved": "Imagen guardada. Súbela a tu historia con el enlace.",
     "storyLinkCopied": "Enlace copiado. Pégalo en un sticker de enlace en tu historia.",
     "storyImageSavedLinkCopied": "Imagen guardada y enlace copiado. Sube la imagen a tu historia y pega el enlace en un sticker de enlace.",
-    "storyImageFailed": "No se pudo crear la imagen. Inténtalo de nuevo."
+    "storyImageFailed": "No se pudo crear la imagen. Inténtalo de nuevo.",
+    "selectionActions": "Acciones para el texto seleccionado",
+    "highlight": "Destacar",
+    "unhighlight": "Quitar destacado",
+    "quoteCard": "Tarjeta con cita",
+    "copyPassage": "Copiar enlace",
+    "highlightSaved": "Guardado como brasa. Lo encuentras en Brasas, en tu menú.",
+    "highlightRemoved": "Destacado quitado.",
+    "highlightFailed": "No se pudo guardar el destacado. Inténtalo de nuevo.",
+    "highlightTooLong": "Es un pasaje largo. Destaca hasta {max} caracteres.",
+    "passageCopied": "Enlace a este pasaje copiado.",
+    "quoteCardSaved": "Tarjeta guardada.",
+    "quoteCardSavedLinkCopied": "Tarjeta guardada. También copiamos el enlace al pasaje.",
+    "quoteCardFailed": "No se pudo crear la tarjeta. Inténtalo de nuevo."
   },
   "Circles": {
     "title": "Círculos",
@@ -1016,7 +1041,7 @@
           "items": [
             "Tu correo electrónico, para que entres con un enlace de un solo uso. Si eliges entrar con Google, Google nos comparte tu correo y tu nombre.",
             "Lo que decides mostrar en tu perfil: nombre de usuario, nombre, biografía corta, foto, enlaces, pronombres, tu línea de «Ahora» y tus referencias. Todo esto es público.",
-            "Lo que publicas y haces: historias, respuestas, chispas, a quién sigues, círculos a los que perteneces y solicitudes para unirte. Las historias y respuestas publicadas son públicas; tus borradores, tus historias guardadas y tus notificaciones son privados.",
+            "Lo que publicas y haces: historias, respuestas, chispas, brasas (pasajes que destacas), a quién sigues, círculos a los que perteneces y solicitudes para unirte. Las historias y respuestas publicadas son públicas; tus borradores, tus historias guardadas, tus brasas y tus notificaciones son privados.",
             "Tus preferencias: idioma de la interfaz y con qué frecuencia podemos escribirte. El tema y las preferencias de lectura se quedan en tu propio navegador.",
             "Las fotos que subes. Tu navegador las redimensiona y les quita los datos de ubicación y de cámara (EXIF/GPS) antes de que nos lleguen.",
             "Conteo anónimo de lecturas: cuando lees una historia, anotamos hasta dónde llegaste y cuánto tiempo, más o menos, con un código que cambia cada día, así que tus lecturas no se pueden enlazar con el tiempo. No guardamos tu dirección IP con eso. Quienes escriben solo ven totales, nunca quién leyó.",
@@ -1147,7 +1172,7 @@
     "feedBody": "Los idiomas en los que lees y los temas que sigues dan forma a Para ti y Lo que arde.",
     "feedButton": "Cambiar idiomas y temas",
     "exportTitle": "Descarga tus datos",
-    "exportBody": "Un archivo con tu perfil, tus historias (borradores incluidos, con su texto completo), tus respuestas, chispas, historias guardadas, a quién sigues y tus círculos.",
+    "exportBody": "Un archivo con tu perfil, tus historias (borradores incluidos, con su texto completo), tus respuestas, chispas, historias guardadas, brasas, a quién sigues y tus círculos.",
     "exportButton": "Descargar mis datos",
     "deleteTitle": "Borra tu cuenta",
     "deleteBody": "Esto borra tu perfil, tus historias, tus respuestas, tus fotos y todo lo demás ligado a tu cuenta, de inmediato y para siempre. Los círculos que administras también se borran. Considera descargar tus datos antes.",

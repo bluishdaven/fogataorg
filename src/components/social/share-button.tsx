@@ -25,17 +25,17 @@ const NETWORK_NAMES = {
 } as const;
 
 // Phones (coarse pointer) can hand links and images to the system share sheet.
-const COARSE = "(pointer: coarse)";
-function subscribe(onChange: () => void) {
+export const COARSE = "(pointer: coarse)";
+export function subscribe(onChange: () => void) {
   const query = window.matchMedia(COARSE);
   query.addEventListener("change", onChange);
   return () => query.removeEventListener("change", onChange);
 }
-const hasShareSheet = () => typeof navigator.share === "function" && window.matchMedia(COARSE).matches;
+export const hasShareSheet = () => typeof navigator.share === "function" && window.matchMedia(COARSE).matches;
 
-const isAbort = (error: unknown) => error instanceof DOMException && error.name === "AbortError";
+export const isAbort = (error: unknown) => error instanceof DOMException && error.name === "AbortError";
 
-function download(blob: Blob, fileName: string) {
+export function download(blob: Blob, fileName: string) {
   const href = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = href;

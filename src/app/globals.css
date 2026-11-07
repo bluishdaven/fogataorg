@@ -443,3 +443,30 @@ html[data-reader-font="sans"] .prose-fogata {
 .editor-body:focus-visible {
   outline: none;
 }
+
+/* Embers (the reader's own highlights), drawn with the CSS Custom Highlight API: no DOM changes. */
+::highlight(ember) {
+  background-color: var(--ember-soft);
+  color: var(--foreground);
+}
+/* Passage links (#p-…:~:text=…): browsers with text fragments mark the words; every browser
+   lands on the paragraph, which glows once. */
+::target-text {
+  background-color: var(--ember-soft);
+  color: var(--foreground);
+}
+.prose-fogata [data-block]:target {
+  border-radius: var(--radius-sm);
+  animation: passage-glow 2.4s ease-out 1;
+}
+@keyframes passage-glow {
+  0%,
+  30% {
+    background-color: var(--ember-soft);
+    box-shadow: 0 0 0 0.4em var(--ember-soft);
+  }
+  100% {
+    background-color: transparent;
+    box-shadow: 0 0 0 0.4em transparent;
+  }
+}

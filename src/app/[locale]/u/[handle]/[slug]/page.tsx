@@ -282,6 +282,9 @@ async function Story({ params }: Pick<Props, "params">) {
           authorUsername={story.authorUsername}
           slug={story.slug}
           content={story.content}
+          title={story.title}
+          authorName={authorName}
+          language={story.language}
         />
       </Suspense>
     </article>

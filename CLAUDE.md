@@ -57,6 +57,16 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   through `record_read()`, a daily HMAC (`readerHash()`, keyed from `EMAIL_SIGNING_SECRET`) of the
   user id or IP, never the IP itself, and skips writers' own reads. The daily cron prunes reads
   after 13 months. The privacy policy describes this: keep the two in step.
+- **Embers and quote cards** (`highlights`, `src/components/social/selection-toolbar.tsx`,
+  `src/lib/domain/highlights.ts`, `/[locale]/me/embers`). Selecting words inside one paragraph
+  of a story opens a toolbar: Highlight (keep as an ember; private to the reader, RLS own-only,
+  live stories only), Respond (paragraph response), Quote card (1080×1350 canvas in the browser,
+  `quote-image.ts`, link copied in the same tap) and Copy link. `saveHighlight` checks the quote
+  really is in that block's stored text (`blockTexts()` + `locateQuote()`). Embers are drawn with
+  the CSS Custom Highlight API (`::highlight(ember)`), never by changing the DOM. Blocks carry
+  `id="p-<block id>"`; passage links are `#p-<id>:~:text=…` (anchor for every browser, text
+  fragment where supported; `:target` glows). Link to passages with a plain `<a>`, since client
+  navigations don't apply text fragments. Embers count once per reader toward `story_heat()`.
 - **Circles** (`src/lib/data/circles.ts`, `src/app/actions/circles.ts`, `src/components/circles/`).
   `circles` (accent color, optional header), `circle_members` (one owner created by trigger, editors,
   writers) and `circle_submissions` (pending → accepted/declined; one active circle per story; members'

@@ -6,6 +6,7 @@ import {
   circleMembers,
   circles,
   follows,
+  highlights,
   profiles,
   responses,
   sparks,
@@ -74,6 +75,12 @@ export async function GET() {
       .innerJoin(stories, eq(stories.id, bookmarks.storyId))
       .innerJoin(profiles, eq(profiles.id, stories.authorId))
       .where(eq(bookmarks.userId, viewer.id));
+    const embers = await tx
+      .select({ quote: highlights.quote, keptAt: highlights.createdAt, ...ref })
+      .from(highlights)
+      .innerJoin(stories, eq(stories.id, highlights.storyId))
+      .innerJoin(profiles, eq(profiles.id, stories.authorId))
+      .where(eq(highlights.userId, viewer.id));
     const followRows = await tx
       .select({ user: profiles.username, topic: topics.slug, circle: circles.slug })
       .from(follows)
@@ -114,6 +121,8 @@ export async function GET() {
       responses: myResponses.map((r) => ({ body: r.body, createdAt: r.createdAt, reply: Boolean(r.isReply), story: { title: r.title, url: link(r.author, r.slug) } })),
       sparks: mySparks.map((s) => ({ count: s.count, story: { title: s.title, url: link(s.author, s.slug) } })),
       saved: saved.map((s) => ({ savedAt: s.savedAt, story: { title: s.title, url: link(s.author, s.slug) } })),
+      embers: embers.map((e) => ({ quote: e.quote, keptAt: e.keptAt, story: { title: e.title, url: link(e.author, e.slug) } })),
+      readingLanguages: profile?.readingLanguages ?? null,
       following: {
         writers: followRows.flatMap((f) => (f.user ? [f.user] : [])),
         topics: followRows.flatMap((f) => (f.topic ? [f.topic] : [])),

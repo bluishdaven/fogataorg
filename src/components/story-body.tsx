@@ -16,9 +16,10 @@ export { safeHref };
 
 type RenderContext = { imagePrefixes: readonly string[] };
 
-function blockProps(node: TiptapNode): { "data-block"?: string } {
+/** Blocks carry their id for paragraph responses and embers, and an anchor for passage links. */
+function blockProps(node: TiptapNode): { "data-block"?: string; id?: string } {
   const id = node.attrs?.id;
-  return typeof id === "string" && /^[0-9a-f-]{36}$/.test(id) ? { "data-block": id } : {};
+  return typeof id === "string" && /^[0-9a-f-]{36}$/.test(id) ? { "data-block": id, id: `p-${id}` } : {};
 }
 
 function applyMarks(text: ReactNode, marks: TiptapMark[] | undefined, key: string): ReactNode {

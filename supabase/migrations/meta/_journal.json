@@ -274,6 +274,20 @@
       "when": 1794018769656,
       "tag": "20261107023249_read_events_and_onboarding_grants",
       "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1794019861341,
+      "tag": "20261107025101_highlights",
+      "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1794019861744,
+      "tag": "20261107025102_highlights_grants_and_heat",
+      "breakpoints": true
     }
   ]
 }

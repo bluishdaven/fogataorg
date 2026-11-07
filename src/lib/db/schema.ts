@@ -373,6 +373,44 @@ export const bookmarks = pgTable(
 );
 
 /** Responses: top-level or one-level replies, optionally anchored to a paragraph (block id). */
+/**
+ * Embers (Brasas): passages a reader keeps from a story. Private to the reader; they count,
+ * anonymously, toward Burning now. Offsets are into the block's text (`blockTexts()`), and the
+ * quote is kept so the ember survives small edits around it.
+ */
+export const highlights = pgTable(
+  "highlights",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => profiles.id, { onDelete: "cascade" }),
+    storyId: uuid("story_id")
+      .notNull()
+      .references(() => stories.id, { onDelete: "cascade" }),
+    blockId: text("block_id").notNull(),
+    startOffset: integer("start_offset").notNull(),
+    endOffset: integer("end_offset").notNull(),
+    quote: text("quote").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    uniqueIndex("highlights_user_passage_key").on(t.userId, t.storyId, t.blockId, t.startOffset, t.endOffset),
+    index("highlights_user_created_idx").on(t.userId, t.createdAt.desc()),
+    index("highlights_story_idx").on(t.storyId, t.createdAt),
+    check("highlights_block_id_format", sql`${t.blockId} ~ '^[0-9a-f-]{36}$'`),
+    check("highlights_offsets", sql`${t.startOffset} >= 0 and ${t.endOffset} > ${t.startOffset}`),
+    check("highlights_quote_length", sql`char_length(${t.quote}) between 1 and 600`),
+    pgPolicy("highlights_select_own", { for: "select", to: authenticatedRole, using: sql`${t.userId} = ${authUid}` }),
+    pgPolicy("highlights_insert_own", {
+      for: "insert",
+      to: authenticatedRole,
+      withCheck: sql`${t.userId} = ${authUid} and ${LIVE_STORY(t.storyId)}`,
+    }),
+    pgPolicy("highlights_delete_own", { for: "delete", to: authenticatedRole, using: sql`${t.userId} = ${authUid}` }),
+  ],
+);
+
 export const responses = pgTable(
   "responses",
   {

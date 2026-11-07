@@ -1,6 +1,6 @@
 "use client";
 
-import { MessageSquareQuote, MessageSquareText } from "lucide-react";
+import { MessageSquareText } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
@@ -12,15 +12,13 @@ const STORY_BODY_ID = "story-body";
 type Marker = { blockId: string; top: number; bottom: number; count: number };
 
 /**
- * Paragraph-level conversation: small markers beside paragraphs that have
- * responses, and a "Respond" button when the reader selects text inside a
- * paragraph. Both talk to the responses section through window events.
+ * Paragraph-level conversation: small markers beside paragraphs that have responses. They (and
+ * the selection toolbar's Respond button) talk to the responses section through window events.
  */
 export function ParagraphAnchors({ counts }: { counts: Record<string, number> }) {
   const t = useTranslations("Social");
   const [container, setContainer] = useState<HTMLElement | null>(null);
   const [markers, setMarkers] = useState<Marker[]>([]);
-  const [selection, setSelection] = useState<{ blockId: string; top: number; left: number } | null>(null);
 
   const measure = useCallback(() => {
     const root = document.getElementById(STORY_BODY_ID);
@@ -48,30 +46,6 @@ export function ParagraphAnchors({ counts }: { counts: Record<string, number> })
     };
   }, [measure]);
 
-  useEffect(() => {
-    const onSelect = () => {
-      const current = window.getSelection();
-      const root = document.getElementById(STORY_BODY_ID);
-      if (!current || current.isCollapsed || !root || current.rangeCount === 0) {
-        setSelection(null);
-        return;
-      }
-      const blockOf = (node: Node | null) =>
-        (node instanceof Element ? node : node?.parentElement)?.closest<HTMLElement>("[data-block]") ?? null;
-      const start = blockOf(current.anchorNode);
-      const end = blockOf(current.focusNode);
-      if (!start || start !== end || !root.contains(start) || start.tagName === "FIGURE") {
-        setSelection(null);
-        return;
-      }
-      const rect = current.getRangeAt(0).getBoundingClientRect();
-      setSelection({ blockId: start.dataset.block!, top: rect.top, left: rect.left + rect.width / 2 });
-    };
-    document.addEventListener("selectionchange", onSelect);
-    window.addEventListener("scroll", () => setSelection(null), { passive: true });
-    return () => document.removeEventListener("selectionchange", onSelect);
-  }, []);
-
   return (
     <>
       {container
@@ -96,23 +70,6 @@ export function ParagraphAnchors({ counts }: { counts: Record<string, number> })
             container,
           )
         : null}
-      {selection ? (
-        <button
-          type="button"
-          className="fixed z-40 flex -translate-x-1/2 -translate-y-[calc(100%+8px)] items-center gap-1.5 rounded-full bg-foreground px-3 py-1.5 font-sans text-sm text-background shadow-lg"
-          style={{ top: selection.top, left: selection.left }}
-          onMouseDown={(event) => event.preventDefault()}
-          onClick={() => {
-            window.dispatchEvent(new CustomEvent(RESPOND_TO_BLOCK_EVENT, { detail: selection.blockId }));
-            window.getSelection()?.removeAllRanges();
-            setSelection(null);
-          }}
-          data-testid="respond-to-selection"
-        >
-          <MessageSquareQuote className="size-4" aria-hidden />
-          {t("respondToParagraph")}
-        </button>
-      ) : null}
     </>
   );
 }
