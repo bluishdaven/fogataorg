@@ -3,7 +3,7 @@ import { and, desc, eq, isNull } from "drizzle-orm";
 import { cacheLife, cacheTag } from "next/cache";
 import type { Viewer } from "@/lib/auth";
 import { asAnon, withRls } from "@/lib/db/rls";
-import { stories, storyTopics, topics } from "@/lib/db/schema";
+import { prompts, stories, storyTopics, topics } from "@/lib/db/schema";
 import type { TiptapDoc } from "@/lib/domain/content";
 import { pendingChangesSchema } from "@/lib/domain/stories";
 import { moderationReasonSql, moderationStatusSql } from "./moderation-sql";
@@ -30,6 +30,10 @@ export async function getStoryForEditing(viewer: Viewer, id: string) {
       .innerJoin(topics, eq(topics.id, storyTopics.topicId))
       .where(eq(storyTopics.storyId, id));
 
+    const [prompt] = story.promptId
+      ? await tx.select({ textEn: prompts.textEn, textEs: prompts.textEs }).from(prompts).where(eq(prompts.id, story.promptId)).limit(1)
+      : [];
+
     const pending = pendingChangesSchema.safeParse(story.pendingChanges);
     const working = pending.success ? pending.data : null;
 
@@ -51,6 +55,7 @@ export async function getStoryForEditing(viewer: Viewer, id: string) {
       seoDescription: story.seoDescription,
       canonicalUrl: story.canonicalUrl ?? "",
       topics: topicRows.map((t) => t.slug),
+      prompt: prompt ?? null,
     };
   });
 }

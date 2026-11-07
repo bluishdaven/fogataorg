@@ -235,6 +235,22 @@
       "failed": "That didn't work. Try again."
     }
   },
+  "Spark": {
+    "eyebrow": "Weekly spark",
+    "write": "Write about it",
+    "entries": "{count, plural, =0 {No entries yet} one {# entry} other {# entries}}",
+    "noEntriesYet": "Be the first to answer",
+    "noEntries": "No one has answered this spark yet.",
+    "archiveTitle": "Weekly sparks",
+    "archiveLede": "A writing prompt every Monday. Answer it with a story; every answer gathers here.",
+    "archiveEmpty": "No sparks yet.",
+    "weekOf": "Week of {date, date, ::MMMMd}",
+    "allSparks": "All weekly sparks",
+    "chip": "Written for the weekly spark",
+    "banner": "Answering the weekly spark: “{prompt}”",
+    "detach": "Not for this spark",
+    "detached": "This story no longer answers the spark."
+  },
   "StoryCard": {
     "byline": "{name}",
     "readStory": "Read “{title}”"
@@ -1007,7 +1023,24 @@
       "failed": "That didn't work. Try again."
     },
     "activeUntil": "active until {date}",
-    "endedOn": "ended {date}"
+    "endedOn": "ended {date}",
+    "promptsTitle": "Weekly sparks",
+    "promptsLede": "One writing prompt per week, from Monday (UTC). Readers see a spark only once its week starts.",
+    "promptWeek": "Week starting (a Monday)",
+    "promptEn": "Prompt in English",
+    "promptEs": "Prompt in Spanish",
+    "promptSave": "Save spark",
+    "promptSaved": "Spark saved.",
+    "promptDelete": "Delete",
+    "promptDeleteConfirm": "Delete the spark for the week of {week}? Stories written for it stay.",
+    "promptUpcoming": "Upcoming",
+    "promptNone": "No sparks yet.",
+    "promptErrors": {
+      "weekOf": "Pick a Monday.",
+      "text": "Write the prompt in both languages (up to 280 characters).",
+      "failed": "That didn't work. Try again."
+    },
+    "promptsLink": "Weekly sparks"
   },
   "Moderation": {
     "nsfwLabel": "NSFW",

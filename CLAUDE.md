@@ -91,11 +91,18 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   Hidden where speech isn't available. The e2e test swaps in a silent fake `speechSynthesis`.
 - **Continue reading** (`reading_positions`, `src/lib/domain/reading-position.ts`,
   `src/components/resume-reading.tsx`). The read beacon also carries the paragraph at the top of the
-  screen and the current progress; `/api/reads` saves it for signed-in readers (RLS own-only, live
+  screen and the current progress; `/api/reads` saves it for signed-in readers when the read counts
+  (not in their own stories; RLS own-only, live
   stories; reaching 95% counts as finished = 1), and `ReadTracker` keeps visitors' newest 50 places
   in localStorage (`fogata:positions`). Story pages offer a fixed "Pick up where you left off" pill
   (not on passage links or once scrolled); the home page lists up to three unfinished stories from
   the last 30 days. In the data download and the privacy policy.
+- **Weekly spark** (`prompts`, `stories.prompt_id`, `/[locale]/prompts[/week]`, `/admin/prompts`).
+  Admins write one prompt per week (Monday, UTC; EN + ES) ahead of time; RLS shows readers only
+  sparks whose week has started, and triggers stop stories answering a future one. The home page
+  shows this week's (`getCurrentPrompt()`, re-checked hourly) with "Write about it" (`createDraft`
+  with `promptId`); the editor shows a banner with "Not for this spark"; stories carry a chip to the
+  spark's page, which lists its entries. Featuring the best entries isn't built yet.
 - **Circles** (`src/lib/data/circles.ts`, `src/app/actions/circles.ts`, `src/components/circles/`).
   `circles` (accent color, optional header), `circle_members` (one owner created by trigger, editors,
   writers) and `circle_submissions` (pending → accepted/declined; one active circle per story; members'

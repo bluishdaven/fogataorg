@@ -6,8 +6,8 @@ import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { getViewer } from "@/lib/auth";
 import { recordVersion } from "@/lib/data/versions";
-import { withRls } from "@/lib/db/rls";
-import { stories, storyTopics, topics } from "@/lib/db/schema";
+import { asAnon, withRls } from "@/lib/db/rls";
+import { prompts, stories, storyTopics, topics } from "@/lib/db/schema";
 import { countWords, readingTimeMinutes, tiptapToText, type TiptapDoc } from "@/lib/domain/content";
 import { storyPath } from "@/lib/domain/handle-routes";
 import { DEFAULT_LOCALE, isLocale, type Locale } from "@/lib/domain/locale";
@@ -48,9 +48,15 @@ export async function createDraft(formData: FormData): Promise<void> {
   if (!viewer) redirect(`/${locale}/login?next=${encodeURIComponent(`/${locale}/me/stories`)}`);
 
   const id = crypto.randomUUID();
+  // Starting from the weekly spark links the draft to it (only a spark that has started; a trigger checks).
+  const promptId = String(formData.get("promptId") ?? "");
+  const [prompt] = /^[0-9a-f-]{36}$/.test(promptId)
+    ? await asAnon((tx) => tx.select({ id: prompts.id }).from(prompts).where(eq(prompts.id, promptId)).limit(1))
+    : [];
   await withRls(viewer.claims, (tx) =>
-    tx.insert(stories).values({ id, authorId: viewer.id, title: "", slug: draftSlug(id), language: locale, status: "draft" }),
+    tx.insert(stories).values({ id, authorId: viewer.id, title: "", slug: draftSlug(id), language: locale, status: "draft", promptId: prompt?.id ?? null }),
   );
+  if (prompt) updateTag("prompts");
   redirect(`/${locale}/write/${id}`);
 }
 

@@ -1,5 +1,23 @@
 # Changelog
 
+## Listen mode, continue reading, weekly spark, easy-to-read typeface (2026-11-07)
+
+**Demo**: on any story, **Listen** reads it aloud and **Aa → Easy to read** switches to a
+dyslexia-friendly typeface. Leave a story halfway and come back: "Pick up where you left off", and
+the home page lists it under **Continue reading**. Admins set **Weekly sparks** in the account
+menu; this week's shows on the home page with **Write about it**.
+
+- **Listen mode**: the browser's own speech (free, on the device), paragraph by paragraph in the
+  story's language, with the paragraph marked; pause, speed (0.8× to 1.5×) and stop.
+- **Easy to read**: Atkinson Hyperlegible Next with more space between letters, words and lines,
+  downloaded only by readers who pick it.
+- **Continue reading**: signed-in readers' place in each story is saved to their account (any
+  device; never their own stories); visitors' place stays in their browser. In the data download
+  and the privacy policy.
+- **Weekly spark** (La chispa de la semana): one prompt per week in English and Spanish, written
+  ahead by admins and shown once its week starts. Drafts started from it say so (and can let go);
+  published answers carry a chip and gather on the spark's page; past sparks are at `/prompts`.
+
 ## Import, series, contents, version history and two home tabs (2026-11-07)
 
 **Demo**: My stories now has **Import stories** and **Series**. Upload a Medium, Substack or

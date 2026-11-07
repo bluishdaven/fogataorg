@@ -3,6 +3,7 @@ import {
   type AnyPgColumn,
   boolean,
   check,
+  date,
   index,
   integer,
   jsonb,
@@ -168,6 +169,33 @@ export const series = pgTable(
   ],
 );
 
+const IS_ADMIN = sql`coalesce((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin', false)`;
+
+/**
+ * The weekly spark (La chispa de la semana): one writing prompt per week, starting on Monday (UTC).
+ * Admins write them ahead; everyone else sees this week's and earlier ones.
+ */
+export const prompts = pgTable(
+  "prompts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    weekOf: date("week_of", { mode: "string" }).notNull().unique(),
+    textEn: text("text_en").notNull(),
+    textEs: text("text_es").notNull(),
+    createdBy: uuid("created_by").references(() => profiles.id, { onDelete: "set null" }),
+    ...timestamps,
+  },
+  (t) => [
+    check("prompts_week_is_monday", sql`extract(isodow from ${t.weekOf}) = 1`),
+    check("prompts_text_length", sql`char_length(btrim(${t.textEn})) between 1 and 280 and char_length(btrim(${t.textEs})) between 1 and 280`),
+    pgPolicy("prompts_select_started", { for: "select", to: everyone, using: sql`${t.weekOf} <= (now() at time zone 'utc')::date` }),
+    pgPolicy("prompts_select_admin", { for: "select", to: authenticatedRole, using: IS_ADMIN }),
+    pgPolicy("prompts_insert_admin", { for: "insert", to: authenticatedRole, withCheck: IS_ADMIN }),
+    pgPolicy("prompts_update_admin", { for: "update", to: authenticatedRole, using: IS_ADMIN, withCheck: IS_ADMIN }),
+    pgPolicy("prompts_delete_admin", { for: "delete", to: authenticatedRole, using: IS_ADMIN }),
+  ],
+);
+
 export const stories = pgTable(
   "stories",
   {
@@ -199,6 +227,8 @@ export const stories = pgTable(
     // Series (set from /me/series): which one, and where in it (1, 2, 3…).
     seriesId: uuid("series_id").references((): AnyPgColumn => series.id, { onDelete: "set null" }),
     seriesPosition: integer("series_position"),
+    // Written for a weekly spark (set when the draft starts from the prompt).
+    promptId: uuid("prompt_id").references((): AnyPgColumn => prompts.id, { onDelete: "set null" }),
     seoTitle: text("seo_title").notNull().default(""),
     seoDescription: text("seo_description").notNull().default(""),
     // Edits to a published story wait here until the writer publishes them.
@@ -215,6 +245,7 @@ export const stories = pgTable(
       .where(sql`${t.status} = 'published' and ${t.deletedAt} is null`),
     index("stories_author_idx").on(t.authorId),
     index("stories_series_idx").on(t.seriesId, t.seriesPosition),
+    index("stories_prompt_idx").on(t.promptId),
     // Drafts may be untitled; anything live needs a title.
     check(
       "stories_title_length",

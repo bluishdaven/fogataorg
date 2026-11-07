@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { JsonLd } from "@/components/json-ld";
 import { HomeHeadline } from "@/components/home-headline";
 import { HomeFeed } from "@/components/home-feed";
+import { WeeklySpark } from "@/components/weekly-spark";
 import { StoryListSkeleton } from "@/components/story-list-skeleton";
 import { localeAlternates } from "@/lib/domain/seo";
 import { publicEnv } from "@/lib/env";
@@ -52,6 +53,9 @@ export default async function HomePage({ searchParams }: PageProps<"/[locale]">)
         <p className="max-w-2xl text-lg text-muted-foreground text-pretty">{t("lede")}</p>
       </section>
 
+      <Suspense fallback={null}>
+        <WeeklySpark />
+      </Suspense>
       <Suspense fallback={<FeedSkeleton />}>
         <HomeFeed searchParams={searchParams} />
       </Suspense>

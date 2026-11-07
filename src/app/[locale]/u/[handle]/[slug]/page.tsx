@@ -1,3 +1,4 @@
+import { Flame } from "lucide-react";
 import type { Metadata } from "next";
 import NextLink from "next/link";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
@@ -178,6 +179,18 @@ async function Story({ params }: Pick<Props, "params">) {
           >
             <span aria-hidden className="size-2.5 rounded-full" style={{ backgroundColor: story.circle.accentColor }} />
             {t("Circles.publishedInChip", { circle: story.circle.name })}
+          </Link>
+        ) : null}
+        {story.promptWeek ? (
+          <Link
+            href={`/prompts/${story.promptWeek}`}
+            className="flex w-fit items-center gap-2 text-sm font-medium text-ember-text hover:underline"
+            lang={locale}
+            data-testid="story-spark"
+          >
+            <Flame className="size-4" aria-hidden />
+            {t("Spark.chip")}
+            <span className="sr-only">: {locale === "es" ? story.promptTextEs : story.promptTextEn}</span>
           </Link>
         ) : null}
         {story.topics.length > 0 ? (

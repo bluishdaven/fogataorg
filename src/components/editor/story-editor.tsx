@@ -43,6 +43,7 @@ import { storyPath } from "@/lib/domain/handle-routes";
 import { storyState, type StoryState } from "@/lib/domain/stories";
 import { creditFromPhoto, type UnsplashPhoto } from "@/lib/domain/unsplash";
 import { Callout, Figure, PullQuote } from "./nodes";
+import { SparkBanner } from "./spark-banner";
 import { VersionHistory } from "./version-history";
 import { PublishDialog, type PublishDialogStory, type TopicOption } from "./publish-dialog";
 import { SelectionToolbar } from "./selection-toolbar";
@@ -70,6 +71,8 @@ export type EditorStoryProps = PublishDialogStory & {
   content: TiptapDoc;
   hasPendingChanges: boolean;
   updatedAt: Date;
+  /** The weekly spark this story answers, if any. */
+  prompt?: { textEn: string; textEs: string } | null;
 };
 
 function imageFiles(data: DataTransfer | null): File[] {
@@ -331,6 +334,8 @@ export function StoryEditor({
           </div>
         </div>
       </div>
+
+      {story.prompt ? <SparkBanner storyId={story.id} prompt={locale === "es" ? story.prompt.textEs : story.prompt.textEn} /> : null}
 
       {autosave.status === "conflict" ? (
         <div role="alert" className="mx-auto mt-4 flex max-w-[var(--measure)] items-center justify-between gap-3 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm">

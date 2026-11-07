@@ -119,6 +119,14 @@ export function AccountDropdown({
             </Link>
           </DropdownMenuItem>
         ) : null}
+        {isAdmin ? (
+          <DropdownMenuItem asChild>
+            <Link href="/admin/prompts" data-testid="admin-prompts-link">
+              <Flame />
+              {t("Admin.promptsLink")}
+            </Link>
+          </DropdownMenuItem>
+        ) : null}
         <DropdownMenuSeparator />
         {/* Donations keep Fogata free (there is no paid tier). */}
         <DropdownMenuItem asChild>

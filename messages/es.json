@@ -235,6 +235,22 @@
       "failed": "Eso no funcionó. Inténtalo de nuevo."
     }
   },
+  "Spark": {
+    "eyebrow": "La chispa de la semana",
+    "write": "Escribir sobre esto",
+    "entries": "{count, plural, =0 {Todavía sin respuestas} one {# respuesta} other {# respuestas}}",
+    "noEntriesYet": "Sé la primera persona en responder",
+    "noEntries": "Nadie ha respondido a esta chispa todavía.",
+    "archiveTitle": "Chispas de la semana",
+    "archiveLede": "Una propuesta de escritura cada lunes. Respóndela con una historia; todas las respuestas se reúnen aquí.",
+    "archiveEmpty": "Todavía no hay chispas.",
+    "weekOf": "Semana del {date, date, ::d 'de' MMMM}",
+    "allSparks": "Todas las chispas",
+    "chip": "Escrita para la chispa de la semana",
+    "banner": "Respondiendo a la chispa de la semana: “{prompt}”",
+    "detach": "No es para esta chispa",
+    "detached": "Esta historia ya no responde a la chispa."
+  },
   "StoryCard": {
     "byline": "{name}",
     "readStory": "Leer «{title}»"
@@ -1007,7 +1023,24 @@
       "failed": "No funcionó. Inténtalo de nuevo."
     },
     "activeUntil": "activa hasta el {date}",
-    "endedOn": "terminó el {date}"
+    "endedOn": "terminó el {date}",
+    "promptsTitle": "Chispas de la semana",
+    "promptsLede": "Una propuesta por semana, desde el lunes (UTC). Los lectores ven una chispa solo cuando empieza su semana.",
+    "promptWeek": "Semana que empieza (un lunes)",
+    "promptEn": "Propuesta en inglés",
+    "promptEs": "Propuesta en español",
+    "promptSave": "Guardar chispa",
+    "promptSaved": "Chispa guardada.",
+    "promptDelete": "Eliminar",
+    "promptDeleteConfirm": "¿Eliminar la chispa de la semana del {week}? Las historias escritas para ella se quedan.",
+    "promptUpcoming": "Próxima",
+    "promptNone": "Todavía no hay chispas.",
+    "promptErrors": {
+      "weekOf": "Elige un lunes.",
+      "text": "Escribe la propuesta en los dos idiomas (hasta 280 caracteres).",
+      "failed": "Eso no funcionó. Inténtalo de nuevo."
+    },
+    "promptsLink": "Chispas de la semana"
   },
   "Moderation": {
     "nsfwLabel": "NSFW",

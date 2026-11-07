@@ -2,7 +2,7 @@ import "server-only";
 import { and, desc, eq, inArray, isNull, lte, sql } from "drizzle-orm";
 import { cacheLife, cacheTag } from "next/cache";
 import { asAnon } from "@/lib/db/rls";
-import { profiles, stories, storyTopics, topics } from "@/lib/db/schema";
+import { profiles, prompts, stories, storyTopics, topics } from "@/lib/db/schema";
 import { badgeData } from "@/lib/domain/badges";
 import { excerpt } from "@/lib/domain/content";
 import { readInfluences } from "@/lib/domain/profile";
@@ -142,6 +142,9 @@ export async function getStory(handle: string, slug: string) {
         authorPronouns: profiles.pronouns,
         wordCount: sql<number>`"stories"."word_count"`,
         seriesId: stories.seriesId,
+        promptWeek: prompts.weekOf,
+        promptTextEn: prompts.textEn,
+        promptTextEs: prompts.textEs,
         authorNowFocus: profiles.nowFocus,
         authorNowText: profiles.nowText,
         moderation: moderationStatusSql,
@@ -149,6 +152,7 @@ export async function getStory(handle: string, slug: string) {
       })
       .from(stories)
       .innerJoin(profiles, eq(profiles.id, stories.authorId))
+      .leftJoin(prompts, eq(prompts.id, stories.promptId))
       // RLS limits this to published/unlisted stories.
       .where(and(sql`lower(${profiles.username}) = lower(${handle})`, eq(stories.slug, slug)))
       .limit(1);
