@@ -157,6 +157,17 @@ html[data-reader-width="wide"] {
 html[data-reader-font="sans"] .prose-fogata {
   font-family: var(--font-sans);
 }
+/* Dyslexia-friendly: clearly different letter shapes (b/d, p/q, I/l/1) and more air around words
+   and lines. The font only downloads for readers who pick it. */
+html[data-reader-font="readable"] .prose-fogata {
+  font-family: var(--font-readable), var(--font-sans);
+  letter-spacing: 0.02em;
+  word-spacing: 0.1em;
+  line-height: 1.85;
+}
+html[data-reader-font="readable"] .prose-fogata :is(h2, h3, blockquote, figcaption) {
+  font-family: var(--font-readable), var(--font-sans);
+}
 
 .sepia {
   --background: #f4ecd8;

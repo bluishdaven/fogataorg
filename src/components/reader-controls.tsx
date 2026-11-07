@@ -80,8 +80,19 @@ export function ReaderControls() {
         <DropdownMenuLabel>{t("font")}</DropdownMenuLabel>
         <DropdownMenuRadioGroup value={prefs?.font} onValueChange={(font) => update({ font: font as ReaderPrefs["font"] })}>
           {READER_FONTS.map((font) => (
-            <DropdownMenuRadioItem key={font} value={font} className={font === "serif" ? "font-serif" : "font-sans"}>
-              {t(`fonts.${font}`)}
+            <DropdownMenuRadioItem
+              key={font}
+              value={font}
+              className={font === "serif" ? "font-serif" : font === "readable" ? "font-[family-name:var(--font-readable)]" : "font-sans"}
+            >
+              {font === "readable" ? (
+                <span className="flex flex-col">
+                  {t("fonts.readable")}
+                  <span className="text-xs text-muted-foreground">{t("readableHint")}</span>
+                </span>
+              ) : (
+                t(`fonts.${font}`)
+              )}
             </DropdownMenuRadioItem>
           ))}
         </DropdownMenuRadioGroup>

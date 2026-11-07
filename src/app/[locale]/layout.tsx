@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations } from "next-intl/server";
-import { Inter, Source_Serif_4 } from "next/font/google";
+import { Atkinson_Hyperlegible_Next, Inter, Source_Serif_4 } from "next/font/google";
 import { notFound } from "next/navigation";
 import Script from "next/script";
 import { locale as rootLocale } from "next/root-params";
@@ -16,6 +16,8 @@ import { publicEnv } from "@/lib/env";
 import "../globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
+// The "Easy to read" typeface: self-hosted by Next, and only downloaded by readers who choose it.
+const readable = Atkinson_Hyperlegible_Next({ subsets: ["latin", "latin-ext"], variable: "--font-readable", display: "swap", preload: false });
 const sourceSerif = Source_Serif_4({
   subsets: ["latin"],
   variable: "--font-source-serif",
@@ -62,7 +64,7 @@ export default async function LocaleLayout({ children }: LayoutProps<"/[locale]"
   const t = await getTranslations({ locale, namespace: "Common" });
 
   return (
-    <html lang={locale} className={`${inter.variable} ${sourceSerif.variable}`} suppressHydrationWarning>
+    <html lang={locale} className={`${inter.variable} ${sourceSerif.variable} ${readable.variable}`} suppressHydrationWarning>
       <body className="flex min-h-dvh flex-col">
         {/* Applies saved reader preferences before paint (no layout jump). */}
         <Script id="reader-prefs" strategy="beforeInteractive">

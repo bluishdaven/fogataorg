@@ -5,7 +5,8 @@
  */
 
 export const READER_SIZES = ["s", "m", "l", "xl"] as const;
-export const READER_FONTS = ["serif", "sans"] as const;
+/** "readable": Atkinson Hyperlegible Next with extra spacing (dyslexia-friendly). */
+export const READER_FONTS = ["serif", "sans", "readable"] as const;
 export const READER_WIDTHS = ["narrow", "standard", "wide"] as const;
 
 export type ReaderPrefs = {
@@ -53,4 +54,4 @@ export function readerPrefsAttributes(prefs: ReaderPrefs): Record<"readerSize" |
  */
 export const READER_PREFS_SCRIPT = `(function(){try{var p=JSON.parse(localStorage.getItem(${JSON.stringify(
   READER_PREFS_KEY,
-)})||"{}");var d=document.documentElement.dataset;if(["s","l","xl"].indexOf(p.size)>-1)d.readerSize=p.size;if(p.font==="sans")d.readerFont="sans";if(["narrow","wide"].indexOf(p.width)>-1)d.readerWidth=p.width;}catch(e){}})();`;
+)})||"{}");var d=document.documentElement.dataset;if(["s","l","xl"].indexOf(p.size)>-1)d.readerSize=p.size;if(p.font==="sans"||p.font==="readable")d.readerFont=p.font;if(["narrow","wide"].indexOf(p.width)>-1)d.readerWidth=p.width;}catch(e){}})();`;

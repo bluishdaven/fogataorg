@@ -60,6 +60,18 @@ test("reader settings apply before paint and survive reloads", async ({ page }) 
   await expect(page.locator(".prose-fogata")).toHaveCSS("font-size", "23px");
 });
 
+test("readers can switch to the dyslexia-friendly typeface", async ({ page }) => {
+  await page.goto("/@danawrites/the-heron-knows-something-i-dont");
+  await page.getByTestId("reader-controls").click();
+  await page.getByRole("menuitemradio", { name: /Easy to read/ }).click();
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("data-reader-font", "readable");
+  const body = page.locator(".prose-fogata").first();
+  await expect(body).toHaveCSS("font-family", /Atkinson Hyperlegible Next/);
+  await expect(body).toHaveCSS("line-height", /px$/);
+  expect(await page.evaluate(() => document.fonts.check('16px "Atkinson Hyperlegible Next"'))).toBe(true);
+});
+
 test("signed-in pages have no WCAG A/AA violations", async ({ page }) => {
   test.setTimeout(60_000);
   await signInWithMagicLink(page, "en");

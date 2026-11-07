@@ -120,7 +120,9 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   put "can't set X on insert" in the insert policy instead. Column-level UPDATE grants are fine.
 - **Thumbnails** (`stories.thumbnail_url`) are set on publish: the cover, else the first figure.
 - **Reader preferences** (size, typeface, width) live in localStorage and are applied to `<html>` by
-  `READER_PREFS_SCRIPT` before paint; CSS reads the data attributes. The reading column width is
+  `READER_PREFS_SCRIPT` before paint; CSS reads the data attributes. The "Easy to read" typeface is
+  Atkinson Hyperlegible Next with wider letter, word and line spacing (dyslexia-friendly), loaded
+  by `next/font` with `preload: false` so only readers who pick it download it. The reading column width is
   `--measure` in rem, so headers and bodies always line up. Once the story's header scrolls away,
   `StoryTitleBar` shows title and writer in a 48px bar under the site header (decorative, hidden
   from screen readers). `<html>` has `scroll-padding-top` (5rem, 8rem on story pages, in

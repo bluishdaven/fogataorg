@@ -555,8 +555,10 @@
     "font": "Typeface",
     "fonts": {
       "serif": "Serif",
-      "sans": "Sans serif"
+      "sans": "Sans serif",
+      "readable": "Easy to read"
     },
+    "readableHint": "Dyslexia-friendly letters and spacing",
     "width": "Line width",
     "widths": {
       "narrow": "Narrow",

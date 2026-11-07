@@ -555,8 +555,10 @@
     "font": "Tipografía",
     "fonts": {
       "serif": "Con serifa",
-      "sans": "Sin serifa"
+      "sans": "Sin serifa",
+      "readable": "Fácil de leer"
     },
+    "readableHint": "Letras y espacios pensados para la dislexia",
     "width": "Ancho de línea",
     "widths": {
       "narrow": "Angosto",
