@@ -72,6 +72,8 @@ async function main() {
           displayName: author.displayName,
           bio: author.bio,
           locale: author.locale,
+          // Sample writers skip the welcome steps.
+          onboardedAt: new Date(),
         })
         .where(eq(schema.profiles.id, id));
     }

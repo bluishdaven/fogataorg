@@ -260,6 +260,20 @@
       "when": 1794017906324,
       "tag": "20261107021826_previous_username_triggers_and_orphaned_uploads",
       "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1794018765177,
+      "tag": "20261107023245_onboarding",
+      "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1794018769656,
+      "tag": "20261107023249_read_events_and_onboarding_grants",
+      "breakpoints": true
     }
   ]
 }

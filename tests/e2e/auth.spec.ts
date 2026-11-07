@@ -35,6 +35,9 @@ test("magic links return to the page the reader came from", async ({ page }) => 
   const link = await waitForMagicLink(email);
   expect(link).toContain("/auth/confirm?next=%2Fen%2Fdesign");
   await page.goto(link);
+  // A new account sees the welcome steps first, which remember where they were going.
+  await expect(page).toHaveURL(/\/en\/welcome\?next=%2Fen%2Fdesign$/);
+  await page.getByTestId("onboarding-skip").click();
   await expect(page).toHaveURL(/\/en\/design$/);
 });
 

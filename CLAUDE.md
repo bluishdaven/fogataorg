@@ -41,6 +41,22 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   `notifications_unread_group_key` expressions; change all three together), and pushed to the bell
   through Supabase Realtime. Per-reader data on story pages loads in its own `<Suspense>` so the cached
   story text never waits for it. Pinning goes through `public.set_response_pinned()`.
+- **Home feeds and onboarding** (`src/lib/data/feeds.ts`, `src/components/home-feed.tsx`,
+  `src/app/[locale]/welcome/`, plan in `docs/plans/phase-3.md`). Tabs by `?feed=` inside Suspense:
+  visitors get Latest and Burning now, readers For you, Following, Burning now and Latest.
+  Burning now ranks `public.story_heat()` (security definer, one score per story: sparkers, others'
+  responses, saves, reads past half, halving every 36 hours over 14 days), cached 15 minutes per
+  set of `profiles.reading_languages`. For you scores the last 30 days per reader (freshness,
+  followed writers/topics/circles, heat, new voices: ≤ 3 stories, first week) and never shows the
+  reader's own stories; both top up with Latest so they're never empty. New accounts
+  (`profiles.onboarded_at` null) go to `/welcome` from `/auth/confirm` and `/auth/callback`
+  (`afterSignInPath()`); the e2e sign-in helper skips it unless `onboarding: "keep"`. Settings →
+  Account links back to it.
+- **Reads** (`read_events`, hand-written migration, no grants). The story page's `ReadTracker`
+  beacons `POST /api/reads` (text/plain JSON) at half the story and on leaving; the route stores,
+  through `record_read()`, a daily HMAC (`readerHash()`, keyed from `EMAIL_SIGNING_SECRET`) of the
+  user id or IP, never the IP itself, and skips writers' own reads. The daily cron prunes reads
+  after 13 months. The privacy policy describes this: keep the two in step.
 - **Circles** (`src/lib/data/circles.ts`, `src/app/actions/circles.ts`, `src/components/circles/`).
   `circles` (accent color, optional header), `circle_members` (one owner created by trigger, editors,
   writers) and `circle_submissions` (pending → accepted/declined; one active circle per story; members'
@@ -293,7 +309,8 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   Vercel Hobby.
 - **No "Pro" tier anywhere**: everyone gets everything. Donations go through Buy Me a Coffee
   (`SUPPORT_URL` in `src/lib/domain/links.ts`, linked from the footer).
-- **Dates render in UTC** until readers can choose a time zone (Phase 3 onboarding).
+- **Dates render in UTC**: story pages and lists are cached for everyone, so a reader time zone
+  needs client-side formatting (not done yet).
 - **Reading speed** 238 wpm (EN) / 218 wpm (ES).
 - **Unsplash hotlinking over privacy-maximal re-hosting**: Unsplash requires it. Readers' browsers
   load those images from Unsplash's CDN, which sees their IP. The privacy policy (Phase 5) must say

@@ -75,6 +75,10 @@ export const profiles = pgTable(
     // Highest writing tier (its minimum story count) the writer was notified about, so a tier is
     // announced once even if stories are unpublished and published again. Set by trigger only.
     badgeTierNotified: integer("badge_tier_notified").notNull().default(0),
+    // Set when the person finishes or skips onboarding (/welcome); null sends them there after sign-in.
+    onboardedAt: timestamp("onboarded_at", { withTimezone: true }),
+    // Languages they read; feeds (For you, Burning now) show stories in these.
+    readingLanguages: localeCode("reading_languages").array().notNull().default(sql`'{es,en}'::locale_code[]`),
     ...timestamps,
   },
   (t) => [
@@ -86,6 +90,7 @@ export const profiles = pgTable(
     check("profiles_now_text_length", sql`char_length(${t.nowText}) <= 120`),
     check("profiles_influences_shape", sql`jsonb_typeof(${t.influences}) = 'object' and octet_length(${t.influences}::text) <= 4000`),
     check("profiles_email_weekday_range", sql`${t.emailWeekday} between 0 and 6`),
+    check("profiles_reading_languages_size", sql`cardinality(${t.readingLanguages}) between 1 and 2`),
     // Profile photos may only point into the owner's own folder of the avatars bucket (uploaded as
     // <user id>/<uuid>.webp), so no one can set an outside image or tracking pixel via the Data API.
     check(

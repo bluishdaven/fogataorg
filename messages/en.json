@@ -72,8 +72,55 @@
       "Where stories outlast the embers."
     ],
     "lede": "Fogata is a warm home for long-form writing. No ads, no feeds built to keep you scrolling, just stories and the people who tell them.",
-    "latest": "Fresh from the fire",
+    "feeds": {
+      "label": "Feeds",
+      "for-you": "For you",
+      "following": "Following",
+      "burning": "Burning now",
+      "latest": "Latest",
+      "pickTopics": "This feed fills up with the topics and writers you follow.",
+      "pickTopicsLink": "Pick a few topics",
+      "followingEmpty": "Follow writers, topics or circles and their new stories show up here.",
+      "browseTopics": "Browse topics"
+    },
     "empty": "No stories yet. The fire has just been lit, and yours could be the first."
+  },
+  "Welcome": {
+    "title": "Welcome to Fogata",
+    "progress": "Step {step} of {total}",
+    "back": "Back",
+    "skip": "Skip for now",
+    "languages": {
+      "title": "Welcome to the fire",
+      "lede": "A couple of choices so Fogata feels like yours. You can change them any time.",
+      "interface": "Show Fogata in",
+      "reading": "I read stories in",
+      "readingHint": "Your feeds show stories in these languages.",
+      "continue": "Continue",
+      "errors": {
+        "readingLanguages": "Pick at least one language you read.",
+        "invalid": "Something didn't save. Try again."
+      }
+    },
+    "topics": {
+      "title": "What do you like to read?",
+      "lede": "Pick at least three topics. They shape your For you feed.",
+      "legend": "Topics",
+      "needMore": "{count, plural, one {Pick # more} other {Pick # more}}",
+      "picked": "{count, plural, one {# topic picked} other {# topics picked}}",
+      "continue": "Continue",
+      "errors": {
+        "tooFewTopics": "Pick at least {min} topics.",
+        "invalid": "Something didn't save. Try again."
+      }
+    },
+    "writers": {
+      "title": "Writers you might like",
+      "lede": "Follow a few and their new stories come to you. New voices are marked, so they get a first reader.",
+      "newVoice": "New voice",
+      "none": "No suggestions yet. Your feed will fill up as people write about your topics.",
+      "done": "Take me to my feed"
+    }
   },
   "StoryCard": {
     "byline": "{name}",
@@ -972,6 +1019,7 @@
             "What you publish and do: stories, responses, sparks, follows, circle memberships and requests to join. Published stories and responses are public; drafts, your saved stories and your notifications are private.",
             "Your preferences: interface language and how often we may email you. Theme and reading preferences stay in your own browser.",
             "Photos you upload. Your browser resizes them and removes location and camera data (EXIF/GPS) before they reach us.",
+            "Anonymous reading counts: when you read a story, we note how far you got and roughly for how long, under a code that changes every day, so your reads can't be linked over time. We don't store your IP address with it. Writers only ever see totals, never who read.",
             "Basic technical records that our hosting keeps for a short time to keep the site secure and working, such as IP address and browser type."
           ]
         },
@@ -1094,7 +1142,10 @@
   },
   "Account": {
     "title": "Your account",
-    "lede": "Take a copy of everything you've done on Fogata, or leave for good.",
+    "lede": "Shape your feeds, take a copy of everything you've done on Fogata, or leave for good.",
+    "feedTitle": "Your feeds",
+    "feedBody": "The languages you read and the topics you follow shape For you and Burning now.",
+    "feedButton": "Change languages and topics",
     "exportTitle": "Download your data",
     "exportBody": "One file with your profile, your stories (drafts included, with their full text), your responses, sparks, saved stories, who you follow and your circles.",
     "exportButton": "Download my data",

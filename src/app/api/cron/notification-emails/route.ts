@@ -36,6 +36,8 @@ export async function GET(request: NextRequest) {
   // Rate-limit records older than any window are forgotten.
   const [pruned] = await db.execute<{ removed: number }>(sql`select public.prune_rate_limits() as removed`);
   console.info("[limits] old hits removed", pruned?.removed ?? 0);
+  const [reads] = await db.execute<{ removed: number }>(sql`select public.prune_read_events() as removed`);
+  console.info("[reads] old reads removed", reads?.removed ?? 0);
   // Uploaded pictures and photos nothing uses any more (needs SUPABASE_SECRET_KEY).
   try {
     const cleanup = await removeOrphanedUploads(db, {

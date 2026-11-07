@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { DEFAULT_LOCALE, LOCALES } from "@/lib/domain/locale";
 import { safeNextPath } from "@/lib/domain/redirect";
+import { afterSignInPath } from "@/lib/onboarding";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 /** OAuth (Google) landing: exchanges the PKCE code for a session. */
@@ -11,8 +12,11 @@ export async function GET(request: NextRequest) {
 
   if (code) {
     const supabase = await createSupabaseServerClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) return NextResponse.redirect(new URL(next, origin));
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+    if (!error) {
+      const destination = data.user ? await afterSignInPath(data.user.id, next) : next;
+      return NextResponse.redirect(new URL(destination, origin));
+    }
     console.error("[auth] exchangeCodeForSession failed", error.message);
   }
 

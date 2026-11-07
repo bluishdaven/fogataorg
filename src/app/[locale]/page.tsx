@@ -3,9 +3,8 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 import { JsonLd } from "@/components/json-ld";
 import { HomeHeadline } from "@/components/home-headline";
-import { StoryCard } from "@/components/story-card";
+import { HomeFeed } from "@/components/home-feed";
 import { StoryListSkeleton } from "@/components/story-list-skeleton";
-import { getLatestStories } from "@/lib/data/stories";
 import { localeAlternates } from "@/lib/domain/seo";
 import { publicEnv } from "@/lib/env";
 
@@ -13,7 +12,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return { alternates: localeAlternates(await getLocale(), "/") };
 }
 
-export default async function HomePage() {
+export default async function HomePage({ searchParams }: PageProps<"/[locale]">) {
   const [t, m, locale] = await Promise.all([getTranslations("Home"), getTranslations("Metadata"), getLocale()]);
   const site = publicEnv.NEXT_PUBLIC_SITE_URL.replace(/\/$/, "");
 
@@ -53,28 +52,21 @@ export default async function HomePage() {
         <p className="max-w-2xl text-lg text-muted-foreground text-pretty">{t("lede")}</p>
       </section>
 
-      <section aria-labelledby="latest-title" className="max-w-3xl">
-        <h2 id="latest-title" className="border-b border-border pb-3 font-serif text-2xl font-semibold">
-          {t("latest")}
-        </h2>
-        <Suspense fallback={<StoryListSkeleton />}>
-          <LatestStories empty={t("empty")} />
-        </Suspense>
-      </section>
+      <Suspense fallback={<FeedSkeleton />}>
+        <HomeFeed searchParams={searchParams} />
+      </Suspense>
     </div>
   );
 }
 
-async function LatestStories({ empty }: { empty: string }) {
-  const stories = await getLatestStories(20);
-  if (stories.length === 0) {
-    return <p className="py-10 text-muted-foreground">{empty}</p>;
-  }
+function FeedSkeleton() {
   return (
-    <div data-testid="story-list">
-      {stories.map((story) => (
-        <StoryCard key={`${story.author.username}/${story.slug}`} story={story} />
-      ))}
+    <div className="max-w-3xl">
+      <div aria-hidden className="flex min-h-11 items-end gap-4 border-b border-border pb-2 sm:min-h-10">
+        <div className="h-5 w-20 animate-pulse rounded bg-muted" />
+        <div className="h-5 w-24 animate-pulse rounded bg-muted" />
+      </div>
+      <StoryListSkeleton />
     </div>
   );
 }

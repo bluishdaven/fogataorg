@@ -17,7 +17,7 @@ import { moderationReasonSql, moderationStatusSql, notModerated, notRemoved } fr
  * `profile:<handle>` for single pages (revalidated on publish in Phase 1).
  */
 
-const cardColumns = {
+export const cardColumns = {
   title: stories.title,
   subtitle: stories.subtitle,
   slug: stories.slug,
@@ -56,7 +56,7 @@ type CardRow = {
   moderation: "nsfw" | "removed" | null;
 };
 
-function toCard(row: CardRow) {
+export function toCard(row: CardRow) {
   return {
     title: row.title,
     subtitle: row.subtitle,
@@ -88,7 +88,7 @@ const listed = and(
   notRemoved,
 );
 /** Feeds (home, topics) also leave out NSFW stories. */
-const inFeeds = and(listed, notModerated);
+export const inFeeds = and(listed, notModerated);
 
 export async function getLatestStories(limit = 20) {
   "use cache";

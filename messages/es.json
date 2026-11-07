@@ -72,8 +72,55 @@
       "Donde las historias duran más que las brasas."
     ],
     "lede": "Fogata es un hogar cálido para la escritura larga. Sin anuncios, sin feeds hechos para que no dejes de deslizar: solo historias y la gente que las cuenta.",
-    "latest": "Recién salidas del fuego",
+    "feeds": {
+      "label": "Secciones",
+      "for-you": "Para ti",
+      "following": "Siguiendo",
+      "burning": "Lo que arde",
+      "latest": "Recientes",
+      "pickTopics": "Esta sección se llena con los temas y las personas que sigues.",
+      "pickTopicsLink": "Elige algunos temas",
+      "followingEmpty": "Sigue a personas, temas o círculos y aquí aparecerán sus historias nuevas.",
+      "browseTopics": "Explorar temas"
+    },
     "empty": "Todavía no hay historias. La fogata acaba de encenderse y la tuya puede ser la primera."
+  },
+  "Welcome": {
+    "title": "Te damos la bienvenida a Fogata",
+    "progress": "Paso {step} de {total}",
+    "back": "Atrás",
+    "skip": "Omitir por ahora",
+    "languages": {
+      "title": "Arrímate al fuego",
+      "lede": "Un par de elecciones para que Fogata se sienta tuya. Puedes cambiarlas cuando quieras.",
+      "interface": "Mostrar Fogata en",
+      "reading": "Leo historias en",
+      "readingHint": "Tus secciones muestran historias en estos idiomas.",
+      "continue": "Continuar",
+      "errors": {
+        "readingLanguages": "Elige al menos un idioma en el que lees.",
+        "invalid": "Algo no se guardó. Inténtalo de nuevo."
+      }
+    },
+    "topics": {
+      "title": "¿Qué te gusta leer?",
+      "lede": "Elige al menos tres temas. Con ellos armamos tu sección Para ti.",
+      "legend": "Temas",
+      "needMore": "{count, plural, one {Elige # más} other {Elige # más}}",
+      "picked": "{count, plural, one {# tema elegido} other {# temas elegidos}}",
+      "continue": "Continuar",
+      "errors": {
+        "tooFewTopics": "Elige al menos {min} temas.",
+        "invalid": "Algo no se guardó. Inténtalo de nuevo."
+      }
+    },
+    "writers": {
+      "title": "Personas que quizá te gusten",
+      "lede": "Sigue a algunas y sus historias nuevas llegarán a ti. Las voces nuevas están marcadas, para que tengan sus primeros lectores.",
+      "newVoice": "Voz nueva",
+      "none": "Todavía no hay sugerencias. Tu sección se irá llenando a medida que la gente escriba sobre tus temas.",
+      "done": "Llévame a mis historias"
+    }
   },
   "StoryCard": {
     "byline": "{name}",
@@ -972,6 +1019,7 @@
             "Lo que publicas y haces: historias, respuestas, chispas, a quién sigues, círculos a los que perteneces y solicitudes para unirte. Las historias y respuestas publicadas son públicas; tus borradores, tus historias guardadas y tus notificaciones son privados.",
             "Tus preferencias: idioma de la interfaz y con qué frecuencia podemos escribirte. El tema y las preferencias de lectura se quedan en tu propio navegador.",
             "Las fotos que subes. Tu navegador las redimensiona y les quita los datos de ubicación y de cámara (EXIF/GPS) antes de que nos lleguen.",
+            "Conteo anónimo de lecturas: cuando lees una historia, anotamos hasta dónde llegaste y cuánto tiempo, más o menos, con un código que cambia cada día, así que tus lecturas no se pueden enlazar con el tiempo. No guardamos tu dirección IP con eso. Quienes escriben solo ven totales, nunca quién leyó.",
             "Registros técnicos básicos que nuestro proveedor de alojamiento guarda por poco tiempo para mantener el sitio seguro y funcionando, como la dirección IP y el tipo de navegador."
           ]
         },
@@ -1094,7 +1142,10 @@
   },
   "Account": {
     "title": "Tu cuenta",
-    "lede": "Llévate una copia de todo lo que has hecho en Fogata, o vete para siempre.",
+    "lede": "Da forma a tus secciones, llévate una copia de todo lo que has hecho en Fogata, o vete para siempre.",
+    "feedTitle": "Tus secciones",
+    "feedBody": "Los idiomas en los que lees y los temas que sigues dan forma a Para ti y Lo que arde.",
+    "feedButton": "Cambiar idiomas y temas",
     "exportTitle": "Descarga tus datos",
     "exportBody": "Un archivo con tu perfil, tus historias (borradores incluidos, con su texto completo), tus respuestas, chispas, historias guardadas, a quién sigues y tus círculos.",
     "exportButton": "Descargar mis datos",

@@ -10,6 +10,7 @@ import { NsfwGate } from "@/components/moderation/nsfw-gate";
 import { RemovedNotice } from "@/components/moderation/removed-notice";
 import { UserBadges } from "@/components/badges/user-badges";
 import { ReaderControls } from "@/components/reader-controls";
+import { ReadTracker } from "@/components/read-tracker";
 import { ReadingProgress } from "@/components/reading-progress";
 import { StoryTitleBar } from "@/components/story-title-bar";
 import { StoryBody } from "@/components/story-body";
@@ -155,6 +156,7 @@ async function Story({ params }: Pick<Props, "params">) {
         />
       ) : null}
       <ReadingProgress targetId="story" />
+      <ReadTracker storyId={story.id} targetId="story" />
       <StoryTitleBar
         headerId="story-header"
         storyId="story"

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { SettingsNav } from "@/components/settings-nav";
 import { buttonVariants } from "@/components/ui/button";
+import { Link } from "@/i18n/navigation";
 import { getViewer } from "@/lib/auth";
 import { DeleteAccountForm } from "./delete-account-form";
 
@@ -33,6 +34,21 @@ async function Sections() {
   const t = await getTranslations("Account");
   return (
     <div className="flex flex-col gap-10">
+      <section aria-labelledby="feed-heading" className="flex flex-col gap-3">
+        <h2 id="feed-heading" className="font-serif text-2xl font-semibold">
+          {t("feedTitle")}
+        </h2>
+        <p className="text-sm text-pretty">{t("feedBody")}</p>
+        <div>
+          <Link
+            href={{ pathname: "/welcome", query: { next: `/${locale}/settings/account` } }}
+            className={buttonVariants({ variant: "outline" })}
+            data-testid="change-feeds"
+          >
+            {t("feedButton")}
+          </Link>
+        </div>
+      </section>
       <section aria-labelledby="export-heading" className="flex flex-col gap-3">
         <h2 id="export-heading" className="font-serif text-2xl font-semibold">
           {t("exportTitle")}

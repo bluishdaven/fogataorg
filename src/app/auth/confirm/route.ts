@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { DEFAULT_LOCALE, LOCALES } from "@/lib/domain/locale";
 import { safeNextPath } from "@/lib/domain/redirect";
+import { afterSignInPath } from "@/lib/onboarding";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const otpType = z.enum([
@@ -28,8 +29,11 @@ export async function GET(request: NextRequest) {
 
   if (tokenHash && type.success) {
     const supabase = await createSupabaseServerClient();
-    const { error } = await supabase.auth.verifyOtp({ type: type.data, token_hash: tokenHash });
-    if (!error) return NextResponse.redirect(new URL(next, origin));
+    const { data, error } = await supabase.auth.verifyOtp({ type: type.data, token_hash: tokenHash });
+    if (!error) {
+      const destination = data.user ? await afterSignInPath(data.user.id, next) : next;
+      return NextResponse.redirect(new URL(destination, origin));
+    }
     console.error("[auth] verifyOtp failed", error.message);
   }
 
