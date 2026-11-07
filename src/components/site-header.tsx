@@ -15,11 +15,18 @@ export function SiteHeader() {
         <Link
           href="/"
           className="flex min-h-11 min-w-11 items-center gap-2 rounded-md font-serif text-xl font-semibold tracking-tight"
-          aria-label={`Fogata — ${t("home")}`}
+          // Starts with the visible "Fogata.org" so voice control users can say what they see (WCAG 2.5.3).
+          aria-label={`Fogata.org — ${t("home")}`}
         >
           <FlameLogo className="h-7" />
           {/* On phones the signed-in controls need the room; the flame still links home. */}
-          <span className="max-sm:group-has-[[data-testid=account-menu]]/header:sr-only">Fogata</span>
+          <span className="max-sm:group-has-[[data-testid=account-menu]]/header:sr-only">
+            Fogata
+            {/* A quiet reminder of what the site is: a .org, not a company. */}
+            <span className="font-normal text-muted-foreground" data-testid="wordmark-org">
+              .org
+            </span>
+          </span>
         </Link>
         <nav aria-label={t("primary")} className="flex items-center gap-0.5 sm:gap-1">
           <SearchButton />
