@@ -30,7 +30,7 @@ export function StoryCard({ story }: { story: StoryCardData }) {
   const authorName = story.author.displayName || story.author.username;
 
   return (
-    <article className="group relative -mx-3 flex items-start gap-4 rounded-2xl border-b border-border/70 px-3 py-6 transition-colors last:border-b-0 hover:bg-card motion-safe:duration-200 sm:-mx-4 sm:gap-6 sm:px-4">
+    <article className="group relative -mx-3 flex items-start gap-4 rounded-2xl border-b border-border/70 px-3 py-6 transition-colors last:border-b-0 hover:bg-card has-[a:focus-visible]:bg-card has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-2 has-[a:focus-visible]:outline-ring motion-safe:duration-200 sm:-mx-4 sm:gap-6 sm:px-4">
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <p className="flex items-center gap-2 text-sm text-muted-foreground">
           <Avatar name={authorName} url={story.author.avatarUrl} className="size-6 text-[0.625rem]" />
@@ -42,7 +42,7 @@ export function StoryCard({ story }: { story: StoryCardData }) {
           {/* Next's Link (not the i18n one): share URLs have no locale prefix. */}
           <NextLink
             href={href}
-            className="after:absolute after:inset-0 after:content-[''] group-hover:text-ember-text focus-visible:outline-none"
+            className="after:absolute after:inset-0 after:content-[''] group-hover:text-ember-text focus-visible:text-ember-text focus-visible:outline-none"
           >
             {story.title}
           </NextLink>

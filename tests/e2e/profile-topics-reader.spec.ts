@@ -25,6 +25,10 @@ test("reserved usernames are refused with a clear message", async ({ page }) => 
   await page.getByLabel("Nombre de usuario").fill("fogata");
   await page.getByTestId("profile-save").click();
   await expect(page.getByRole("main").getByRole("alert")).toContainText("Ese nombre de usuario está reservado.");
+  // The message is tied to the field, so screen readers read it on the field itself.
+  const username = page.getByLabel("Nombre de usuario");
+  await expect(username).toHaveAttribute("aria-invalid", "true");
+  await expect(username).toHaveAccessibleDescription(/Ese nombre de usuario está reservado\./);
 });
 
 test("topic pages list stories in the reader's language", async ({ page }) => {

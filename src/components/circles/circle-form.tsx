@@ -17,6 +17,8 @@ import { slugify } from "@/lib/domain/slug";
 import { creditFromPhoto, type ImageCredit } from "@/lib/domain/unsplash";
 import { cn } from "@/lib/utils";
 
+const errorId = (key: CircleErrorKey) => `circle-error-${key}`;
+
 type Header = { url: string; alt: string; credit: ImageCredit | null } | null;
 
 export function CircleForm({
@@ -38,6 +40,9 @@ export function CircleForm({
   const [header, setHeader] = useState<Header>(initial?.header ?? null);
   const [isPrivate, setIsPrivate] = useState(initial?.isPrivate ?? false);
   const [errors, setErrors] = useState<CircleErrorKey[]>([]);
+  /** Ties a field to its messages in the error list, so screen readers read them with the field. */
+  const describedBy = (keys: CircleErrorKey[], ...more: string[]) =>
+    [...keys.filter((key) => errors.includes(key)).map(errorId), ...more].join(" ") || undefined;
   const [pending, setPending] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [unsplashOpen, setUnsplashOpen] = useState(false);
@@ -82,7 +87,9 @@ export function CircleForm({
       {errors.length ? (
         <ul role="alert" className="list-disc rounded-lg border border-destructive/30 bg-destructive/5 py-3 pr-4 pl-8 text-sm text-destructive">
           {errors.map((key) => (
-            <li key={key}>{t(`errors.${key}`)}</li>
+            <li key={key} id={errorId(key)}>
+              {t(`errors.${key}`)}
+            </li>
           ))}
         </ul>
       ) : null}
@@ -100,13 +107,21 @@ export function CircleForm({
 
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="circle-name">{t("name")}</Label>
-        <Input id="circle-name" value={name} maxLength={60} onChange={(e) => setName(e.target.value)} placeholder={t("namePlaceholder")} />
+        <Input
+          id="circle-name"
+          value={name}
+          maxLength={60}
+          onChange={(e) => setName(e.target.value)}
+          placeholder={t("namePlaceholder")}
+          aria-invalid={errors.includes("name") || undefined}
+          aria-describedby={describedBy(["name"])}
+        />
       </div>
 
       {initial ? null : (
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="circle-slug">{t("slug")}</Label>
-          <div className="flex items-center rounded-lg border border-input focus-within:ring-3 focus-within:ring-ring/50">
+          <div className="flex items-center rounded-lg border border-input focus-within:border-ring focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-ring">
             <span className="pl-2.5 text-sm text-muted-foreground" aria-hidden>
               /circles/
             </span>
@@ -120,7 +135,8 @@ export function CircleForm({
               }}
               className="h-11 min-w-0 flex-1 bg-transparent pr-3 text-base outline-none sm:h-9 sm:text-sm"
               spellCheck={false}
-              aria-describedby="circle-slug-hint"
+              aria-invalid={errors.some((key) => key === "slug" || key === "slugTaken") || undefined}
+              aria-describedby={describedBy(["slug", "slugTaken"], "circle-slug-hint")}
             />
           </div>
           <p id="circle-slug-hint" className="text-xs text-muted-foreground">
@@ -143,7 +159,9 @@ export function CircleForm({
           rows={3}
           onChange={(e) => setDescription(e.target.value)}
           placeholder={t("descriptionPlaceholder")}
-          className="rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+          aria-invalid={errors.includes("description") || undefined}
+          aria-describedby={describedBy(["description"])}
+          className="rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm focus-visible:border-ring"
         />
       </div>
 
@@ -153,7 +171,7 @@ export function CircleForm({
           <label
             key={String(value)}
             className={cn(
-              "flex cursor-pointer gap-3 rounded-lg border p-3 has-focus-visible:ring-3 has-focus-visible:ring-ring/50",
+              "flex cursor-pointer gap-3 rounded-lg border p-3 has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ring",
               isPrivate === value ? "border-primary bg-ember-soft/40" : "border-border",
             )}
           >
@@ -218,7 +236,14 @@ export function CircleForm({
         {header ? (
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="circle-header-alt">{t("headerAlt")}</Label>
-            <Input id="circle-header-alt" value={header.alt} maxLength={300} onChange={(e) => setHeader({ ...header, alt: e.target.value })} />
+            <Input
+              id="circle-header-alt"
+              value={header.alt}
+              maxLength={300}
+              onChange={(e) => setHeader({ ...header, alt: e.target.value })}
+              aria-invalid={errors.includes("headerAlt") || undefined}
+              aria-describedby={describedBy(["headerAlt"])}
+            />
           </div>
         ) : null}
         <input

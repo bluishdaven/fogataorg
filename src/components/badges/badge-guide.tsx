@@ -13,7 +13,7 @@ import { DonorIcon, TierIcon } from "./badge-icons";
 type Shown = WritingTierKey | "donor";
 
 const CHIP =
-  "relative inline-flex min-h-8 items-center gap-2 rounded-full border border-border px-3 text-sm hover:bg-accent focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none after:absolute after:inset-x-0 after:-inset-y-1.5 sm:after:hidden";
+  "relative inline-flex min-h-8 items-center gap-2 rounded-full border border-border px-3 text-sm hover:bg-accent after:absolute after:inset-x-0 after:-inset-y-1.5 sm:after:hidden";
 
 /**
  * A person's badges on their profile, as chips. Tapping one explains it and shows every badge
@@ -32,8 +32,8 @@ export function BadgeChips({ badges, name, className }: { badges: BadgeData; nam
           <li data-badge="donor">
             <button type="button" className={CHIP} onClick={() => setShown("donor")} data-testid="badge-chip">
               <DonorIcon className="h-4 w-auto" />
-              <span>{t("donor")}</span>
-              <span className="sr-only">: {t("donorLabel", { name: t("donor") })}</span>
+              <span aria-hidden>{t("donor")}</span>
+              <span className="sr-only">{t("donorLabel", { name: t("donor") })}</span>
             </button>
           </li>
         ) : null}
@@ -41,8 +41,8 @@ export function BadgeChips({ badges, name, className }: { badges: BadgeData; nam
           <li data-badge={tier.key}>
             <button type="button" className={CHIP} onClick={() => setShown(tier.key)} data-testid="badge-chip">
               <TierIcon tier={tier.key} className="h-4 w-auto" />
-              <span>{t(`tiers.${tier.key}`)}</span>
-              <span className="sr-only">: {t("tierLabel", { name: t(`tiers.${tier.key}`), count: tier.min })}</span>
+              <span aria-hidden>{t(`tiers.${tier.key}`)}</span>
+              <span className="sr-only">{t("tierLabel", { name: t(`tiers.${tier.key}`), count: tier.min })}</span>
             </button>
           </li>
         ) : null}

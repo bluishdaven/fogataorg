@@ -190,6 +190,12 @@ html[data-reader-font="sans"] .prose-fogata {
   html {
     @apply font-sans;
     -webkit-text-size-adjust: 100%;
+    /* Keeps anchors and keyboard-focused elements clear of the sticky header (WCAG 2.4.11). */
+    scroll-padding-top: 5rem;
+  }
+  /* Story pages also have the 48px StoryTitleBar under the header (112px together on phones). */
+  html:has(#story) {
+    scroll-padding-top: 8rem;
   }
   body {
     @apply bg-background text-foreground antialiased;
@@ -424,7 +430,6 @@ html[data-reader-font="sans"] .prose-fogata {
   height: 0;
   pointer-events: none;
   color: var(--muted-foreground);
-  opacity: 0.8;
 }
 .editor-body p.is-empty:not(.is-editor-empty)::before {
   /* Only hint on the empty line the cursor is on, not every blank paragraph. */
@@ -433,6 +438,8 @@ html[data-reader-font="sans"] .prose-fogata {
 .editor-body .ProseMirror-selectednode {
   outline: none;
 }
-.editor-body :focus-visible {
+/* Only the writing surface goes without an outline (the caret shows focus). Buttons, fields and
+   links inside figures keep theirs. */
+.editor-body:focus-visible {
   outline: none;
 }

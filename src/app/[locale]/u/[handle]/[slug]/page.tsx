@@ -320,8 +320,10 @@ function StoryCover({ url, alt, credit }: { url: string; alt: string; credit: un
 }
 
 function StorySkeleton() {
+  // At least a screen tall: the story that replaces it almost always is, so the footer starts below
+  // the fold instead of jumping down when the text streams in (CLS was 0.24 on phones).
   return (
-    <div aria-hidden className="mx-auto flex max-w-[var(--measure)] flex-col gap-4 px-4 py-16">
+    <div aria-hidden className="mx-auto flex min-h-dvh max-w-[var(--measure)] flex-col gap-4 px-4 py-16">
       <div className="h-10 w-4/5 animate-pulse rounded bg-muted" />
       <div className="h-6 w-3/5 animate-pulse rounded bg-muted" />
       <div className="h-4 w-48 animate-pulse rounded bg-muted" />

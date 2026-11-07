@@ -26,6 +26,8 @@ import { cn } from "@/lib/utils";
 
 type Link = { label: string; url: string };
 
+const errorId = (key: ProfileErrorKey) => `profile-error-${key}`;
+
 export function ProfileForm({
   initial,
 }: {
@@ -77,13 +79,18 @@ export function ProfileForm({
   };
 
   const has = (...keys: ProfileErrorKey[]) => keys.some((key) => errors.includes(key));
+  /** Ties a field to its messages in the error list, so screen readers read them with the field. */
+  const describedBy = (keys: ProfileErrorKey[], ...more: string[]) =>
+    [...keys.filter((key) => errors.includes(key)).map(errorId), ...more].join(" ") || undefined;
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-6" noValidate>
       {errors.length ? (
         <ul role="alert" className="list-disc rounded-lg border border-destructive/30 bg-destructive/5 py-3 pr-4 pl-8 text-sm text-destructive">
           {errors.map((key) => (
-            <li key={key}>{t(`errors.${key}`)}</li>
+            <li key={key} id={errorId(key)}>
+              {t(`errors.${key}`)}
+            </li>
           ))}
         </ul>
       ) : null}
@@ -104,13 +111,14 @@ export function ProfileForm({
           maxLength={DISPLAY_NAME_MAX}
           onChange={(event) => setDisplayName(event.target.value)}
           aria-invalid={has("displayName") || undefined}
+          aria-describedby={describedBy(["displayName"])}
           autoComplete="name"
         />
       </div>
 
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="username">{t("username")}</Label>
-        <div className="flex items-center rounded-lg border border-input focus-within:ring-3 focus-within:ring-ring/50">
+        <div className="flex items-center rounded-lg border border-input focus-within:border-ring focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-ring">
           <span className="pl-2.5 text-muted-foreground" aria-hidden>
             fogata.org/@
           </span>
@@ -120,7 +128,7 @@ export function ProfileForm({
             maxLength={30}
             onChange={(event) => setUsername(event.target.value)}
             aria-invalid={has("username", "usernameReserved", "usernameTaken") || undefined}
-            aria-describedby="username-hint"
+            aria-describedby={describedBy(["username", "usernameReserved", "usernameTaken"], "username-hint")}
             autoComplete="username"
             spellCheck={false}
             className="h-11 min-w-0 flex-1 bg-transparent pr-3 text-base outline-none sm:h-9 sm:text-sm"
@@ -163,7 +171,8 @@ export function ProfileForm({
           rows={3}
           onChange={(event) => setBio(event.target.value)}
           aria-invalid={has("bio") || undefined}
-          className="rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+          aria-describedby={describedBy(["bio"])}
+          className="rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm focus-visible:border-ring"
         />
       </div>
 

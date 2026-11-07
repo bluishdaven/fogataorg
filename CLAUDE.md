@@ -80,7 +80,8 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   `READER_PREFS_SCRIPT` before paint; CSS reads the data attributes. The reading column width is
   `--measure` in rem, so headers and bodies always line up. Once the story's header scrolls away,
   `StoryTitleBar` shows title and writer in a 48px bar under the site header (decorative, hidden
-  from screen readers); in-story anchors need `scroll-mt-32` to land below both.
+  from screen readers). `<html>` has `scroll-padding-top` (5rem, 8rem on story pages, in
+  `globals.css`), so anchors and keyboard focus land below both bars without `scroll-mt-*`.
 - **Home headline** (`src/lib/domain/headlines.ts`, `src/components/home-headline.tsx`). Every
   `Home.headlines` entry is rendered so the page stays static; `HEADLINE_SCRIPT` (root layout, before
   paint) sets `<html data-headline>` to one that differs from the last visit's (localStorage) and CSS
@@ -249,7 +250,12 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
 - Styling: Tailwind 4 with tokens in `src/app/globals.css` (light, dark, sepia). Use semantic
   tokens (`bg-background`, `text-muted-foreground`, `text-ember-text`), never raw colors. Every
   text/background pair must pass WCAG AA in all three themes (e2e axe tests check this).
-- Skeletons, never spinners. Respect `prefers-reduced-motion` (`motion-safe:` utilities).
+- Skeletons, never spinners. Respect `prefers-reduced-motion` (`motion-safe:` utilities; use
+  `scrollBehavior()` from `src/lib/utils.ts` for scripted scrolling).
+- Focus: the global `:focus-visible` rule (2px solid `--ring`, 2px offset) is the focus style. Don't
+  add `outline-none` or `ring-*/50` to interactive elements; stretched-link cards draw the outline on
+  the card (`has-[a:focus-visible]:`). `DialogContent` returns focus to whatever opened it, trigger or
+  not. Audit and open items: `docs/plans/ui-audit.md`.
 - Seed content is original and fictional; seed emails use the reserved `.test` TLD.
 - Commit in small steps; never commit `.env*` (only `.env.example`).
 

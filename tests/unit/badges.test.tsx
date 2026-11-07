@@ -139,6 +139,14 @@ describe("BadgeChips", () => {
     expect([...container.querySelectorAll("[data-badge]")].map((el) => el.getAttribute("data-badge"))).toEqual(["donor", "torch"]);
   });
 
+  it("name each profile chip once, with what it means", () => {
+    renderBadges({ stories: 30, donor: true }, "en", true);
+    // The visible word starts the name (WCAG 2.5.3) and isn't read twice.
+    expect(screen.getByRole("button", { name: "Firekeeper: supports Fogata with a donation" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Torch: 25+ published stories" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Torch: Torch/ })).not.toBeInTheDocument();
+  });
+
   it("put the donor chip first on profiles", () => {
     renderBadges({ stories: 30, donor: true }, "en", true);
     expect(screen.getAllByTestId("badge-chip").map((el) => el.closest("li")?.getAttribute("data-badge"))).toEqual(["donor", "torch"]);

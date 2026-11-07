@@ -145,3 +145,28 @@ test("pressing / opens search", async ({ page }) => {
   }).toPass({ timeout: 10_000 });
   await expect(page.getByTestId("search-input")).toBeFocused();
 });
+
+test("the bell counts a new follower live, without a reload", async ({ browser }) => {
+  test.setTimeout(90_000);
+  const readerContext = await browser.newContext();
+  const followerContext = await browser.newContext();
+  try {
+    const reader = await readerContext.newPage();
+    await signInWithMagicLink(reader, "en");
+    await reader.goto("/en/settings/profile");
+    const username = await reader.getByLabel("Username").inputValue();
+    await reader.goto("/en");
+    await expect(reader.getByTestId("notification-count")).toHaveCount(0);
+
+    const follower = await followerContext.newPage();
+    await signInWithMagicLink(follower, "en");
+    await follower.goto(`/@${username}`);
+    await follower.getByRole("main").getByRole("button", { name: "Follow" }).click();
+
+    // Supabase Realtime (loaded after hydration) pushes the change to the open page.
+    await expect(reader.getByTestId("notification-count")).toHaveText("1", { timeout: 15_000 });
+  } finally {
+    await followerContext.close();
+    await readerContext.close();
+  }
+});

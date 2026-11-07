@@ -31,6 +31,9 @@ test("write, autosave, add an image, publish, then delete", async ({ page }) => 
   await page.getByTestId("image-input").setInputFiles({ name: "ember.png", mimeType: "image/png", buffer: solidPng(64, 48, [232, 89, 12]) });
   await expect(page.getByTestId("figure-alt")).toBeVisible({ timeout: 15_000 });
   await waitSaved(page);
+  // Fields inside a figure keep their focus outline (only the writing surface relies on the caret).
+  await page.getByTestId("figure-alt").focus();
+  await expect.poll(() => page.getByTestId("figure-alt").evaluate((el) => getComputedStyle(el).outlineStyle)).toBe("solid");
 
   // Publishing requires alt text on every image.
   await page.getByTestId("open-publish").click();
@@ -38,6 +41,8 @@ test("write, autosave, add an image, publish, then delete", async ({ page }) => 
   await page.getByTestId("publish-submit").click();
   await expect(page.getByTestId("publish-errors")).toContainText("Every image in the story needs alt text.");
   await page.getByRole("button", { name: "Cancel" }).click();
+  // Closing the dialog hands focus back to the button that opened it.
+  await expect(page.getByTestId("open-publish")).toBeFocused();
 
   await page.getByTestId("figure-alt").fill("A small orange square");
   // Pictures come in four sizes; a landscape one starts at Large.

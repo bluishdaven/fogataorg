@@ -62,7 +62,7 @@ export function GrantDonorForm() {
           placeholder={t("notePlaceholder")}
           maxLength={500}
           rows={2}
-          className="min-h-11 rounded-xl border border-input bg-transparent px-3.5 py-2 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 sm:text-sm"
+          className="min-h-11 rounded-xl border border-input bg-transparent px-3.5 py-2 text-base focus-visible:border-ring sm:text-sm"
         />
       </div>
       {message ? (

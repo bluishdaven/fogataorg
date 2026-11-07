@@ -97,7 +97,7 @@ function FigureView({ node, updateAttributes, deleteNode, selected }: ReactNodeV
             onChange={(event) => updateAttributes({ alt: event.target.value.slice(0, 300) })}
             placeholder={t("altPlaceholder")}
             aria-invalid={missingAlt || undefined}
-            className="rounded-md border border-input bg-transparent px-2 py-1.5 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+            className="rounded-md border border-input bg-transparent px-2 py-1.5 focus-visible:border-ring"
             data-testid="figure-alt"
           />
         </label>
@@ -106,7 +106,7 @@ function FigureView({ node, updateAttributes, deleteNode, selected }: ReactNodeV
           onChange={(event) => updateAttributes({ caption: event.target.value.slice(0, 300) })}
           placeholder={t("captionPlaceholder")}
           aria-label={t("captionLabel")}
-          className="rounded-md border border-transparent bg-transparent px-2 py-1 text-center text-muted-foreground outline-none hover:border-input focus-visible:border-input"
+          className="rounded-md border border-transparent bg-transparent px-2 py-1 text-center text-muted-foreground hover:border-input focus-visible:border-ring"
         />
         {attrs.credit ? <UnsplashCredit credit={attrs.credit} className="text-center" /> : null}
       </div>
