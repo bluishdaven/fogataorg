@@ -1,5 +1,17 @@
 # Changelog
 
+## Manifesto, Fogata.org wordmark, Stories link (2026-11-06)
+
+**Demo**: the footer now links to the **Manifesto** next to Topics; the header reads "Fogata.org";
+"Image for Stories" copies the story's link as it makes the image.
+
+- **Manifesto** in English and Spanish, in the founder's voice and signed Fogata.org: reading comes
+  first, a .org not an ad network, your words are yours, everyone gets everything, quiet by design,
+  two languages one flame, new voices burn too. In the sitemap with hreflang links.
+- **Wordmark**: a quiet, greyed ".org" after Fogata in the header.
+- **Stories image**: the link is copied in the same tap, with a note to paste it into a link
+  sticker (Instagram doesn't take links from shared images).
+
 ## Picture sizes (2026-11-06)
 
 **Demo**: in the editor, every picture has **S / M / L / W** buttons on its corner (Small, Medium,

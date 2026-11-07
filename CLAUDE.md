@@ -156,6 +156,11 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   `tdm-reservation` meta tag, `/.well-known/tdmrep.json`); stories show "© year Writer. All rights
   reserved." with matching JSON-LD. Immediate publishes stamp `published_at` with the database's
   `now()` so triggers comparing against `now()` agree despite clock skew.
+- **Manifesto** (`/[locale]/manifesto`, footer next to Topics). The text lives in `messages/*.json`
+  under `Manifesto` (lede, `sections[]`, closing, signature "Fogata.org"), written in the founder's
+  voice: long layered sentences, tactile and fire imagery, a bracketed aside, then a short line that
+  lands it. Its promises must stay true to what the product does; edit both languages together.
+  The header wordmark reads "Fogata.org" with a muted ".org" (the home link's label starts with it).
 - **Topics** come from a catalog migration (`*_topics_catalog.sql`, EN + ES names, upsert by slug).
   Add or rename topics with a new migration; the seed only references slugs that exist there.
 - **Sharing** (`src/components/social/share-button.tsx`, `src/lib/domain/share.ts`). A menu in the story
@@ -165,7 +170,8 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
 - **Stories image** (`src/components/social/story-image.ts`, layout in `src/lib/domain/story-card.ts`).
   Drawn on a canvas in the browser (1080×1920, Instagram safe zones) with the page's own fonts: no
   server route and no font files. Its copy follows the story's language (`ShareCard` messages), not the
-  reader's UI. Phones hand the PNG to the share sheet (rendering starts when the menu opens, because
+  reader's UI. Making the image also copies the story's link (started in the same tap, before any
+  await, since clipboard writes need one) for the Story's link sticker. Phones hand the PNG to the share sheet (rendering starts when the menu opens, because
   iOS only allows sharing shortly after a tap); desktops download it. Only our avatars bucket (CORS
   enabled) is drawn, so the canvas can't be tainted.
 - **Badges** (`src/lib/domain/badges.ts`, `src/components/badges/`, plan in `docs/plans/badges.md`).
