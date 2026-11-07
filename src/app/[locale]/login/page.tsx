@@ -40,6 +40,7 @@ async function LoginFormWithParams({
       next={next}
       linkError={error === "link" || error === "oauth"}
       googleEnabled={publicEnv.NEXT_PUBLIC_AUTH_GOOGLE_ENABLED}
+      turnstileSiteKey={publicEnv.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
     />
   );
 }

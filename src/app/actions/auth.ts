@@ -3,11 +3,14 @@
 import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { clientIp, isLoopback } from "@/lib/domain/limits";
 import { DEFAULT_LOCALE, isLocale, type Locale } from "@/lib/domain/locale";
 import { safeNextPath } from "@/lib/domain/redirect";
 import { magicLinkSchema, oauthSchema } from "@/lib/domain/schemas";
 import { publicEnv } from "@/lib/env";
+import { allowAnonymous } from "@/lib/limits";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { verifyTurnstile } from "@/lib/turnstile";
 
 export type MagicLinkState =
   | { status: "idle" }
@@ -50,6 +53,17 @@ export async function sendMagicLink(
     return { status: "error", message: t("email"), field: "email", email: submittedEmail };
   }
 
+  // Bots: a person check (when Turnstile is configured), then a per-IP limit on sign-in links.
+  const requestHeaders = await headers();
+  const ip = clientIp(requestHeaders.get("x-forwarded-for"), requestHeaders.get("x-real-ip"));
+  const tAuth = await getTranslations({ locale, namespace: "Auth" });
+  if (!(await verifyTurnstile(String(formData.get("cf-turnstile-response") ?? "") || null, ip))) {
+    return { status: "error", message: tAuth("botCheckFailed"), email: submittedEmail };
+  }
+  if (ip && !isLoopback(ip) && !(await allowAnonymous("signInLink", ip))) {
+    return { status: "error", message: tAuth("rateLimited"), email: submittedEmail };
+  }
+
   const next = safeNextPath(parsed.data.next, `/${locale}`);
   const origin = await requestOrigin();
   const supabase = await createSupabaseServerClient();
@@ -65,7 +79,6 @@ export async function sendMagicLink(
 
   if (error) {
     if (error.status === 429) {
-      const tAuth = await getTranslations({ locale, namespace: "Auth" });
       return { status: "error", message: tAuth("rateLimited"), email: submittedEmail };
     }
     console.error("[auth] signInWithOtp failed", error.message);

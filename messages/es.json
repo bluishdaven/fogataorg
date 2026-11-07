@@ -118,7 +118,9 @@
     "errorTitle": "Ese enlace no funcionó",
     "errorBody": "Los enlaces para entrar caducan en una hora y solo funcionan una vez. Pide uno nuevo aquí abajo.",
     "rateLimited": "Demasiados intentos. Espera un minuto y vuelve a intentarlo.",
-    "signedInAs": "Sesión iniciada como {name}"
+    "signedInAs": "Sesión iniciada como {name}",
+    "botCheck": "Comprobando que eres una persona…",
+    "botCheckFailed": "No pudimos confirmar que eres una persona. Espera a que termine la comprobación y vuelve a intentarlo."
   },
   "Validation": {
     "email": "Escribe un correo electrónico válido.",
@@ -347,7 +349,8 @@
       "seoDescription": "La descripción para buscadores puede tener hasta 160 caracteres.",
       "canonicalUrl": "La URL original debe empezar con https://.",
       "scheduleInPast": "Elige una fecha y hora futuras.",
-      "invalid": "Algo no está bien. Revisa el formulario y vuelve a intentarlo."
+      "invalid": "Algo no está bien. Revisa el formulario y vuelve a intentarlo.",
+      "rateLimited": "Llegaste al límite por ahora. Espera un poco y vuelve a intentarlo. (Las cuentas nuevas tienen límites más bajos su primer día)."
     },
     "uploadErrors": {
       "type": "Ese tipo de archivo no es compatible. Usa JPEG, PNG, WebP, GIF o AVIF.",
@@ -554,7 +557,8 @@
       "invalid": "No se pudo publicar. Vuelve a intentarlo.",
       "not_allowed": "No puedes hacer eso aquí.",
       "empty": "Escribe algo primero.",
-      "tooLong": "Las respuestas pueden tener hasta 4000 caracteres."
+      "tooLong": "Las respuestas pueden tener hasta 4000 caracteres.",
+      "rateLimited": "Llegaste al límite por ahora. Espera un poco y vuelve a intentarlo. (Las cuentas nuevas tienen límites más bajos su primer día)."
     },
     "notifications": "Notificaciones",
     "notificationsUnread": "{count, plural, one {Notificaciones, # sin leer} other {Notificaciones, # sin leer}}",
@@ -700,7 +704,8 @@
       "alreadyMember": "Esa persona ya está en el círculo.",
       "alreadySubmitted": "Esa historia ya está en un círculo (o esperando revisión).",
       "invalid": "Algo no está bien. Vuelve a intentarlo.",
-      "alreadyRequested": "Ya pediste unirte a este círculo."
+      "alreadyRequested": "Ya pediste unirte a este círculo.",
+      "rateLimited": "Llegaste al límite por ahora. Espera un poco y vuelve a intentarlo. (Las cuentas nuevas tienen límites más bajos su primer día)."
     },
     "uploadErrors": {
       "type": "Ese tipo de archivo no es compatible. Usa JPEG, PNG, WebP, GIF o AVIF.",
@@ -999,7 +1004,7 @@
         {
           "title": "Quién nos ayuda a operar Fogata",
           "paragraphs": [
-            "Usamos algunos proveedores, cada uno solo para su tarea: Supabase (base de datos, acceso y almacenamiento de archivos), Vercel (alojamiento), Resend (envío de correos) y Google (solo si entras con Google). Las fotos elegidas de Unsplash se cargan directamente desde los servidores de Unsplash, así que Unsplash puede ver la dirección IP de quien lee; no pone cookies en esas imágenes. Las donaciones se hacen en Buy Me a Coffee, bajo su propio aviso de privacidad. Estos proveedores pueden tratar datos en Estados Unidos y otros países, con sus propios compromisos de seguridad y privacidad."
+            "Usamos algunos proveedores, cada uno solo para su tarea: Supabase (base de datos, acceso y almacenamiento de archivos), Vercel (alojamiento), Resend (envío de correos) y Google (solo si entras con Google). En la página para entrar, Cloudflare Turnstile comprueba que eres una persona, sin cookies de rastreo. Las fotos elegidas de Unsplash se cargan directamente desde los servidores de Unsplash, así que Unsplash puede ver la dirección IP de quien lee; no pone cookies en esas imágenes. Las donaciones se hacen en Buy Me a Coffee, bajo su propio aviso de privacidad. Estos proveedores pueden tratar datos en Estados Unidos y otros países, con sus propios compromisos de seguridad y privacidad."
           ]
         },
         {

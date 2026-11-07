@@ -1,6 +1,7 @@
 "use server";
 
 import { and, eq, isNull, sql } from "drizzle-orm";
+import { allowAction } from "@/lib/limits";
 import { getViewer } from "@/lib/auth";
 import { withRls } from "@/lib/db/rls";
 import { bookmarks, follows, notifications, responses, responseSparks, sparks, stories } from "@/lib/db/schema";
@@ -17,7 +18,7 @@ import {
 import type { BadgeData } from "@/lib/domain/badges";
 
 type Ok<T = object> = { ok: true } & T;
-type Fail = { ok: false; error: "unauthorized" | "invalid" | "not_allowed" | "empty" | "tooLong" };
+type Fail = { ok: false; error: "unauthorized" | "invalid" | "not_allowed" | "empty" | "tooLong" | "rateLimited" };
 
 function pgCode(error: unknown): string | undefined {
   let current: unknown = error;
@@ -44,6 +45,7 @@ export async function setFollow(input: unknown): Promise<Ok<{ following: boolean
   if (!parsed.success) return { ok: false, error: "invalid" };
   const { target, id, follow } = parsed.data;
   return asViewer(async (viewer) => {
+    if (follow && !(await allowAction(viewer, "follow"))) return { ok: false as const, error: "rateLimited" as const };
     await withRls(viewer.claims, async (tx) => {
       const column = { user: follows.followedUserId, topic: follows.followedTopicId, circle: follows.followedCircleId }[target];
       const condition = and(eq(follows.followerId, viewer.id), eq(column, id));
@@ -116,6 +118,7 @@ export async function postResponse(input: ResponseInput): Promise<Ok<{ response:
   }
   const { storyId, parentId, blockId, body } = parsed.data;
   return asViewer(async (viewer) => {
+    if (!(await allowAction(viewer, "respond"))) return { ok: false as const, error: "rateLimited" as const };
     const created = await withRls(viewer.claims, async (tx) => {
       if (blockId) {
         // The anchor must be a block of the published story.

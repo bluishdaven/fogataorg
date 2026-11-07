@@ -118,7 +118,9 @@
     "errorTitle": "That link didn't work",
     "errorBody": "Sign-in links expire after an hour and work once. Request a new one below.",
     "rateLimited": "Too many attempts. Wait a minute and try again.",
-    "signedInAs": "Signed in as {name}"
+    "signedInAs": "Signed in as {name}",
+    "botCheck": "Checking that you're a person…",
+    "botCheckFailed": "We couldn't confirm you're a person. Wait for the check to finish, then try again."
   },
   "Validation": {
     "email": "Enter a valid email address.",
@@ -347,7 +349,8 @@
       "seoDescription": "The search description can be at most 160 characters.",
       "canonicalUrl": "The original URL must start with https://.",
       "scheduleInPast": "Pick a time in the future.",
-      "invalid": "Something's not right. Check the form and try again."
+      "invalid": "Something's not right. Check the form and try again.",
+      "rateLimited": "You've reached the limit for now. Wait a little and try again. (New accounts have lower limits on their first day.)"
     },
     "uploadErrors": {
       "type": "That file type isn't supported. Use JPEG, PNG, WebP, GIF or AVIF.",
@@ -554,7 +557,8 @@
       "invalid": "That couldn't be posted. Try again.",
       "not_allowed": "You can't do that here.",
       "empty": "Write something first.",
-      "tooLong": "Responses can be at most 4,000 characters."
+      "tooLong": "Responses can be at most 4,000 characters.",
+      "rateLimited": "You've reached the limit for now. Wait a little and try again. (New accounts have lower limits on their first day.)"
     },
     "notifications": "Notifications",
     "notificationsUnread": "{count, plural, one {Notifications, # unread} other {Notifications, # unread}}",
@@ -700,7 +704,8 @@
       "alreadyMember": "That person is already in the circle.",
       "alreadySubmitted": "That story is already in (or waiting for) a circle.",
       "invalid": "Something's not right. Try again.",
-      "alreadyRequested": "You've already asked to join this circle."
+      "alreadyRequested": "You've already asked to join this circle.",
+      "rateLimited": "You've reached the limit for now. Wait a little and try again. (New accounts have lower limits on their first day.)"
     },
     "uploadErrors": {
       "type": "That file type isn't supported. Use JPEG, PNG, WebP, GIF or AVIF.",
@@ -999,7 +1004,7 @@
         {
           "title": "Who helps us run Fogata",
           "paragraphs": [
-            "We use a few service providers, each only for its job: Supabase (database, sign-in and file storage), Vercel (hosting), Resend (sending email) and Google (only if you sign in with Google). Photos picked from Unsplash load directly from Unsplash's servers, so Unsplash can see the reader's IP address; it doesn't set cookies on those images. Donations happen on Buy Me a Coffee, under its own privacy policy. These providers may process data in the United States and other countries, under their own security and privacy commitments."
+            "We use a few service providers, each only for its job: Supabase (database, sign-in and file storage), Vercel (hosting), Resend (sending email) and Google (only if you sign in with Google). On the sign-in page, Cloudflare Turnstile checks that you're a person, without tracking cookies. Photos picked from Unsplash load directly from Unsplash's servers, so Unsplash can see the reader's IP address; it doesn't set cookies on those images. Donations happen on Buy Me a Coffee, under its own privacy policy. These providers may process data in the United States and other countries, under their own security and privacy commitments."
           ]
         },
         {

@@ -68,6 +68,7 @@ export type PublishInput = z.input<typeof publishSchema>;
 
 export type PublishErrorKey =
   | "unauthorized"
+  | "rateLimited"
   | "not_found"
   | "titleRequired"
   | "tooShort"

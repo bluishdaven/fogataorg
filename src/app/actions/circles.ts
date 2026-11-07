@@ -17,6 +17,7 @@ import {
   type CreateCircleInput,
   type UpdateCircleInput,
 } from "@/lib/domain/circles";
+import { allowAction } from "@/lib/limits";
 import { isAllowedStoryImage } from "@/lib/story-images";
 
 type Result<T = object> = ({ ok: true } & T) | { ok: false; errors: CircleErrorKey[] };
@@ -48,6 +49,7 @@ export async function createCircle(input: CreateCircleInput): Promise<Result<{ s
   if (!parsed.success) return { ok: false, errors: zodErrors(parsed.error.issues) };
   const { name, slug, description, accentColor, header, isPrivate } = parsed.data;
   if (header && !isAllowedStoryImage(header.url)) return { ok: false, errors: ["unsafeImage"] };
+  if (!(await allowAction(viewer, "createCircle"))) return { ok: false, errors: ["rateLimited"] };
 
   try {
     await withRls(viewer.claims, (tx) =>
@@ -234,6 +236,7 @@ export async function requestToJoin(input: unknown): Promise<Result> {
   if (!viewer) return { ok: false, errors: ["unauthorized"] };
   const parsed = joinRequestSchema.safeParse(input);
   if (!parsed.success) return { ok: false, errors: ["invalid"] };
+  if (!(await allowAction(viewer, "joinRequest"))) return { ok: false, errors: ["rateLimited"] };
   try {
     await withRls(viewer.claims, (tx) => tx.insert(circleJoinRequests).values({ circleId: parsed.data.circleId, userId: viewer.id }));
   } catch (error) {

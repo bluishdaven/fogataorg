@@ -114,4 +114,5 @@ export type CircleErrorKey =
   | "alreadyMember"
   | "alreadySubmitted"
   | "alreadyRequested"
+  | "rateLimited"
   | "invalid";

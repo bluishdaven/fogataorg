@@ -15,6 +15,8 @@ export type Viewer = {
   displayName: string;
   avatarUrl: string | null;
   pronouns: string;
+  /** When the account was created (new accounts get tighter rate limits). */
+  createdAt: Date;
   badges: BadgeData;
   /** Owner account (Supabase app_metadata.role = "admin"); can grant donor badges. */
   isAdmin: boolean;
@@ -41,6 +43,7 @@ export const getViewer = cache(async (): Promise<Viewer | null> => {
         displayName: profiles.displayName,
         avatarUrl: profiles.avatarUrl,
         pronouns: profiles.pronouns,
+        createdAt: profiles.createdAt,
         publishedCount: publishedCountSql(),
         donorActive: donorActiveSql(),
       })
@@ -58,6 +61,7 @@ export const getViewer = cache(async (): Promise<Viewer | null> => {
     displayName: row.displayName || row.username,
     avatarUrl: row.avatarUrl,
     pronouns: row.pronouns,
+    createdAt: row.createdAt,
     badges: badgeData(row),
     isAdmin: isAdminClaims(claims),
   };

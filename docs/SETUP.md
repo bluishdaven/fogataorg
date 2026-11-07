@@ -103,6 +103,13 @@ Never run `npm run db:seed` against production; it refuses unless you pass `--al
    | `EMAIL_SIGNING_SECRET` | `openssl rand -hex 32`; signs unsubscribe links, keep it stable |
    | `CRON_SECRET` | `openssl rand -hex 32`; Vercel Cron sends it to the summary route |
    | `EMAIL_SUMMARY_DAILY_LIMIT` | optional, default `80`; raise it with a paid Resend plan |
+   | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Cloudflare Turnstile site key (sign-in person check; optional) |
+   | `TURNSTILE_SECRET_KEY` | the matching Turnstile secret key |
+
+   **Turnstile** (free): in the Cloudflare dashboard, open Turnstile → Add widget, name it Fogata,
+   add the hostname `fogata.org` (and `www.fogata.org` if used), widget mode **Managed**. Copy the
+   site key and secret key into the two variables above and redeploy. Without them the sign-in form
+   shows no check; with them, a sign-in link is only sent after Cloudflare confirms a person.
 
    The secret key is **not** needed by the app; keep it out of Vercel until a feature needs it.
    Add the `NEXT_PUBLIC_*` values as **Config** variables: Vercel strips the `NEXT_PUBLIC_` prefix from

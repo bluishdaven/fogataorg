@@ -7,6 +7,7 @@ import { sendMagicLink, signInWithOAuth, type MagicLinkState } from "@/app/actio
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Turnstile } from "@/components/turnstile";
 import { Link } from "@/i18n/navigation";
 
 type Props = {
@@ -14,6 +15,8 @@ type Props = {
   next?: string;
   linkError: boolean;
   googleEnabled: boolean;
+  /** Cloudflare Turnstile site key; without one there's no person check (local and test builds). */
+  turnstileSiteKey?: string;
 };
 
 export function LoginForm(props: Props) {
@@ -22,7 +25,7 @@ export function LoginForm(props: Props) {
   return <LoginFormInner key={attempt} {...props} onReset={() => setAttempt((n) => n + 1)} />;
 }
 
-function LoginFormInner({ locale, next, linkError, googleEnabled, onReset }: Props & { onReset: () => void }) {
+function LoginFormInner({ locale, next, linkError, googleEnabled, turnstileSiteKey, onReset }: Props & { onReset: () => void }) {
   const t = useTranslations("Auth");
   const [state, formAction, pending] = useActionState<MagicLinkState, FormData>(sendMagicLink, {
     status: "idle",
@@ -74,6 +77,7 @@ function LoginFormInner({ locale, next, linkError, googleEnabled, onReset }: Pro
             {state.message}
           </p>
         ) : null}
+        <Turnstile siteKey={turnstileSiteKey} locale={locale} resetKey={state} />
         <Button type="submit" size="lg" className="h-11 text-base" disabled={pending} aria-disabled={pending}>
           {pending ? t("sending") : t("sendLink")}
         </Button>

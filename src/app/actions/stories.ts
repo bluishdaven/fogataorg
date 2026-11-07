@@ -1,6 +1,7 @@
 "use server";
 
 import { and, eq, inArray, isNull, ne, sql } from "drizzle-orm";
+import { limitFor } from "@/lib/domain/limits";
 import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { getViewer } from "@/lib/auth";
@@ -153,6 +154,15 @@ export async function publishStory(input: PublishInput): Promise<PublishResult> 
       : [];
     if (topicRows.length !== data.topics.length) errors.push("unknownTopic");
     if (errors.length) return { ok: false as const, errors: [...new Set(errors)] };
+
+    // First publishes count toward the rate limit; edits to a live story don't.
+    if (story.status === "draft") {
+      const limit = limitFor("publish", viewer.createdAt, now);
+      const [gate] = await tx.execute<{ ok: boolean }>(
+        sql`select public.take_rate_limit('publish', ${viewer.id}, ${limit.max}, ${limit.per}::interval) as ok`,
+      );
+      if (gate?.ok === false) return { ok: false as const, errors: ["rateLimited" as const] };
+    }
 
     const slug = isDraftSlug(story.slug)
       ? await uniqueSlug(slugify(title) || "story", async (candidate) => {

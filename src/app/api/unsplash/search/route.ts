@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getViewer } from "@/lib/auth";
+import { allowAction } from "@/lib/limits";
 import {
   unsplashSearchParamsSchema,
   type UnsplashSearchError,
@@ -20,6 +21,7 @@ export async function GET(request: NextRequest) {
   const viewer = await getViewer();
   if (!viewer) return fail("unauthorized", 401);
   if (!unsplashAccessKey()) return fail("not_configured", 503);
+  if (!(await allowAction(viewer, "photoSearch"))) return fail("rate_limited", 429);
 
   const { searchParams } = request.nextUrl;
   const parsed = unsplashSearchParamsSchema.safeParse({

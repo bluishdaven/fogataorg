@@ -32,6 +32,9 @@ export async function GET(request: NextRequest) {
   // (once a day), before the summaries are built. Runs even when email isn't configured.
   const [badges] = await db.execute<{ checked: number }>(sql`select public.check_due_writing_badges() as checked`);
   console.info("[badges] writers checked", badges?.checked ?? 0);
+  // Rate-limit records older than any window are forgotten.
+  const [pruned] = await db.execute<{ removed: number }>(sql`select public.prune_rate_limits() as removed`);
+  console.info("[limits] old hits removed", pruned?.removed ?? 0);
 
   const signingSecret = emailSigningSecret();
   if (!signingSecret) return NextResponse.json({ error: "not_configured" }, { status: 503 });

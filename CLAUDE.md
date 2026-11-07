@@ -192,6 +192,15 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   donor. They're `badge`/`donor` notifications with no actors (`notifications.badge` holds the key),
   inserted by `notify_badge()`. SQL tier thresholds mirror `WRITING_TIERS` (a db test checks).
   The donor badge is a heart in flames.
+- **Abuse protection** (`src/lib/domain/limits.ts`, `src/lib/limits.ts`, `src/lib/turnstile.ts`).
+  Rate limits count hits in `rate_limit_hits` (hand-written migration, outside the Drizzle schema,
+  no grants: only `public.take_rate_limit()` touches it, under an advisory lock; the daily cron runs
+  `prune_rate_limits()`). Per person for publishing, responses, circles, join requests, follows and
+  photo searches, tighter in an account's first 24 hours (`profiles.created_at`); per hashed address
+  for sign-in links, skipped for loopback addresses so local runs and e2e aren't limited. Limited
+  actions return a `rateLimited` error. Cloudflare Turnstile guards the sign-in form only when
+  `NEXT_PUBLIC_TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` are set, and fails open if Cloudflare
+  can't be reached.
 - **Moderation** (`src/lib/data/moderation-sql.ts`, `src/components/moderation/`, `/admin/moderation`).
   Admins mark a story NSFW or remove it with a public reason via `moderate_story()`; state lives in
   `story_moderation` (public read, written only by that function, so authors can't undo it) and every
@@ -298,8 +307,6 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
 - Some corporate mail scanners prefetch links and can burn a magic link. If reported, switch
   `/auth/confirm` to a confirm-button page.
 - Google sign-in doesn't yet save the reader's locale on first sign-in (magic links do).
-- Turnstile on sign-up, rate limits and new-account limits are not in yet (spec: Trust & safety).
-  That includes a per-writer limit on photo searches; today only caching protects the Unsplash quota.
 - Changing a username breaks old `/@old/...` links; add redirects from previous usernames.
 - Phase 2 leftovers: reading lists beyond one "Saved" list, undoing sparks, editing responses, blocking and
   muting, rate limits, deleting or transferring circles, a decline note for writers, and circle RSS.

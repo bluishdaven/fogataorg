@@ -239,6 +239,13 @@
       "when": 1794016958612,
       "tag": "20261107020238_delete_own_account",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1794017155626,
+      "tag": "20261107020555_rate_limits",
+      "breakpoints": true
     }
   ]
 }

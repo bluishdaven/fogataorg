@@ -191,3 +191,15 @@ test("private circles: people ask to join, editors let them in, then they publis
   await ownerContext.close();
   await writerContext.close();
 });
+
+test("new accounts can start two circles on their first day", async ({ page }) => {
+  test.setTimeout(90_000);
+  await signInWithMagicLink(page, "en");
+  await createCircle(page, circleName());
+  await createCircle(page, circleName());
+  // The third one waits: new accounts have lower limits for a day.
+  await page.goto("/en/circles/new");
+  await page.getByLabel("Name", { exact: true }).fill(circleName());
+  await page.getByTestId("circle-submit").click();
+  await expect(page.getByRole("main").getByRole("alert")).toContainText("You've reached the limit for now");
+});
