@@ -713,6 +713,8 @@
     "sparkTotal": "{count, plural, =0 {No sparks yet} one {# spark} other {# sparks}}",
     "yourSparks": "You sparked this {count, plural, one {once} other {# times}}",
     "sparkFailed": "Your sparks couldn't be saved. Try again.",
+    "takeBack": "Take back your sparks",
+    "sparksTakenBack": "Your sparks were taken back",
     "save": "Save for later",
     "saved": "Saved",
     "savedToast": "Saved to your reading list.",

@@ -1,6 +1,6 @@
 "use client";
 
-import { Sparkles } from "lucide-react";
+import { Sparkles, Undo2 } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 /**
  * Sparks: tap up to 50 times. Taps update instantly and are saved as one total
  * shortly after the last tap (and when leaving the page). Failed saves roll back.
+ * Readers who sparked can take all their sparks back.
  */
 export function SparkButton({
   storyId,
@@ -34,21 +35,46 @@ export function SparkButton({
   const [mine, setMine] = useState(initialMine);
   const [total, setTotal] = useState(initialTotal);
   const [burst, setBurst] = useState(0);
+  const [announcement, setAnnouncement] = useState("");
   const saved = useRef(initialMine);
   const pending = useRef<number | null>(null);
+  const inflight = useRef<Promise<unknown> | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const button = useRef<HTMLButtonElement>(null);
 
   const save = async () => {
     clearTimeout(timer.current);
     const value = pending.current;
     if (value === null || value === saved.current) return;
     pending.current = null;
-    const result = await setSparks({ storyId, count: value });
+    const request = setSparks({ storyId, count: value });
+    inflight.current = request;
+    const result = await request;
     if (result.ok) {
       saved.current = value;
     } else {
       setTotal((current) => current - (value - saved.current));
       setMine(saved.current);
+      toast.error(t("sparkFailed"));
+    }
+  };
+
+  const takeBack = async () => {
+    clearTimeout(timer.current);
+    pending.current = null;
+    const given = mine;
+    setMine(0);
+    setTotal((current) => current - given);
+    button.current?.focus();
+    // Let a save that's already on its way land first, so it can't undo the undo.
+    await inflight.current?.catch(() => undefined);
+    const result = await setSparks({ storyId, count: 0 });
+    if (result.ok) {
+      saved.current = 0;
+      setAnnouncement(t("sparksTakenBack"));
+    } else {
+      setMine(given);
+      setTotal((current) => current + given);
       toast.error(t("sparkFailed"));
     }
   };
@@ -73,6 +99,7 @@ export function SparkButton({
       return;
     }
     if (isAuthor || mine >= MAX_SPARKS) return;
+    setAnnouncement("");
     const next = mine + 1;
     setMine(next);
     setTotal((current) => current + 1);
@@ -92,6 +119,7 @@ export function SparkButton({
   return (
     <div className="flex items-center gap-1.5">
       <button
+        ref={button}
         type="button"
         onClick={onClick}
         aria-label={label}
@@ -116,8 +144,20 @@ export function SparkButton({
         <span className="sr-only">{t("sparkTotal", { count: total })}</span>
         <span aria-hidden>{format.number(total, { notation: "compact" })}</span>
       </span>
+      {mine > 0 && !isAuthor ? (
+        <button
+          type="button"
+          onClick={() => void takeBack()}
+          aria-label={t("takeBack")}
+          title={t("takeBack")}
+          className="relative flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors after:absolute after:-inset-1.5 hover:bg-accent hover:text-foreground"
+          data-testid="spark-undo"
+        >
+          <Undo2 className="size-4" aria-hidden />
+        </button>
+      ) : null}
       <span className="sr-only" aria-live="polite">
-        {mine > 0 ? t("yourSparks", { count: mine }) : ""}
+        {mine > 0 ? t("yourSparks", { count: mine }) : announcement}
       </span>
     </div>
   );

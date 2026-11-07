@@ -713,6 +713,8 @@
     "sparkTotal": "{count, plural, =0 {Aún no hay chispas} one {# chispa} other {# chispas}}",
     "yourSparks": "Diste {count, plural, one {una chispa} other {# chispas}}",
     "sparkFailed": "No se pudieron guardar tus chispas. Vuelve a intentarlo.",
+    "takeBack": "Retirar tus chispas",
+    "sparksTakenBack": "Retiraste tus chispas",
     "save": "Guardar para después",
     "saved": "Guardada",
     "savedToast": "Guardada en tu leña.",
