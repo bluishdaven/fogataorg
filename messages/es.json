@@ -733,7 +733,8 @@
     "unauthorized": "Tu sesión terminó. Vuelve a entrar.",
     "nav": "Secciones de ajustes",
     "profileTab": "Perfil",
-    "notificationsTab": "Correo"
+    "notificationsTab": "Correo",
+    "accountTab": "Cuenta"
   },
   "Unsubscribe": {
     "title": "¿Dejar de recibir resúmenes?",
@@ -1084,6 +1085,23 @@
           ]
         }
       ]
+    }
+  },
+  "Account": {
+    "title": "Tu cuenta",
+    "lede": "Llévate una copia de todo lo que has hecho en Fogata, o vete para siempre.",
+    "exportTitle": "Descarga tus datos",
+    "exportBody": "Un archivo con tu perfil, tus historias (borradores incluidos, con su texto completo), tus respuestas, chispas, historias guardadas, a quién sigues y tus círculos.",
+    "exportButton": "Descargar mis datos",
+    "deleteTitle": "Borra tu cuenta",
+    "deleteBody": "Esto borra tu perfil, tus historias, tus respuestas, tus fotos y todo lo demás ligado a tu cuenta, de inmediato y para siempre. Los círculos que administras también se borran. Considera descargar tus datos antes.",
+    "deleteConfirmLabel": "Para confirmar, escribe tu nombre de usuario ({username})",
+    "deleteButton": "Borrar mi cuenta",
+    "deleting": "Borrando…",
+    "errors": {
+      "unauthorized": "Tu sesión terminó. Vuelve a entrar.",
+      "mismatch": "Ese no es tu nombre de usuario.",
+      "failed": "No se pudo borrar tu cuenta. Inténtalo de nuevo o escribe a hola@fogata.org."
     }
   }
 }

@@ -232,6 +232,13 @@
       "when": 1793988296475,
       "tag": "20261106180456_close_data_api",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1794016958612,
+      "tag": "20261107020238_delete_own_account",
+      "breakpoints": true
     }
   ]
 }

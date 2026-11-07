@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 const TABS = [
   { key: "profile", href: "/settings/profile", label: "profileTab" },
   { key: "notifications", href: "/settings/notifications", label: "notificationsTab" },
+  { key: "account", href: "/settings/account", label: "accountTab" },
 ] as const;
 
 /** Tabs across the settings pages. Each page passes its own key (no pathname reads, so pages stay prerenderable). */

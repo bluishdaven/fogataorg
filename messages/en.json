@@ -733,7 +733,8 @@
     "unauthorized": "Your session ended. Sign in again.",
     "nav": "Settings sections",
     "profileTab": "Profile",
-    "notificationsTab": "Email"
+    "notificationsTab": "Email",
+    "accountTab": "Account"
   },
   "Unsubscribe": {
     "title": "Stop summary emails?",
@@ -1084,6 +1085,23 @@
           ]
         }
       ]
+    }
+  },
+  "Account": {
+    "title": "Your account",
+    "lede": "Take a copy of everything you've done on Fogata, or leave for good.",
+    "exportTitle": "Download your data",
+    "exportBody": "One file with your profile, your stories (drafts included, with their full text), your responses, sparks, saved stories, who you follow and your circles.",
+    "exportButton": "Download my data",
+    "deleteTitle": "Delete your account",
+    "deleteBody": "This deletes your profile, your stories, your responses, your photos and everything else tied to your account, right away and for good. Circles you own are deleted too. Consider downloading your data first.",
+    "deleteConfirmLabel": "To confirm, type your username ({username})",
+    "deleteButton": "Delete my account",
+    "deleting": "Deleting…",
+    "errors": {
+      "unauthorized": "Your session ended. Sign in again.",
+      "mismatch": "That isn't your username.",
+      "failed": "Your account couldn't be deleted. Try again, or write to hola@fogata.org."
     }
   }
 }
