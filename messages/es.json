@@ -114,7 +114,7 @@
     "checkEmailTitle": "Revisa tu correo",
     "checkEmailBody": "Enviamos un enlace para entrar a {email}. Caduca en una hora.",
     "useDifferentEmail": "Usar otro correo",
-    "terms": "Al continuar aceptas tratar con cuidado a quienes se sientan alrededor del fuego.",
+    "terms": "Al continuar aceptas los <terms>Términos de uso</terms> y el <privacy>Aviso de privacidad</privacy>, y tratar con cuidado a quienes están alrededor del fuego.",
     "errorTitle": "Ese enlace no funcionó",
     "errorBody": "Los enlaces para entrar caducan en una hora y solo funcionan una vez. Pide uno nuevo aquí abajo.",
     "rateLimited": "Demasiados intentos. Espera un minuto y vuelve a intentarlo.",
@@ -877,5 +877,213 @@
     ],
     "closing": "Esto es lo que creemos. Lo demás es leña: herramientas, páginas, código que mañana puede cambiar. Lo que no cambia es el fuego, y la promesa de cuidarlo entre todos.",
     "signature": "Fogata.org"
+  },
+  "Legal": {
+    "updated": "Última actualización: 6 de noviembre de 2026",
+    "contact": "Dudas sobre esta página: hola@fogata.org",
+    "related": "Lee también",
+    "terms": "Términos de uso",
+    "privacy": "Aviso de privacidad",
+    "content": "Política de contenido",
+    "nav": "Legal",
+    "termsDoc": {
+      "title": "Términos de uso",
+      "description": "El acuerdo entre tú y Fogata.org: tu cuenta, tus derechos sobre lo que escribes y cómo operamos la plataforma.",
+      "intro": "Estos términos son el acuerdo entre tú y Fogata.org cuando lees, escribes o participas en Fogata. Al usarlo, los aceptas. Los hicimos tan cortos y claros como pudimos.",
+      "sections": [
+        {
+          "title": "Tu cuenta",
+          "paragraphs": [
+            "Necesitas tener al menos 13 años, o la edad mínima para usar servicios en línea donde vives. Una cuenta por persona, y cuida el acceso a tu correo: quien pueda abrir tus enlaces de acceso puede entrar a tu cuenta."
+          ]
+        },
+        {
+          "title": "Lo que escribes es tuyo",
+          "paragraphs": [
+            "Conservas todos los derechos sobre lo que publicas. Para operar Fogata, nos das un permiso limitado, mundial, no exclusivo y gratuito para guardar, mostrar y compartir tu obra en Fogata y en los lugares que llevan de vuelta a ella: vistas previas al compartir, correos de notificación y resultados de búsqueda. Ese permiso existe solo para operar el servicio y termina cuando borras la obra o tu cuenta (salvo copias que se conservan por un tiempo limitado en respaldos). No vendemos tu obra ni la usamos, ni dejamos que se use, para entrenar inteligencia artificial."
+          ]
+        },
+        {
+          "title": "Convivir con los demás",
+          "paragraphs": [
+            "Todo lo que publiques debe cumplir la Política de contenido. Eres responsable de lo que publicas, incluido tener los derechos sobre los textos y las imágenes que usas."
+          ]
+        },
+        {
+          "title": "Moderación",
+          "paragraphs": [
+            "Para mantener Fogata seguro, podemos marcar una historia como sensible (NSFW), retirar contenido con una razón pública o suspender cuentas que incumplan estos términos o la Política de contenido. Si crees que nos equivocamos, escríbenos a hola@fogata.org y lo revisaremos de nuevo."
+          ]
+        },
+        {
+          "title": "Círculos",
+          "paragraphs": [
+            "Quien administra un círculo y sus editores deciden qué historias incluye y quién puede unirse. Toman esas decisiones dentro de estos términos; las historias siguen siendo de quienes las escribieron."
+          ]
+        },
+        {
+          "title": "Donaciones e insignias",
+          "paragraphs": [
+            "Fogata no tiene un plan de pago: todos tienen todas las funciones. Las donaciones por Buy Me a Coffee son voluntarias, no compran funciones y se rigen por los términos de Buy Me a Coffee. Quienes donan reciben la insignia de Mecenas por dos meses por cada donación. Las insignias son un agradecimiento y pueden otorgarse, vencer o retirarse."
+          ]
+        },
+        {
+          "title": "El servicio",
+          "paragraphs": [
+            "Trabajamos para mantener Fogata funcionando y proteger tu obra, pero lo ofrecemos tal como es, sin garantía de que siempre esté disponible o libre de errores, y podemos cambiar o retirar funciones. En la medida que lo permita la ley, Fogata.org no responde por pérdidas indirectas ni por el contenido que publican otras personas."
+          ]
+        },
+        {
+          "title": "Irte",
+          "paragraphs": [
+            "Puedes irte cuando quieras borrando tu cuenta en Configuración, y antes descargar tus datos. Podemos cerrar cuentas que incumplan estos términos de forma grave o repetida."
+          ]
+        },
+        {
+          "title": "Ley aplicable y cambios",
+          "paragraphs": [
+            "Estos términos se rigen por las leyes de México, sin quitarte las protecciones que tienes como consumidor donde vives. Si los cambiamos, actualizaremos la fecha de arriba y te avisaremos en Fogata de los cambios importantes antes de que apliquen. Dudas: hola@fogata.org."
+          ]
+        }
+      ]
+    },
+    "privacyDoc": {
+      "title": "Aviso de privacidad",
+      "description": "Qué datos recaba Fogata, para qué, quién nos ayuda a tratarlos y tus derechos sobre ellos.",
+      "intro": "Fogata.org es un lugar para leer y escribir historias largas. Este aviso explica qué datos recabamos, para qué los necesitamos, quién nos ayuda a tratarlos y qué puedes hacer al respecto. En corto: no mostramos anuncios, no vendemos ni rentamos tus datos y no usamos rastreadores publicitarios.",
+      "sections": [
+        {
+          "title": "Quién es responsable",
+          "paragraphs": [
+            "Fogata.org es responsable de los datos personales que se describen aquí. Para cualquier asunto sobre tus datos, escríbenos a hola@fogata.org."
+          ]
+        },
+        {
+          "title": "Qué datos recabamos",
+          "items": [
+            "Tu correo electrónico, para que entres con un enlace de un solo uso. Si eliges entrar con Google, Google nos comparte tu correo y tu nombre.",
+            "Lo que decides mostrar en tu perfil: nombre de usuario, nombre, biografía corta, foto, enlaces, pronombres, tu línea de «Ahora» y tus referencias. Todo esto es público.",
+            "Lo que publicas y haces: historias, respuestas, chispas, a quién sigues, círculos a los que perteneces y solicitudes para unirte. Las historias y respuestas publicadas son públicas; tus borradores, tus historias guardadas y tus notificaciones son privados.",
+            "Tus preferencias: idioma de la interfaz y con qué frecuencia podemos escribirte. El tema y las preferencias de lectura se quedan en tu propio navegador.",
+            "Las fotos que subes. Tu navegador las redimensiona y les quita los datos de ubicación y de cámara (EXIF/GPS) antes de que nos lleguen.",
+            "Registros técnicos básicos que nuestro proveedor de alojamiento guarda por poco tiempo para mantener el sitio seguro y funcionando, como la dirección IP y el tipo de navegador."
+          ]
+        },
+        {
+          "title": "Lo que no hacemos",
+          "items": [
+            "No mostramos anuncios y no vendemos, rentamos ni intercambiamos datos personales.",
+            "No usamos cookies de publicidad ni de analítica, y no armamos perfiles tuyos para nadie más.",
+            "No usamos lo que escribes para entrenar inteligencia artificial y les pedimos a los rastreadores de IA que no lo recolecten."
+          ]
+        },
+        {
+          "title": "Para qué usamos tus datos",
+          "paragraphs": [
+            "Para operar tu cuenta y mostrar lo que publicas; para enviarte enlaces de acceso y, si lo quieres, un resumen semanal de actividad; para mantener Fogata seguro (evitar abusos y aplicar la Política de contenido), y para responderte cuando nos escribes. Nos basamos en tu consentimiento y en lo necesario para darte el servicio que pediste."
+          ]
+        },
+        {
+          "title": "Cookies",
+          "paragraphs": [
+            "Solo usamos las cookies que el sitio necesita: una mantiene tu sesión abierta y otra recuerda tu idioma. No hay cookies de rastreo, por eso no mostramos un aviso de cookies."
+          ]
+        },
+        {
+          "title": "Correos",
+          "paragraphs": [
+            "Solo enviamos dos tipos de correo: enlaces para entrar y, si lo dejas activado, un resumen semanal de actividad nueva. Cada resumen trae un enlace para darte de baja con un clic, y puedes apagarlo en Configuración."
+          ]
+        },
+        {
+          "title": "Quién nos ayuda a operar Fogata",
+          "paragraphs": [
+            "Usamos algunos proveedores, cada uno solo para su tarea: Supabase (base de datos, acceso y almacenamiento de archivos), Vercel (alojamiento), Resend (envío de correos) y Google (solo si entras con Google). Las fotos elegidas de Unsplash se cargan directamente desde los servidores de Unsplash, así que Unsplash puede ver la dirección IP de quien lee; no pone cookies en esas imágenes. Las donaciones se hacen en Buy Me a Coffee, bajo su propio aviso de privacidad. Estos proveedores pueden tratar datos en Estados Unidos y otros países, con sus propios compromisos de seguridad y privacidad."
+          ]
+        },
+        {
+          "title": "Cuánto tiempo los conservamos",
+          "paragraphs": [
+            "Conservamos tus datos mientras exista tu cuenta. Si borras una historia, sale de Fogata de inmediato. Si borras tu cuenta, eliminamos tu perfil, tus historias, tus respuestas y todo lo demás ligado a ella. Puede quedar alguna copia en respaldos por un tiempo limitado antes de que se sobrescriba."
+          ]
+        },
+        {
+          "title": "Tus derechos",
+          "paragraphs": [
+            "Puedes acceder a tus datos, corregirlos, cancelarlos y oponerte a su uso (tus derechos ARCO en México; en la Unión Europea, tus derechos del RGPD), además de llevarte una copia. Casi todo lo puedes hacer tú: edita tu perfil en Configuración, descarga tus datos o borra tu cuenta. Para lo demás, escríbenos a hola@fogata.org y te responderemos en un máximo de 20 días hábiles."
+          ]
+        },
+        {
+          "title": "Menores de edad",
+          "paragraphs": [
+            "Fogata no está pensado para menores de 13 años, ni para quienes no tengan la edad mínima para usar servicios en línea donde viven."
+          ]
+        },
+        {
+          "title": "Seguridad",
+          "paragraphs": [
+            "Todo viaja cifrado (HTTPS), el acceso a los datos está limitado por reglas en la propia base de datos y recabamos lo mínimo. Ningún sistema es perfecto; si algo sale mal y te afecta, te lo diremos."
+          ]
+        },
+        {
+          "title": "Cambios",
+          "paragraphs": [
+            "Cuando este aviso cambie actualizaremos la fecha de arriba, y si el cambio es importante te avisaremos en Fogata antes de que entre en vigor."
+          ]
+        }
+      ]
+    },
+    "contentDoc": {
+      "title": "Política de contenido",
+      "description": "Lo que tiene lugar alrededor del fuego de Fogata, lo que no, y cómo reportar algo.",
+      "intro": "Fogata es una fogata: la gente viene a contar historias y a escuchar. La ficción, la poesía y el ensayo pueden ir a lugares oscuros, y deben poder hacerlo. Lo que no tiene lugar aquí es dañar a personas reales. Estas reglas aplican a historias, respuestas, perfiles y círculos.",
+      "sections": [
+        {
+          "title": "No está permitido",
+          "items": [
+            "Cualquier contenido sexual que involucre a menores. Tolerancia cero: lo retiramos, cerramos la cuenta y lo denunciamos ante las autoridades.",
+            "Imágenes íntimas o contenido sexual compartido sin el consentimiento de las personas que aparecen.",
+            "Amenazas, incitación a la violencia o apoyo al extremismo violento.",
+            "Acoso e intimidación, incluido publicar información privada de alguien (doxxing).",
+            "Ataques a personas por su origen étnico, nacionalidad, religión, discapacidad, sexo, identidad de género, orientación sexual u otras características similares.",
+            "Animar al suicidio, la autolesión o los trastornos alimentarios. Escribir sobre esas experiencias es bienvenido; empujar a otros hacia ellas, no.",
+            "Spam, estafas, enlaces de phishing o malware, y manipular la plataforma con cuentas falsas o chispas coordinadas.",
+            "Hacerse pasar por otras personas u organizaciones.",
+            "El plagio, o publicar obra sobre la que no tienes derechos.",
+            "Cualquier cosa ilegal."
+          ]
+        },
+        {
+          "title": "Permitido, con advertencia",
+          "paragraphs": [
+            "El contenido sexual explícito entre personas adultas y la violencia gráfica pueden tener lugar en la literatura. La moderación puede marcar esas historias como sensibles (NSFW): se abren detrás de una advertencia que dice por qué, no muestran imágenes en las vistas previas y no aparecen en la portada, los temas, los círculos ni la búsqueda."
+          ]
+        },
+        {
+          "title": "Honestidad sobre tu obra",
+          "paragraphs": [
+            "Publica lo que escribiste. Si una historia la generó en buena parte una inteligencia artificial, dilo en ella."
+          ]
+        },
+        {
+          "title": "Qué pasa cuando algo rompe las reglas",
+          "paragraphs": [
+            "Según su gravedad, podemos marcarlo como sensible, retirarlo (su dirección mostrará la razón) o suspender la cuenta. El contenido ilegal se denuncia ante las autoridades. Para pedirnos que revisemos una decisión, escríbenos a hola@fogata.org."
+          ]
+        },
+        {
+          "title": "Reportar",
+          "paragraphs": [
+            "Envía el enlace y una descripción corta del problema a hola@fogata.org. Leemos cada reporte y mantenemos en privado quién lo envió. Pronto habrá un botón para reportar dentro de Fogata."
+          ]
+        },
+        {
+          "title": "Reclamos por derechos de autor",
+          "paragraphs": [
+            "Si crees que algo en Fogata copia tu obra, escríbenos a hola@fogata.org con: la obra que es tuya, el enlace en Fogata, tus datos de contacto y una declaración de que eres titular o actúas en su nombre y de que la información es correcta. Retiraremos lo que infrinja y se lo diremos a quien lo publicó, que puede responder si cree que es un error."
+          ]
+        }
+      ]
+    }
   }
 }

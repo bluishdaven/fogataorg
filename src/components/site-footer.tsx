@@ -28,6 +28,20 @@ export function SiteFooter() {
                 ),
               })}
             </p>
+            <nav aria-label={t("Legal.nav")} className="flex flex-wrap gap-x-4 pt-1 text-xs" data-testid="legal-links">
+              <Link href="/terms" className="inline-flex min-h-11 items-center underline-offset-4 hover:text-foreground hover:underline sm:min-h-0">
+                {t("Legal.terms")}
+              </Link>
+              <Link href="/privacy" className="inline-flex min-h-11 items-center underline-offset-4 hover:text-foreground hover:underline sm:min-h-0">
+                {t("Legal.privacy")}
+              </Link>
+              <Link
+                href="/content-policy"
+                className="inline-flex min-h-11 items-center underline-offset-4 hover:text-foreground hover:underline sm:min-h-0"
+              >
+                {t("Legal.content")}
+              </Link>
+            </nav>
           </div>
         </div>
         <nav className="flex flex-wrap items-center gap-x-5 gap-y-0 sm:gap-y-2" aria-label={t("Nav.footer")}>

@@ -20,6 +20,7 @@ const pages = [
   ["story", "/@lucia_ortega/el-mole-de-mi-abuela-no-tiene-receta"],
   ["profile", "/@danawrites"],
   ["manifesto", "/es/manifesto"],
+  ["privacy", "/en/privacy"],
 ] as const;
 
 for (const theme of ["light", "dark", "sepia"] as const) {

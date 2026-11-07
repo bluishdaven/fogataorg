@@ -114,7 +114,7 @@
     "checkEmailTitle": "Check your email",
     "checkEmailBody": "We sent a sign-in link to {email}. It expires in one hour.",
     "useDifferentEmail": "Use a different email",
-    "terms": "By continuing you agree to treat others around the fire with care.",
+    "terms": "By continuing you agree to the <terms>Terms of use</terms> and the <privacy>Privacy policy</privacy>, and to treat others around the fire with care.",
     "errorTitle": "That link didn't work",
     "errorBody": "Sign-in links expire after an hour and work once. Request a new one below.",
     "rateLimited": "Too many attempts. Wait a minute and try again.",
@@ -877,5 +877,213 @@
     ],
     "closing": "This is what we believe. Everything else is kindling: tools, pages, code that can change tomorrow. What doesn't change is the fire, and the promise to tend it together.",
     "signature": "Fogata.org"
+  },
+  "Legal": {
+    "updated": "Last updated: November 6, 2026",
+    "contact": "Questions about this page: hola@fogata.org",
+    "related": "Also read",
+    "terms": "Terms of use",
+    "privacy": "Privacy policy",
+    "content": "Content policy",
+    "nav": "Legal",
+    "termsDoc": {
+      "title": "Terms of use",
+      "description": "The agreement between you and Fogata.org: your account, your rights over your writing, and how we run the platform.",
+      "intro": "These terms are the agreement between you and Fogata.org when you read, write or take part on Fogata. By using it, you accept them. We kept them as short and plain as we could.",
+      "sections": [
+        {
+          "title": "Your account",
+          "paragraphs": [
+            "You need to be at least 13, or the minimum age to use online services where you live. One account per person, and keep access to your email safe: anyone who can open your sign-in links can enter your account."
+          ]
+        },
+        {
+          "title": "Your writing is yours",
+          "paragraphs": [
+            "You keep all rights to what you publish. To run Fogata, you give us a limited, worldwide, non-exclusive, royalty-free permission to store, show and share your work on Fogata and in the places that point back to it: share previews, notification emails and search results. That permission exists only to operate the service, and it ends when you delete the work or your account (except for copies kept for a limited time in backups). We don't sell your work, and we don't use it or let it be used to train AI."
+          ]
+        },
+        {
+          "title": "Being here with others",
+          "paragraphs": [
+            "Everything you publish must follow the Content policy. You're responsible for what you post, including having the rights to the text and images you use."
+          ]
+        },
+        {
+          "title": "Moderation",
+          "paragraphs": [
+            "To keep Fogata safe, we may mark a story as sensitive (NSFW), remove content with a public reason, or suspend accounts that break these terms or the Content policy. If you think we got it wrong, write to hola@fogata.org and we'll take another look."
+          ]
+        },
+        {
+          "title": "Circles",
+          "paragraphs": [
+            "A circle's owner and editors decide which stories it includes and who can join. They make those decisions within these terms; the stories themselves remain their writers'."
+          ]
+        },
+        {
+          "title": "Donations and badges",
+          "paragraphs": [
+            "Fogata has no paid tier: everyone gets every feature. Donations through Buy Me a Coffee are voluntary, they don't buy features, and Buy Me a Coffee's terms apply to them. Donors receive the Firekeeper badge for two months per donation. Badges are a thank-you and can be granted, expire or be removed."
+          ]
+        },
+        {
+          "title": "The service",
+          "paragraphs": [
+            "We work hard to keep Fogata running and to protect your work, but we provide it as it is, without guarantees that it will always be available or free of errors, and we may change or retire features. To the extent the law allows, Fogata.org isn't liable for indirect losses, or for content that others publish."
+          ]
+        },
+        {
+          "title": "Leaving",
+          "paragraphs": [
+            "You can leave whenever you want by deleting your account in Settings, and download your data first. We may close accounts that seriously or repeatedly break these terms."
+          ]
+        },
+        {
+          "title": "Law and changes",
+          "paragraphs": [
+            "These terms are governed by the laws of Mexico, without taking away the protections you have as a consumer where you live. If we change them, we'll update the date above and tell you on Fogata about important changes before they apply. Questions: hola@fogata.org."
+          ]
+        }
+      ]
+    },
+    "privacyDoc": {
+      "title": "Privacy policy",
+      "description": "What Fogata collects, why, who helps us run it, and your rights over your data.",
+      "intro": "Fogata.org is a place to read and write long-form stories. This policy explains what we collect, why we need it, who helps us process it, and what you can do about it. The short version: we don't show ads, we don't sell or rent your data, and we don't use ad trackers.",
+      "sections": [
+        {
+          "title": "Who is responsible",
+          "paragraphs": [
+            "Fogata.org is responsible for the personal data described here. For anything about your data, write to hola@fogata.org."
+          ]
+        },
+        {
+          "title": "What we collect",
+          "items": [
+            "Your email address, to sign you in with a one-time link. If you choose Google sign-in, Google shares your email address and name with us.",
+            "What you choose to show on your profile: username, name, short bio, photo, links, pronouns, your \"Now\" line and your influences. All of it is public.",
+            "What you publish and do: stories, responses, sparks, follows, circle memberships and requests to join. Published stories and responses are public; drafts, your saved stories and your notifications are private.",
+            "Your preferences: interface language and how often we may email you. Theme and reading preferences stay in your own browser.",
+            "Photos you upload. Your browser resizes them and removes location and camera data (EXIF/GPS) before they reach us.",
+            "Basic technical records that our hosting keeps for a short time to keep the site secure and working, such as IP address and browser type."
+          ]
+        },
+        {
+          "title": "What we don't do",
+          "items": [
+            "We don't show ads and we don't sell, rent or trade personal data.",
+            "We don't use advertising or analytics cookies, and we don't build profiles of you for anyone else.",
+            "We don't use your writing to train AI, and we ask AI crawlers not to collect it."
+          ]
+        },
+        {
+          "title": "Why we use your data",
+          "paragraphs": [
+            "To run your account and show what you publish; to send sign-in links and, if you want it, a weekly activity summary; to keep Fogata safe (preventing abuse and enforcing the Content policy); and to answer you when you write to us. We rely on your consent and on what's necessary to provide the service you asked for."
+          ]
+        },
+        {
+          "title": "Cookies",
+          "paragraphs": [
+            "We only use cookies that the site needs: one keeps you signed in and another remembers your language. There are no tracking cookies, which is why we don't show a cookie banner."
+          ]
+        },
+        {
+          "title": "Email",
+          "paragraphs": [
+            "We only send two kinds of email: sign-in links, and a weekly summary of new activity if you leave it on. Every summary has a one-click unsubscribe, and you can turn it off in Settings."
+          ]
+        },
+        {
+          "title": "Who helps us run Fogata",
+          "paragraphs": [
+            "We use a few service providers, each only for its job: Supabase (database, sign-in and file storage), Vercel (hosting), Resend (sending email) and Google (only if you sign in with Google). Photos picked from Unsplash load directly from Unsplash's servers, so Unsplash can see the reader's IP address; it doesn't set cookies on those images. Donations happen on Buy Me a Coffee, under its own privacy policy. These providers may process data in the United States and other countries, under their own security and privacy commitments."
+          ]
+        },
+        {
+          "title": "How long we keep it",
+          "paragraphs": [
+            "We keep your data while your account exists. If you delete a story, it leaves Fogata at once. If you delete your account, we delete your profile, your stories, your responses and everything else tied to it. Copies can remain in backups for a limited time before they're overwritten."
+          ]
+        },
+        {
+          "title": "Your rights",
+          "paragraphs": [
+            "You can access, correct, delete and take a copy of your data, and object to how we use it (in Mexico, your ARCO rights; in the EU, your GDPR rights). Most of it you can do yourself: edit your profile in Settings, download your data, or delete your account. For anything else, write to hola@fogata.org and we'll answer within 20 business days."
+          ]
+        },
+        {
+          "title": "Children",
+          "paragraphs": [
+            "Fogata isn't meant for children under 13, or under the minimum age to use online services where they live."
+          ]
+        },
+        {
+          "title": "Security",
+          "paragraphs": [
+            "Everything travels encrypted (HTTPS), access to data is restricted by rules in the database itself, and we keep what we collect to a minimum. No system is perfectly secure; if something goes wrong that affects you, we'll tell you."
+          ]
+        },
+        {
+          "title": "Changes",
+          "paragraphs": [
+            "When this policy changes we'll update the date above, and for important changes we'll let you know on Fogata before they take effect."
+          ]
+        }
+      ]
+    },
+    "contentDoc": {
+      "title": "Content policy",
+      "description": "What belongs around Fogata's fire, what doesn't, and how to report something.",
+      "intro": "Fogata is a campfire: people come to tell stories and to listen. Fiction, poetry and essays can go to dark places, and they should be able to. What isn't welcome is harming real people. These rules apply to stories, responses, profiles and circles.",
+      "sections": [
+        {
+          "title": "Not allowed",
+          "items": [
+            "Any sexual content involving minors. Zero tolerance: we remove it, close the account and report it to the authorities.",
+            "Intimate images or sexual content shared without the consent of the people in them.",
+            "Threats, incitement to violence or support for violent extremism.",
+            "Harassment and bullying, including publishing someone's private information (doxxing).",
+            "Attacks on people for their ethnicity, nationality, religion, disability, sex, gender identity, sexual orientation or similar characteristics.",
+            "Encouraging suicide, self-harm or eating disorders. Writing about these experiences is welcome; urging others toward them isn't.",
+            "Spam, scams, phishing or malware links, and manipulating the platform with fake accounts or coordinated sparks.",
+            "Impersonating other people or organizations.",
+            "Plagiarism, or publishing work you don't have the rights to.",
+            "Anything illegal."
+          ]
+        },
+        {
+          "title": "Allowed, with a warning",
+          "paragraphs": [
+            "Explicit sexual content between adults and graphic violence can have a place in literature. Moderators may mark those stories as sensitive (NSFW): they open behind a warning that states why, they don't show images in previews, and they stay off the home page, topics, circles and search."
+          ]
+        },
+        {
+          "title": "Honesty about your work",
+          "paragraphs": [
+            "Publish what you wrote. If a story is largely generated by AI, say so in it."
+          ]
+        },
+        {
+          "title": "What happens when something breaks the rules",
+          "paragraphs": [
+            "Depending on how serious it is, we may mark it as sensitive, remove it (its address will show the reason), or suspend the account. Illegal content is reported to the authorities. To ask us to review a decision, write to hola@fogata.org."
+          ]
+        },
+        {
+          "title": "Reporting",
+          "paragraphs": [
+            "Send the link and a short description of the problem to hola@fogata.org. We read every report and keep the reporter's identity private. A report button inside Fogata is on its way."
+          ]
+        },
+        {
+          "title": "Copyright complaints",
+          "paragraphs": [
+            "If you believe something on Fogata copies your work, write to hola@fogata.org with: the work that's yours, the link on Fogata, your contact details, and a statement that you're the owner or act for them and that the information is accurate. We'll remove what infringes and let the writer know; they can reply if they believe it's a mistake."
+          ]
+        }
+      ]
+    }
   }
 }

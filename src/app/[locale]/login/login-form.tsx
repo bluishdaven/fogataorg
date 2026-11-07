@@ -7,6 +7,7 @@ import { sendMagicLink, signInWithOAuth, type MagicLinkState } from "@/app/actio
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Link } from "@/i18n/navigation";
 
 type Props = {
   locale: string;
@@ -96,7 +97,20 @@ function LoginFormInner({ locale, next, linkError, googleEnabled, onReset }: Pro
         </>
       ) : null}
 
-      <p className="text-center text-xs text-muted-foreground">{t("terms")}</p>
+      <p className="text-center text-xs text-muted-foreground">
+        {t.rich("terms", {
+          terms: (chunks) => (
+            <Link href="/terms" className="underline underline-offset-2 hover:text-foreground">
+              {chunks}
+            </Link>
+          ),
+          privacy: (chunks) => (
+            <Link href="/privacy" className="underline underline-offset-2 hover:text-foreground">
+              {chunks}
+            </Link>
+          ),
+        })}
+      </p>
     </div>
   );
 }
