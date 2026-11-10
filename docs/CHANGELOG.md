@@ -1,5 +1,11 @@
 # Changelog
 
+## Quote cards in Story size, with the cover (2026-11-09)
+
+- **Quote card** now opens the same preview dialog: choose **Post · 4:5** or **Story · 9:16**
+  (Instagram's safe zones kept clear), add the story's cover (off by default) and use the story's
+  color (on when the writer chose one). The passage link is still copied in the same tap.
+
 ## Story colors and a better Stories image (2026-11-09)
 
 **Demo**: publish a story and pick a **Story color**. The story page shows it as a thin line above

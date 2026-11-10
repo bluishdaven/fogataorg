@@ -314,6 +314,7 @@ async function Story({ params }: Pick<Props, "params">) {
           authorName={authorName}
           language={story.language}
           accent={story.accentColor}
+          cover={nsfw ? null : drawableImage(story.coverUrl, story.coverCredit, publicEnv.NEXT_PUBLIC_SUPABASE_URL)}
         />
       </Suspense>
     </article>

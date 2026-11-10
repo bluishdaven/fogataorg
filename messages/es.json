@@ -871,7 +871,12 @@
     "previewMedium": "Mediano",
     "previewLong": "Largo",
     "shareImageButton": "Compartir imagen",
-    "downloadImageButton": "Descargar imagen"
+    "downloadImageButton": "Descargar imagen",
+    "quoteCardTitle": "Tarjeta con cita",
+    "quoteCardDescription": "Este pasaje como imagen, para tu feed o tus historias. También copiamos el enlace al pasaje.",
+    "quoteFormat": "Tamaño",
+    "quoteFormatPost": "Publicación · 4:5",
+    "quoteFormatStory": "Historia · 9:16"
   },
   "Circles": {
     "title": "Círculos",

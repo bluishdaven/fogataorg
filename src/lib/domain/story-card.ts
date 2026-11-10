@@ -56,6 +56,26 @@ export function fitTitle(
   return { size: min, lines: wrapLines(title, maxWidth, measureAt(min), maxLines) };
 }
 
+/**
+ * The largest size (stepping down from `max`) at which the text fits in `height` pixels, lines
+ * `leadingRatio` × size apart; at `min` it's cut to the lines that fit (ending in "…").
+ */
+export function fitToHeight(
+  text: string,
+  maxWidth: number,
+  height: number,
+  measureAt: (size: number) => Measure,
+  { max = 84, min = 40, step = 4, leadingRatio = 1.32 } = {},
+): { size: number; leading: number; lines: string[] } {
+  for (let size = max; size > min; size -= step) {
+    const leading = Math.round(size * leadingRatio);
+    const lines = wrapLines(text, maxWidth, measureAt(size));
+    if (lines.length * leading <= height) return { size, leading, lines };
+  }
+  const leading = Math.round(min * leadingRatio);
+  return { size: min, leading, lines: wrapLines(text, maxWidth, measureAt(min), Math.max(1, Math.floor(height / leading))) };
+}
+
 /** "https://fogata.org/@ana/slug" → "fogata.org/@ana", the part people can read off a screen. */
 export function readableProfileUrl(storyUrl: string): string {
   try {

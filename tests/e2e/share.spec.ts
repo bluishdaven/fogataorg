@@ -165,7 +165,28 @@ test("writers give a story a color; its Stories image uses it, with the cover an
   await download.saveAs(path);
   expect(pngSize(await readFile(path))).toEqual([1080, 1920]);
 
-  // The link preview card for a story with an uploaded cover is the cover itself; the color shows
-  // on the card for stories without a picture (checked by the unit tests of the card's colors).
+  // Quote cards carry the color too, and can add the cover (off by default) and be Story-sized.
+  await page.evaluate(() => {
+    const paragraph = document.querySelector<HTMLElement>("#story-body [data-block]")!;
+    const text = [...paragraph.childNodes].find((node) => node.nodeType === Node.TEXT_NODE)!;
+    const range = document.createRange();
+    range.setStart(text, 0);
+    range.setEnd(text, 30);
+    window.getSelection()!.removeAllRanges();
+    window.getSelection()!.addRange(range);
+  });
+  await page.getByTestId("quote-card").click();
+  const quote = page.getByTestId("share-image-dialog");
+  const quotePreview = quote.getByTestId("share-image-preview");
+  await expect(quote.getByLabel("Include the cover")).not.toBeChecked();
+  await expect(quote.getByLabel("Use the story's color")).toBeChecked();
+  await expect.poll(() => pixel(quotePreview, 5, 5)).toEqual([15, 118, 110]);
+  await quote.getByLabel("Include the cover").check();
+  await expect.poll(async () => near(await pixel(quotePreview, 540, 400), [20, 120, 200])).toBe(true);
+  await quote.getByText("Story · 9:16").click();
+  await expect.poll(() => quotePreview.evaluate((img: HTMLImageElement) => img.naturalHeight)).toBe(1920);
+  await expect.poll(async () => near(await pixel(quotePreview, 540, 600), [20, 120, 200])).toBe(true);
+  await page.keyboard.press("Escape");
+
   await deleteFromMyStories(page, title);
 });

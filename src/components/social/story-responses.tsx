@@ -1,4 +1,4 @@
-import { getLocale } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { getViewer } from "@/lib/auth";
 import { listStoryHighlights } from "@/lib/data/highlights";
 import { listResponses } from "@/lib/data/social";
@@ -21,6 +21,7 @@ export async function StoryResponses({
   authorName,
   language,
   accent,
+  cover,
 }: {
   storyId: string;
   storyAuthorId: string;
@@ -32,9 +33,17 @@ export async function StoryResponses({
   language: "en" | "es";
   /** The story's color, for quote cards. */
   accent: string | null;
+  /** The cover, when quote cards can draw it, and who took it (Unsplash). */
+  cover: { url: string; photographer: string | null } | null;
 }) {
   const viewer = await getViewer();
-  const [list, highlights, locale] = await Promise.all([listResponses(viewer, storyId), listStoryHighlights(viewer, storyId), getLocale()]);
+  const [list, highlights, locale, card] = await Promise.all([
+    listResponses(viewer, storyId),
+    listStoryHighlights(viewer, storyId),
+    getLocale(),
+    // Card copy follows the story's language, like the Stories image.
+    getTranslations({ locale: language, namespace: "ShareCard" }),
+  ]);
   const storyUrl = new URL(storyPath(authorUsername, slug), publicEnv.NEXT_PUBLIC_SITE_URL).toString();
   const texts = blockTexts(content);
   const counts: Record<string, number> = {};
@@ -50,7 +59,15 @@ export async function StoryResponses({
         signedIn={Boolean(viewer)}
         loginHref={`/${locale}/login?next=${encodeURIComponent(storyPath(authorUsername, slug))}`}
         initialHighlights={highlights}
-        share={{ url: storyUrl, slug, title, author: authorName, lang: language, accent }}
+        share={{
+          url: storyUrl,
+          slug,
+          title,
+          author: authorName,
+          lang: language,
+          accent,
+          cover: cover ? { url: cover.url, credit: cover.photographer ? card("photoCredit", { name: cover.photographer }) : null } : null,
+        }}
       />
       <ResponsesSection
         storyId={storyId}

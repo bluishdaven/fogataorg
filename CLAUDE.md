@@ -68,8 +68,10 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
 - **Embers and quote cards** (`highlights`, `src/components/social/selection-toolbar.tsx`,
   `src/lib/domain/highlights.ts`, `/[locale]/me/embers`). Selecting words inside one paragraph
   of a story opens a toolbar: Highlight (keep as an ember; private to the reader, RLS own-only,
-  live stories only), Respond (paragraph response), Quote card (1080×1350 canvas in the browser,
-  `quote-image.ts`, link copied in the same tap) and Copy link. `saveHighlight` checks the quote
+  live stories only), Respond (paragraph response), Quote card (`quote-image.ts`, drawn in the
+  browser; opens `ShareImageDialog`: a 4:5 post or a 9:16 Story per `QUOTE_LAYOUTS`, the cover
+  optional and off by default, the story's color on; the passage link is copied in the same tap)
+  and Copy link. `saveHighlight` checks the quote
   really is in that block's stored text (`blockTexts()` + `locateQuote()`). Embers are drawn with
   the CSS Custom Highlight API (`::highlight(ember)`), never by changing the DOM. Blocks carry
   `id="p-<block id>"`; passage links are `#p-<id>:~:text=…` (anchor for every browser, text

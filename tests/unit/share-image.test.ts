@@ -54,3 +54,24 @@ describe("story color", () => {
     expect(publishSchema.safeParse({ ...base, accentColor: "#0f766e; background:url(x)" }).success).toBe(false);
   });
 });
+
+describe("quote card layouts", () => {
+  it("come as a 4:5 post or a 9:16 Story, with the Story's text clear of Instagram's bars", async () => {
+    const { QUOTE_LAYOUTS } = await import("@/lib/domain/share-image");
+    expect(QUOTE_LAYOUTS.post.width / QUOTE_LAYOUTS.post.height).toBeCloseTo(4 / 5);
+    expect(QUOTE_LAYOUTS.story.width / QUOTE_LAYOUTS.story.height).toBeCloseTo(9 / 16);
+    expect(QUOTE_LAYOUTS.story.brandY).toBeGreaterThanOrEqual(180);
+    expect(QUOTE_LAYOUTS.story.height - QUOTE_LAYOUTS.story.urlY).toBeGreaterThanOrEqual(340);
+  });
+
+  it("fit a passage as large as the space allows, and cut it at the smallest size", async () => {
+    const { fitToHeight } = await import("@/lib/domain/story-card");
+    const measureAt = (size: number) => (text: string) => text.length * size * 0.5;
+    const short = fitToHeight("A short line.", 800, 400, measureAt, { max: 100, min: 40 });
+    expect(short.size).toBe(100);
+    const long = fitToHeight("word ".repeat(400), 800, 300, measureAt, { max: 84, min: 40 });
+    expect(long.size).toBe(40);
+    expect(long.lines.length * long.leading).toBeLessThanOrEqual(300);
+    expect(long.lines.at(-1)).toMatch(/…$/);
+  });
+});

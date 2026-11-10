@@ -9,8 +9,8 @@ import { removeHighlight, saveHighlight } from "@/app/actions/highlights";
 import { locateQuote, passageUrl, QUOTE_MAX, quoteCardFileName } from "@/lib/domain/highlights";
 import type { StoryHighlight } from "@/lib/data/highlights";
 import { RESPOND_TO_BLOCK_EVENT } from "./paragraph-anchors";
-import { renderQuoteImage } from "./quote-image";
-import { COARSE, download, hasShareSheet, isAbort, subscribe } from "./share-button";
+import { COARSE, hasShareSheet, subscribe } from "./share-button";
+import { ShareImageDialog } from "./share-image-dialog";
 
 const STORY_BODY_ID = "story-body";
 
@@ -72,7 +72,16 @@ export function SelectionToolbar({
   loginHref: string;
   initialHighlights: StoryHighlight[];
   /** For quote cards and passage links; the card follows the story's language. */
-  share: { url: string; slug: string; title: string; author: string; lang: string; accent: string | null };
+  share: {
+    url: string;
+    slug: string;
+    title: string;
+    author: string;
+    lang: string;
+    accent: string | null;
+    /** The cover, when a quote card can draw it, with its credit line in the story's language. */
+    cover: { url: string; credit: string | null } | null;
+  };
 }) {
   const t = useTranslations("Social");
   const router = useRouter();
@@ -80,7 +89,8 @@ export function SelectionToolbar({
   const shareSheet = useSyncExternalStore(subscribe, hasShareSheet, () => false);
   const [embers, setEmbers] = useState(initialHighlights);
   const [selected, setSelected] = useState<Selected | null>(null);
-  const [busy, setBusy] = useState(false);
+  // The passage being made into a quote card (the dialog outlives the selection).
+  const [quoteCard, setQuoteCard] = useState<{ quote: string; link: string } | null>(null);
 
   useEffect(() => {
     paintEmbers(embers);
@@ -126,7 +136,22 @@ export function SelectionToolbar({
     };
   }, []);
 
-  if (!selected) return null;
+  const quoteDialog = quoteCard ? (
+    <ShareImageDialog
+      open
+      onOpenChange={(open) => !open && setQuoteCard(null)}
+      image={{
+        kind: "quote",
+        input: { quote: quoteCard.quote, author: share.author, title: share.title, url: share.url, lang: share.lang, accent: share.accent, cover: share.cover },
+      }}
+      fileName={quoteCardFileName(share.slug)}
+      url={quoteCard.link}
+      title={share.title}
+      shareSheet={shareSheet}
+    />
+  ) : null;
+
+  if (!selected) return quoteDialog;
   const existing = embers.find(
     (ember) => ember.blockId === selected.blockId && selected.near < ember.end && selected.near + selected.quote.length > ember.start,
   );
@@ -177,39 +202,17 @@ export function SelectionToolbar({
     }
   };
 
-  const card = async () => {
-    // The passage link goes on the clipboard in this same tap (browsers only allow it during one).
-    const linkCopied: Promise<boolean> =
-      navigator.clipboard?.writeText(link).then(
-        () => true,
-        () => false,
-      ) ?? Promise.resolve(false);
+  const card = () => {
     const quote = selected.quote.length > QUOTE_MAX ? `${selected.quote.slice(0, QUOTE_MAX - 1)}…` : selected.quote;
     done();
-    setBusy(true);
-    try {
-      const blob = await renderQuoteImage({ quote, author: share.author, title: share.title, url: share.url, lang: share.lang, accent: share.accent });
-      const file = new File([blob], quoteCardFileName(share.slug), { type: "image/png" });
-      if (shareSheet && navigator.canShare?.({ files: [file] })) {
-        try {
-          await navigator.share({ files: [file], title: share.title });
-          return;
-        } catch (error) {
-          if (isAbort(error)) return;
-        }
-      }
-      download(blob, file.name);
-      toast.success((await linkCopied) ? t("quoteCardSavedLinkCopied") : t("quoteCardSaved"));
-    } catch {
-      toast.error(t("quoteCardFailed"));
-    } finally {
-      setBusy(false);
-    }
+    setQuoteCard({ quote, link });
   };
 
   const button =
     "flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm whitespace-nowrap transition-colors hover:bg-background/15 sm:min-h-9";
   return (
+    <>
+    {quoteDialog}
     <div
       role="toolbar"
       aria-label={t("selectionActions")}
@@ -246,7 +249,7 @@ export function SelectionToolbar({
         <MessageSquareQuote className="size-4" aria-hidden />
         {t("respondToParagraph")}
       </button>
-      <button type="button" className={button} onClick={() => void card()} disabled={busy} data-testid="quote-card">
+      <button type="button" className={button} onClick={card} data-testid="quote-card">
         <ImageIcon className="size-4" aria-hidden />
         <span className="max-sm:sr-only">{t("quoteCard")}</span>
       </button>
@@ -255,5 +258,6 @@ export function SelectionToolbar({
         <span className="max-sm:sr-only">{t("copyPassage")}</span>
       </button>
     </div>
+    </>
   );
 }

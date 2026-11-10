@@ -7,14 +7,25 @@ import { toast } from "sonner";
 import { renderCircleImage, type CircleImageInput, type CircleImageOptions } from "@/components/circles/circle-image";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { PREVIEW_LENGTHS, type PreviewLength } from "@/lib/domain/share-image";
+import { PREVIEW_LENGTHS, QUOTE_FORMATS, type PreviewLength, type QuoteFormat } from "@/lib/domain/share-image";
 import { cn } from "@/lib/utils";
+import { DEFAULT_QUOTE_IMAGE_OPTIONS, renderQuoteImage, type QuoteImageInput, type QuoteImageOptions } from "./quote-image";
 import { DEFAULT_STORY_IMAGE_OPTIONS, renderStoryImage, type StoryImageInput, type StoryImageOptions } from "./story-image";
 
-/** What the "Image for Stories" shows: a story, or a whole circle. */
-export type ShareImage = { kind: "story"; input: StoryImageInput } | { kind: "circle"; input: CircleImageInput };
+/** What the image shows: a story or a whole circle (for Stories), or a passage (a quote card). */
+export type ShareImage =
+  | { kind: "story"; input: StoryImageInput }
+  | { kind: "circle"; input: CircleImageInput }
+  | { kind: "quote"; input: QuoteImageInput };
 
-type Options = StoryImageOptions & CircleImageOptions;
+type Options = StoryImageOptions & CircleImageOptions & QuoteImageOptions;
+
+const draw = (image: ShareImage, options: Options) =>
+  image.kind === "story"
+    ? renderStoryImage(image.input, options)
+    : image.kind === "circle"
+      ? renderCircleImage(image.input, options)
+      : renderQuoteImage(image.input, options);
 
 const isAbort = (error: unknown) => error instanceof DOMException && error.name === "AbortError";
 
@@ -30,10 +41,11 @@ function download(blob: Blob, fileName: string) {
 }
 
 /**
- * Lets whoever shares shape the Stories image before it goes out: include the cover (or circle
- * header), use the story's color, and how much of the opening to show (S/M/L), with a live preview.
- * The image is redrawn when an option changes, so it's ready by the time they tap Share (phones only
- * allow sharing right after a tap). Tapping it also copies the link, for the Story's link sticker.
+ * Lets whoever shares shape the image before it goes out, with a live preview: include the cover (or
+ * circle header), use the story's color, how much of the opening to show (S/M/L, story images), and
+ * a feed post or Story size (quote cards). The image is redrawn when an option changes, so it's ready
+ * by the time they tap Share (phones only allow sharing right after a tap). Tapping it also copies
+ * the link (the story, circle or passage), for the Story's link sticker or a caption.
  */
 export function ShareImageDialog({
   open,
@@ -54,7 +66,13 @@ export function ShareImageDialog({
   shareSheet: boolean;
 }) {
   const t = useTranslations("Social");
-  const [options, setOptions] = useState<Options>({ ...DEFAULT_STORY_IMAGE_OPTIONS, header: true });
+  // Quote cards are about the words: the cover is there to add, not on by default.
+  const [options, setOptions] = useState<Options>(() => ({
+    ...DEFAULT_STORY_IMAGE_OPTIONS,
+    header: true,
+    format: DEFAULT_QUOTE_IMAGE_OPTIONS.format,
+    ...(image.kind === "quote" ? { cover: DEFAULT_QUOTE_IMAGE_OPTIONS.cover } : {}),
+  }));
   const [done, setDone] = useState<{ key: string; blob: Blob; src: string } | null>(null);
   const [failed, setFailed] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -71,9 +89,7 @@ export function ShareImageDialog({
     if (!open) return;
     let cancelled = false;
     const timer = setTimeout(() => {
-      const current = imageRef.current;
-      const drawing = current.kind === "story" ? renderStoryImage(current.input, options) : renderCircleImage(current.input, options);
-      drawing.then(
+      draw(imageRef.current, options).then(
         (blob) => {
           if (cancelled) return;
           setDone({ key, blob, src: URL.createObjectURL(blob) });
@@ -111,7 +127,7 @@ export function ShareImageDialog({
       if (shareSheet && navigator.canShare?.({ files: [file] })) {
         try {
           await navigator.share({ files: [file], title });
-          if (await linkCopied) toast.success(t("storyLinkCopied"));
+          if (await linkCopied) toast.success(quote ? t("passageCopied") : t("storyLinkCopied"));
           onOpenChange(false);
           return;
         } catch (error) {
@@ -120,10 +136,11 @@ export function ShareImageDialog({
         }
       }
       download(done.blob, fileName);
-      toast.success((await linkCopied) ? t("storyImageSavedLinkCopied") : t("storyImageSaved"));
+      const copied = await linkCopied;
+      toast.success(quote ? (copied ? t("quoteCardSavedLinkCopied") : t("quoteCardSaved")) : copied ? t("storyImageSavedLinkCopied") : t("storyImageSaved"));
       onOpenChange(false);
     } catch {
-      toast.error(t("storyImageFailed"));
+      toast.error(quote ? t("quoteCardFailed") : t("storyImageFailed"));
     } finally {
       setBusy(false);
     }
@@ -132,17 +149,27 @@ export function ShareImageDialog({
   const set = <K extends keyof Options>(name: K, value: Options[K]) => setOptions((current) => ({ ...current, [name]: value }));
   const story = image.kind === "story" ? image.input : null;
   const circle = image.kind === "circle" ? image.input : null;
+  const quote = image.kind === "quote" ? image.input : null;
+  // Pictures that share the cover and color options.
+  const withCover = story ?? quote;
+  const formatLabel: Record<QuoteFormat, string> = { post: t("quoteFormatPost"), story: t("quoteFormatStory") };
+  const tall = !quote || options.format === "story";
   const lengthLabel: Record<PreviewLength, string> = { s: t("previewShort"), m: t("previewMedium"), l: t("previewLong") };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent closeLabel={t("close")} className="max-h-[92dvh] overflow-y-auto sm:max-w-lg" data-testid="share-image-dialog">
         <DialogHeader>
-          <DialogTitle className="font-serif text-xl">{t("storyImageTitle")}</DialogTitle>
-          <DialogDescription>{t("storyImageDescription")}</DialogDescription>
+          <DialogTitle className="font-serif text-xl">{quote ? t("quoteCardTitle") : t("storyImageTitle")}</DialogTitle>
+          <DialogDescription>{quote ? t("quoteCardDescription") : t("storyImageDescription")}</DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
-          <div className="relative mx-auto aspect-[9/16] w-40 shrink-0 overflow-hidden rounded-xl border border-border bg-muted sm:w-44">
+          <div
+            className={cn(
+              "relative mx-auto shrink-0 overflow-hidden rounded-xl border border-border bg-muted",
+              tall ? "aspect-[9/16] w-40 sm:w-44" : "aspect-[4/5] w-48 sm:w-52",
+            )}
+          >
             {done ? (
               // A blob URL drawn in this browser; Next's image optimizer has nothing to do here.
               // eslint-disable-next-line @next/next/no-img-element
@@ -160,17 +187,43 @@ export function ShareImageDialog({
             </span>
           </div>
           <div className="flex min-w-0 flex-1 flex-col gap-4 text-sm">
-            {story?.cover ? (
+            {quote ? (
+              <fieldset className="flex flex-col gap-2">
+                <legend className="mb-2 font-medium">{t("quoteFormat")}</legend>
+                <div className="flex flex-wrap gap-2" data-testid="share-image-format">
+                  {QUOTE_FORMATS.map((format) => (
+                    <label
+                      key={format}
+                      className={cn(
+                        "flex min-h-11 cursor-pointer items-center justify-center rounded-full border px-3.5 font-medium transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ring sm:min-h-9",
+                        options.format === format ? "border-ember bg-ember-soft text-ember-text" : "border-border hover:bg-accent",
+                      )}
+                    >
+                      <input
+                        type="radio"
+                        name="share-image-format"
+                        value={format}
+                        checked={options.format === format}
+                        onChange={() => set("format", format)}
+                        className="sr-only"
+                      />
+                      {formatLabel[format]}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            ) : null}
+            {withCover?.cover ? (
               <label className="flex min-h-11 items-center gap-3 sm:min-h-9">
                 <input type="checkbox" checked={options.cover} onChange={(e) => set("cover", e.target.checked)} className="size-4 accent-primary" />
                 {t("storyImageCover")}
               </label>
             ) : null}
-            {story?.accent ? (
+            {withCover?.accent ? (
               <label className="flex min-h-11 items-center gap-3 sm:min-h-9">
                 <input type="checkbox" checked={options.accent} onChange={(e) => set("accent", e.target.checked)} className="size-4 accent-primary" />
                 <span className="flex items-center gap-2">
-                  <span aria-hidden className="size-4 rounded-full border border-border" style={{ backgroundColor: story.accent }} />
+                  <span aria-hidden className="size-4 rounded-full border border-border" style={{ backgroundColor: withCover.accent }} />
                   {t("storyImageAccent")}
                 </span>
               </label>

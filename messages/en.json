@@ -871,7 +871,12 @@
     "previewMedium": "Medium",
     "previewLong": "Long",
     "shareImageButton": "Share image",
-    "downloadImageButton": "Download image"
+    "downloadImageButton": "Download image",
+    "quoteCardTitle": "Quote card",
+    "quoteCardDescription": "This passage as a picture, for your feed or your Stories. The link to the passage is copied too.",
+    "quoteFormat": "Size",
+    "quoteFormatPost": "Post · 4:5",
+    "quoteFormatStory": "Story · 9:16"
   },
   "Circles": {
     "title": "Circles",

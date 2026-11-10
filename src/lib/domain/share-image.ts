@@ -46,3 +46,27 @@ export function withAlpha(hex: string, alpha: number): string {
   const value = Number.parseInt(hex.replace("#", ""), 16);
   return `rgba(${(value >> 16) & 255}, ${(value >> 8) & 255}, ${value & 255}, ${alpha})`;
 }
+
+/** Quote cards come as a feed post (4:5) or a Story (9:16, Instagram's safe zones kept clear). */
+export const QUOTE_FORMATS = ["post", "story"] as const;
+export type QuoteFormat = (typeof QUOTE_FORMATS)[number];
+
+export const QUOTE_LAYOUTS: Record<
+  QuoteFormat,
+  {
+    width: number;
+    height: number;
+    margin: number;
+    brandY: number;
+    top: number;
+    bottom: number;
+    urlY: number;
+    coverMax: number;
+    coverMin: number;
+    /** The largest the passage gets (short passages fill the taller Story frame). */
+    quoteMax: number;
+  }
+> = {
+  post: { width: 1080, height: 1350, margin: 104, brandY: 96, top: 230, bottom: 1350 - 170, urlY: 1350 - 96, coverMax: 380, coverMin: 220, quoteMax: 84 },
+  story: { width: 1080, height: 1920, margin: 96, brandY: 196, top: 340, bottom: 1920 - 470, urlY: 1920 - 380, coverMax: 520, coverMin: 260, quoteMax: 104 },
+};

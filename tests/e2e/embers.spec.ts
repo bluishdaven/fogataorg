@@ -68,17 +68,32 @@ test("a passage link and a quote card, with the link copied in the same tap", as
   const link = await page.evaluate(() => navigator.clipboard.readText());
   expect(link).toMatch(/\/@danawrites\/the-heron-knows-something-i-dont#p-[0-9a-f-]{36}:~:text=It%20stands/);
 
-  await selectPassage(page);
-  const downloading = page.waitForEvent("download");
-  await page.getByTestId("quote-card").click();
-  const download = await downloading;
-  expect(download.suggestedFilename()).toBe("fogata-quote-the-heron-knows-something-i-dont.png");
-  await expect(page.getByText("Quote card saved. The link to the passage is copied too.")).toBeVisible();
-  const path = testInfo.outputPath("quote-card.png");
-  await download.saveAs(path);
-  const png = await readFile(path);
-  expect([png.readUInt32BE(16), png.readUInt32BE(20)]).toEqual([1080, 1350]);
-  expect(png.length).toBeGreaterThan(30_000);
+  // A quote card: a feed post by default, or a Story; the dialog shows a preview first.
+  const quoteCard = async (format: "Post · 4:5" | "Story · 9:16", height: number) => {
+    await selectPassage(page);
+    await page.getByTestId("quote-card").click();
+    const dialog = page.getByTestId("share-image-dialog");
+    await expect(dialog.getByRole("heading", { name: "Quote card" })).toBeVisible();
+    // No cover or story color on this story, so only the size can change.
+    await expect(dialog.getByLabel("Include the cover")).toHaveCount(0);
+    await dialog.getByText(format).click();
+    await expect(dialog.getByRole("radio", { name: format })).toBeChecked();
+    await expect.poll(() => dialog.getByTestId("share-image-preview").evaluate((img: HTMLImageElement) => img.naturalHeight)).toBe(height);
+    const downloading = page.waitForEvent("download");
+    await dialog.getByTestId("share-image-confirm").click();
+    const download = await downloading;
+    expect(download.suggestedFilename()).toBe("fogata-quote-the-heron-knows-something-i-dont.png");
+    // The newest message (the first card's can still be showing when the second is made).
+    await expect(page.getByText("Quote card saved. The link to the passage is copied too.").last()).toBeVisible();
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toMatch(/#p-[0-9a-f-]{36}:~:text=It%20stands/);
+    const path = testInfo.outputPath(`quote-card-${height}.png`);
+    await download.saveAs(path);
+    const png = await readFile(path);
+    expect([png.readUInt32BE(16), png.readUInt32BE(20)]).toEqual([1080, height]);
+    expect(png.length).toBeGreaterThan(30_000);
+  };
+  await quoteCard("Post · 4:5", 1350);
+  await quoteCard("Story · 9:16", 1920);
 
   // Visitors who try to keep an ember are asked to sign in first.
   await selectPassage(page);
