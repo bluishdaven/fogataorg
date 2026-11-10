@@ -4,9 +4,10 @@ import { useEffect, useRef } from "react";
 
 /**
  * Thin ember bar at the top of the window showing how far through the story
- * the reader is. Decorative (screen readers already know their position).
+ * the reader is, in the story's own color when the writer chose one. Decorative
+ * (screen readers already know their position).
  */
-export function ReadingProgress({ targetId }: { targetId: string }) {
+export function ReadingProgress({ targetId, color }: { targetId: string; color?: string | null }) {
   const bar = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -35,7 +36,12 @@ export function ReadingProgress({ targetId }: { targetId: string }) {
 
   return (
     <div aria-hidden className="pointer-events-none fixed inset-x-0 top-0 z-50 h-0.5">
-      <div ref={bar} className="h-full origin-left bg-ember" style={{ transform: "scaleX(0)" }} data-testid="reading-progress" />
+      <div
+        ref={bar}
+        className="h-full origin-left bg-ember"
+        style={{ transform: "scaleX(0)", ...(color ? { backgroundColor: color } : {}) }}
+        data-testid="reading-progress"
+      />
     </div>
   );
 }

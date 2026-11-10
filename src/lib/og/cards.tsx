@@ -16,7 +16,10 @@ const C = {
   border: "#e6dccb",
 };
 
-function Frame({ children, flame }: { children: ReactNode; flame: string }) {
+/** An accent background with its readable text color (white or black), for stories with a color. */
+type Tint = { background: string; text: string };
+
+function Frame({ children, flame, tint }: { children: ReactNode; flame: string; tint?: Tint | null }) {
   return (
     <div
       style={{
@@ -24,13 +27,13 @@ function Frame({ children, flame }: { children: ReactNode; flame: string }) {
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        background: C.paper,
+        background: tint?.background ?? C.paper,
         fontFamily: "Inter",
-        color: C.ink,
+        color: tint?.text ?? C.ink,
         position: "relative",
       }}
     >
-      <div style={{ height: 10, width: "100%", background: C.ember, display: "flex" }} />
+      <div style={{ height: 10, width: "100%", background: tint ? tint.text : C.ember, opacity: tint ? 0.35 : 1, display: "flex" }} />
       <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "56px 72px 48px" }}>{children}</div>
       <div
         style={{
@@ -42,7 +45,7 @@ function Frame({ children, flame }: { children: ReactNode; flame: string }) {
           gap: 12,
           fontSize: 28,
           fontWeight: 600,
-          color: C.emberText,
+          color: tint?.text ?? C.emberText,
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text */}
@@ -89,15 +92,19 @@ export function StoryCard({
   subtitle,
   author,
   meta,
+  tint,
 }: {
   flame: string;
   title: string;
   subtitle: string;
   author: string;
   meta: string;
+  /** The story's color, when the writer chose one. */
+  tint?: Tint | null;
 }) {
+  const muted = tint ? { color: tint.text, opacity: 0.82 } : { color: C.muted };
   return (
-    <Frame flame={flame}>
+    <Frame flame={flame} tint={tint}>
       <div style={{ display: "flex", alignItems: "center", gap: 14, fontFamily: "Source Serif", fontWeight: 600, fontSize: 34 }}>
         {/* eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text */}
         <img src={flame} width={48} height={48} />
@@ -118,12 +125,12 @@ export function StoryCard({
           {title}
         </div>
         {subtitle ? (
-          <div style={{ fontSize: 32, color: C.muted, marginTop: 20, lineHeight: 1.35, display: "block", lineClamp: 2 }}>{subtitle}</div>
+          <div style={{ fontSize: 32, ...muted, marginTop: 20, lineHeight: 1.35, display: "block", lineClamp: 2 }}>{subtitle}</div>
         ) : null}
       </div>
       <div style={{ display: "flex", flexDirection: "column", fontSize: 30, maxWidth: 680 }}>
         <div style={{ fontWeight: 600 }}>{author}</div>
-        <div style={{ color: C.muted, fontSize: 26, marginTop: 4 }}>{meta}</div>
+        <div style={{ ...muted, fontSize: 26, marginTop: 4 }}>{meta}</div>
       </div>
     </Frame>
   );

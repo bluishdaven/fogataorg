@@ -72,7 +72,7 @@ export function SelectionToolbar({
   loginHref: string;
   initialHighlights: StoryHighlight[];
   /** For quote cards and passage links; the card follows the story's language. */
-  share: { url: string; slug: string; title: string; author: string; lang: string };
+  share: { url: string; slug: string; title: string; author: string; lang: string; accent: string | null };
 }) {
   const t = useTranslations("Social");
   const router = useRouter();
@@ -188,7 +188,7 @@ export function SelectionToolbar({
     done();
     setBusy(true);
     try {
-      const blob = await renderQuoteImage({ quote, author: share.author, title: share.title, url: share.url, lang: share.lang });
+      const blob = await renderQuoteImage({ quote, author: share.author, title: share.title, url: share.url, lang: share.lang, accent: share.accent });
       const file = new File([blob], quoteCardFileName(share.slug), { type: "image/png" });
       if (shareSheet && navigator.canShare?.({ files: [file] })) {
         try {

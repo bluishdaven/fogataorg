@@ -1,5 +1,20 @@
 # Changelog
 
+## Story colors and a better Stories image (2026-11-09)
+
+**Demo**: publish a story and pick a **Story color**. The story page shows it as a thin line above
+the title and in the reading progress bar. **Share → Image for Stories** now opens a preview with
+options: include the cover, use the story's color, and how much of the story to show (S/M/L).
+
+- **Story color** (optional): presets or any color, chosen in the publish dialog next to the cover.
+  It colors the Stories image and quote cards (white or black text, whichever reads), and the link
+  preview card for stories without a picture.
+- **Image for Stories** dialog, for stories and circles: a live preview, then Share (phones) or
+  Download; the link is still copied for the link sticker. The cover shrinks to a banner to make
+  room for longer previews.
+- Covers and circle headers from Unsplash can now go into these images too, loaded from Unsplash
+  with "Photo: name / Unsplash" printed under them.
+
 ## Continue reading removed (2026-11-07)
 
 - No more "Pick up where you left off" on story pages or **Continue reading** on the home page, and

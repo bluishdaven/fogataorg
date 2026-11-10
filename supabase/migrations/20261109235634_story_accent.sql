@@ -1,0 +1,2 @@
+ALTER TABLE "stories" ADD COLUMN "accent_color" text;--> statement-breakpoint
+ALTER TABLE "stories" ADD CONSTRAINT "stories_accent_format" CHECK ("stories"."accent_color" is null or "stories"."accent_color" ~ '^#[0-9a-fA-F]{6}$');

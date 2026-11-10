@@ -27,6 +27,7 @@ import { getViewer } from "@/lib/auth";
 import { getStory } from "@/lib/data/stories";
 import { badgeData } from "@/lib/domain/badges";
 import { excerpt } from "@/lib/domain/content";
+import { drawableImage, PREVIEW_SOURCE_CHARS } from "@/lib/domain/share-image";
 import { profilePath, storyPath } from "@/lib/domain/handle-routes";
 import { clampText, OG_SIZE, ogPaths, previewVersion } from "@/lib/domain/og";
 import { imageCreditSchema, isUnsplashImageUrl, unsplashShareImageUrl } from "@/lib/domain/unsplash";
@@ -52,7 +53,8 @@ function storyShareImage(story: LoadedStory) {
     url: ogPaths.story(
       story.authorUsername,
       story.slug,
-      previewVersion(story.title, story.subtitle, authorName, story.readingTime, story.language, picture, story.moderation),
+      // The color only joins the version when there is one, so existing previews keep their address.
+      previewVersion(story.title, story.subtitle, authorName, story.readingTime, story.language, picture, story.moderation, ...(story.accentColor ? [story.accentColor] : [])),
     ),
     ...OG_SIZE,
     alt: picture ? pictureAlt : story.title,
@@ -159,7 +161,7 @@ async function Story({ params }: Pick<Props, "params">) {
           }}
         />
       ) : null}
-      <ReadingProgress targetId="story" />
+      <ReadingProgress targetId="story" color={story.accentColor} />
       <ReadTracker storyId={story.id} targetId="story" />
       <StoryTitleBar
         headerId="story-header"
@@ -170,6 +172,10 @@ async function Story({ params }: Pick<Props, "params">) {
         lang={story.language}
       />
       <header id="story-header" className="mx-auto mb-10 flex max-w-[var(--measure)] flex-col gap-4">
+        {story.accentColor ? (
+          // The writer's color for this story: a thin line here, and the color of its share images.
+          <span aria-hidden className="block h-1.5 w-16 rounded-full" style={{ backgroundColor: story.accentColor }} data-testid="story-accent" />
+        ) : null}
         {story.circle ? (
           <Link
             href={`/circles/${story.circle.slug}`}
@@ -281,7 +287,9 @@ async function Story({ params }: Pick<Props, "params">) {
           nsfw={nsfw}
           language={story.language}
           readingTime={story.readingTime}
-          preview={excerpt(story.contentText, 300)}
+          preview={excerpt(story.contentText, PREVIEW_SOURCE_CHARS)}
+          accent={story.accentColor}
+          cover={nsfw ? null : drawableImage(story.coverUrl, story.coverCredit, publicEnv.NEXT_PUBLIC_SUPABASE_URL)}
           slug={story.slug}
           author={{
             id: story.authorId,
@@ -305,6 +313,7 @@ async function Story({ params }: Pick<Props, "params">) {
           title={story.title}
           authorName={authorName}
           language={story.language}
+          accent={story.accentColor}
         />
       </Suspense>
     </article>

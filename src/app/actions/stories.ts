@@ -206,6 +206,7 @@ export async function publishStory(input: PublishInput): Promise<PublishResult> 
         coverUrl: data.cover?.url ?? null,
         coverAlt: data.cover?.alt ?? "",
         coverCredit: data.cover?.credit ?? null,
+        accentColor: data.accentColor,
         thumbnailUrl: thumbnail?.url ?? null,
         thumbnailAlt: thumbnail?.alt ?? "",
         seoTitle: data.seoTitle,

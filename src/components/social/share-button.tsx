@@ -2,7 +2,7 @@
 
 import { ImageIcon, Link2, Share } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useRef, useState, useSyncExternalStore } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { toast } from "sonner";
 import {
   DropdownMenu,
@@ -12,15 +12,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { renderCircleImage, type CircleImageInput } from "@/components/circles/circle-image";
 import { Button } from "@/components/ui/button";
 import { SHARE_NETWORKS, shareLink } from "@/lib/domain/share";
-import { renderStoryImage, type StoryImageInput } from "./story-image";
+import { ShareImageDialog, type ShareImage } from "./share-image-dialog";
 
-/** What the "Image for Stories" shows: a story, or a whole circle. */
-export type ShareImage = { kind: "story"; input: StoryImageInput } | { kind: "circle"; input: CircleImageInput };
-
-const renderImage = (image: ShareImage) => (image.kind === "story" ? renderStoryImage(image.input) : renderCircleImage(image.input));
+export type { ShareImage };
 
 const NETWORK_NAMES = {
   whatsapp: "WhatsApp",
@@ -76,17 +72,7 @@ export function ShareButton({
 }) {
   const t = useTranslations("Social");
   const shareSheet = useSyncExternalStore(subscribe, hasShareSheet, () => false);
-  const rendering = useRef<Promise<Blob> | null>(null);
-  const [busy, setBusy] = useState(false);
-
-  // Start drawing as soon as the menu opens: phones only allow sharing shortly after a tap.
-  const prepareImage = () => {
-    rendering.current ??= renderImage(image).catch((error: unknown) => {
-      rendering.current = null;
-      throw error;
-    });
-    return rendering.current;
-  };
+  const [imageOpen, setImageOpen] = useState(false);
 
   const copy = async () => {
     try {
@@ -97,46 +83,12 @@ export function ShareButton({
     }
   };
 
-  const shareImage = async () => {
-    setBusy(true);
-    // Copy the story's link in the same tap (browsers only allow clipboard writes during one), so
-    // it's ready to paste into the Story's link sticker. Started before any await, on purpose.
-    const linkCopied: Promise<boolean> =
-      navigator.clipboard?.writeText(url).then(
-        () => true,
-        () => false,
-      ) ?? Promise.resolve(false);
-    try {
-      const blob = await prepareImage();
-      const file = new File([blob], fileName, { type: "image/png" });
-      if (shareSheet && navigator.canShare?.({ files: [file] })) {
-        try {
-          await navigator.share({ files: [file], title });
-          if (await linkCopied) toast.success(t("storyLinkCopied"));
-          return;
-        } catch (error) {
-          if (isAbort(error)) return;
-          // Took too long after the tap, or the app refused: save it instead.
-        }
-      }
-      download(blob, fileName);
-      toast.success((await linkCopied) ? t("storyImageSavedLinkCopied") : t("storyImageSaved"));
-    } catch {
-      toast.error(t("storyImageFailed"));
-    } finally {
-      setBusy(false);
-    }
-  };
-
   return (
-    <DropdownMenu
-      onOpenChange={(open) => {
-        if (open && allowImage) void prepareImage().catch(() => undefined);
-      }}
-    >
+    <>
+    <DropdownMenu>
       <DropdownMenuTrigger asChild>
         {appearance === "button" ? (
-          <Button variant="secondary" size="sm" aria-busy={busy || undefined} data-testid="share-button">
+          <Button variant="secondary" size="sm" data-testid="share-button">
             <Share aria-hidden />
             {t("share")}
           </Button>
@@ -146,7 +98,6 @@ export function ShareButton({
             className="flex size-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent"
             aria-label={t("share")}
             title={t("share")}
-            aria-busy={busy || undefined}
             data-testid="share-button"
           >
             <Share className="size-5" aria-hidden />
@@ -169,7 +120,8 @@ export function ShareButton({
           </DropdownMenuItem>
         ) : null}
         {allowImage ? (
-          <DropdownMenuItem onSelect={() => void shareImage()} disabled={busy} data-testid="share-stories">
+          // Opens once the menu has closed, so focus moves into the dialog rather than back to the menu.
+          <DropdownMenuItem onSelect={() => requestAnimationFrame(() => setImageOpen(true))} data-testid="share-stories">
             <ImageIcon aria-hidden />
             {t("shareStories")}
           </DropdownMenuItem>
@@ -193,5 +145,17 @@ export function ShareButton({
         ))}
       </DropdownMenuContent>
     </DropdownMenu>
+      {allowImage ? (
+        <ShareImageDialog
+          open={imageOpen}
+          onOpenChange={setImageOpen}
+          image={image}
+          fileName={fileName}
+          url={url}
+          title={title}
+          shareSheet={shareSheet}
+        />
+      ) : null}
+    </>
   );
 }

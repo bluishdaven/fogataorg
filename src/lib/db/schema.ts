@@ -219,6 +219,8 @@ export const stories = pgTable(
     coverAlt: text("cover_alt").notNull().default(""),
     // Who to credit for the cover (e.g. an Unsplash photographer). Null for the writer's own uploads.
     coverCredit: jsonb("cover_credit").$type<ImageCredit>(),
+    // Optional story color (hex), used for share images and link previews, like a circle's accent.
+    accentColor: text("accent_color"),
     // List-view thumbnail, set on publish: the cover, else the first image in the story.
     thumbnailUrl: text("thumbnail_url"),
     thumbnailAlt: text("thumbnail_alt").notNull().default(""),
@@ -255,6 +257,7 @@ export const stories = pgTable(
     check("stories_slug_format", sql`${t.slug} ~ '^[a-z0-9]+(-[a-z0-9]+)*$'`),
     check("stories_reading_time_positive", sql`${t.readingTime} >= 1`),
     check("stories_cover_alt_length", sql`char_length(${t.coverAlt}) <= 300`),
+    check("stories_accent_format", sql`${t.accentColor} is null or ${t.accentColor} ~ '^#[0-9a-fA-F]{6}$'`),
     check(
       "stories_live_has_published_at",
       sql`${t.status} = 'draft' or ${t.publishedAt} is not null`,

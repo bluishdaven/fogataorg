@@ -428,6 +428,13 @@
       "when": 1794092315045,
       "tag": "20261107225835_drop_reading_positions",
       "breakpoints": true
+    },
+    {
+      "idx": 61,
+      "version": "7",
+      "when": 1794268594813,
+      "tag": "20261109235634_story_accent",
+      "breakpoints": true
     }
   ]
 }

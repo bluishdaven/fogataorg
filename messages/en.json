@@ -534,7 +534,12 @@
       "type": "That file type isn't supported. Use JPEG, PNG, WebP, GIF or AVIF.",
       "size": "That image is larger than 10 MB.",
       "failed": "The image couldn't be uploaded. Try again."
-    }
+    },
+    "accent": "Story color (optional)",
+    "accentNone": "No color: Fogata's own look",
+    "accentOption": "Color {color}",
+    "accentCustom": "Pick any color",
+    "accentHint": "Used for the story's Stories image, quote cards and link previews, and as a thin line on its page."
   },
   "MyStories": {
     "title": "Your stories",
@@ -852,7 +857,21 @@
     "blockConfirm": "Block",
     "mutedBadge": "Muted",
     "blockedBadge": "Blocked",
-    "blockFailed": "That didn't work. Try again."
+    "blockFailed": "That didn't work. Try again.",
+    "close": "Close",
+    "storyImageTitle": "Image for Stories",
+    "storyImageDescription": "Ready for Instagram, WhatsApp or Facebook Stories. The link is copied too, for the link sticker.",
+    "storyImagePreviewAlt": "Preview of the image",
+    "storyImageDrawing": "Drawing the image…",
+    "storyImageCover": "Include the cover",
+    "storyImageAccent": "Use the story's color",
+    "storyImageHeader": "Include the header picture",
+    "storyImagePreview": "How much of the story",
+    "previewShort": "Short",
+    "previewMedium": "Medium",
+    "previewLong": "Long",
+    "shareImageButton": "Share image",
+    "downloadImageButton": "Download image"
   },
   "Circles": {
     "title": "Circles",
@@ -1040,7 +1059,8 @@
     "circleStats": "{stories, plural, one {# story} other {# stories}} · {members, plural, one {# member} other {# members}}",
     "circleLatest": "Latest stories",
     "circleCta": "Read the circle",
-    "circleMembers": "{members, plural, one {# member} other {# members}}"
+    "circleMembers": "{members, plural, one {# member} other {# members}}",
+    "photoCredit": "Photo: {name} / Unsplash"
   },
   "Badges": {
     "tiers": {

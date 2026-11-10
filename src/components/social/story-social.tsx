@@ -27,6 +27,8 @@ export async function StorySocial({
   language,
   readingTime,
   preview,
+  accent,
+  cover,
   author,
   slug,
 }: {
@@ -36,8 +38,12 @@ export async function StorySocial({
   nsfw?: boolean;
   language: "en" | "es";
   readingTime: number;
-  /** A few sentences from the start of the story, for the Stories image. */
+  /** The start of the story, for the Stories image (it shows as much as the sharer picks). */
   preview: string;
+  /** The story's color, if the writer chose one. */
+  accent: string | null;
+  /** The cover, when the Stories image can draw it, and who took it (Unsplash). */
+  cover: { url: string; photographer: string | null } | null;
   author: {
     id: string;
     username: string;
@@ -112,6 +118,8 @@ export async function StorySocial({
               cta: card("cta"),
               url: shareUrl,
               lang: language,
+              accent,
+              cover: cover ? { url: cover.url, credit: cover.photographer ? card("photoCredit", { name: cover.photographer }) : null } : null,
             },
           }}
         />

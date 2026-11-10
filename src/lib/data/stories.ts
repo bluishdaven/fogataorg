@@ -132,6 +132,7 @@ export async function getStory(handle: string, slug: string) {
         coverUrl: stories.coverUrl,
         coverAlt: stories.coverAlt,
         coverCredit: stories.coverCredit,
+        accentColor: stories.accentColor,
         thumbnailUrl: stories.thumbnailUrl,
         seoTitle: stories.seoTitle,
         seoDescription: stories.seoDescription,

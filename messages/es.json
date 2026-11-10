@@ -534,7 +534,12 @@
       "type": "Ese tipo de archivo no es compatible. Usa JPEG, PNG, WebP, GIF o AVIF.",
       "size": "Esa imagen pesa más de 10 MB.",
       "failed": "No se pudo subir la imagen. Vuelve a intentarlo."
-    }
+    },
+    "accent": "Color de la historia (opcional)",
+    "accentNone": "Sin color: el aspecto de Fogata",
+    "accentOption": "Color {color}",
+    "accentCustom": "Elige cualquier color",
+    "accentHint": "Se usa en la imagen para historias, las tarjetas de cita y las vistas previas de enlaces, y como una línea fina en su página."
   },
   "MyStories": {
     "title": "Tus historias",
@@ -852,7 +857,21 @@
     "blockConfirm": "Bloquear",
     "mutedBadge": "Cuenta silenciada",
     "blockedBadge": "Cuenta bloqueada",
-    "blockFailed": "No funcionó. Vuelve a intentarlo."
+    "blockFailed": "No funcionó. Vuelve a intentarlo.",
+    "close": "Cerrar",
+    "storyImageTitle": "Imagen para historias",
+    "storyImageDescription": "Lista para las historias de Instagram, WhatsApp o Facebook. También copiamos el enlace, para el sticker de enlace.",
+    "storyImagePreviewAlt": "Vista previa de la imagen",
+    "storyImageDrawing": "Dibujando la imagen…",
+    "storyImageCover": "Incluir la portada",
+    "storyImageAccent": "Usar el color de la historia",
+    "storyImageHeader": "Incluir la imagen de cabecera",
+    "storyImagePreview": "Cuánto de la historia",
+    "previewShort": "Corto",
+    "previewMedium": "Mediano",
+    "previewLong": "Largo",
+    "shareImageButton": "Compartir imagen",
+    "downloadImageButton": "Descargar imagen"
   },
   "Circles": {
     "title": "Círculos",
@@ -1040,7 +1059,8 @@
     "circleStats": "{stories, plural, one {# historia} other {# historias}} · {members, plural, one {# integrante} other {# integrantes}}",
     "circleLatest": "Historias recientes",
     "circleCta": "Lee el círculo",
-    "circleMembers": "{members, plural, one {# integrante} other {# integrantes}}"
+    "circleMembers": "{members, plural, one {# integrante} other {# integrantes}}",
+    "photoCredit": "Foto: {name} / Unsplash"
   },
   "Badges": {
     "tiers": {

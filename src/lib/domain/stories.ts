@@ -36,9 +36,17 @@ export const coverSchema = z.object({
   credit: imageCreditSchema.nullable(),
 });
 
+/** A story's optional color: a hex like a circle's accent, stored in lowercase. */
+export const storyAccentSchema = z
+  .string()
+  .regex(/^#[0-9a-fA-F]{6}$/)
+  .transform((value) => value.toLowerCase())
+  .nullable();
+
 export const publishSchema = z.object({
   id: storyIdSchema,
   cover: coverSchema.nullable(),
+  accentColor: storyAccentSchema.default(null),
   topics: z
     .array(topicSlugSchema)
     .max(MAX_TOPICS_PER_STORY, { message: "tooManyTopics" })

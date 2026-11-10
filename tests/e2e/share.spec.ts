@@ -1,5 +1,9 @@
 import { readFile } from "node:fs/promises";
-import { expect, test } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
+import { expect, test, type Locator } from "@playwright/test";
+import { deleteFromMyStories, startDraft, waitSaved, writeStory } from "./helpers";
+import { solidPng } from "./png";
+import { signInWithMagicLink } from "./sign-in";
 
 const STORY = "/@danawrites/the-heron-knows-something-i-dont";
 
@@ -41,8 +45,16 @@ test("readers can download a ready-to-post Stories image of the story, with its 
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   await page.goto(STORY);
   await page.getByTestId("story-actions").getByTestId("share-button").click();
-  const downloading = page.waitForEvent("download");
   await page.getByTestId("share-stories").click();
+  // A dialog with a live preview and options comes first.
+  const dialog = page.getByTestId("share-image-dialog");
+  await expect(dialog.getByTestId("share-image-preview")).toBeVisible();
+  // No cover or story color here, so only the length can change.
+  await expect(dialog.getByLabel("Include the cover")).toHaveCount(0);
+  await expect(dialog.getByLabel("Use the story's color")).toHaveCount(0);
+  await expect(dialog.getByRole("radio", { name: "Medium" })).toBeChecked();
+  const downloading = page.waitForEvent("download");
+  await dialog.getByTestId("share-image-confirm").click();
   const download = await downloading;
   expect(download.suggestedFilename()).toBe("fogata-the-heron-knows-something-i-dont.png");
   await expect(page.getByText("Image saved and link copied. Add the image to your Story and paste the link into a link sticker.")).toBeVisible();
@@ -66,8 +78,11 @@ test("circle pages share too, with a Stories image of the circle", async ({ page
   const whatsapp = page.getByTestId("share-whatsapp");
   expect(decodeURIComponent((await whatsapp.getAttribute("href"))!)).toMatch(/Lake Notes, a circle on Fogata https?:\/\/[^/]+\/circles\/lake-notes$/);
 
-  const downloading = page.waitForEvent("download");
   await page.getByTestId("share-stories").click();
+  const dialog = page.getByTestId("share-image-dialog");
+  await expect(dialog.getByTestId("share-image-preview")).toBeVisible();
+  const downloading = page.waitForEvent("download");
+  await dialog.getByTestId("share-image-confirm").click();
   const download = await downloading;
   expect(download.suggestedFilename()).toBe("fogata-circle-lake-notes.png");
   await expect(page.getByText("Image saved and link copied.", { exact: false })).toBeVisible();
@@ -78,4 +93,79 @@ test("circle pages share too, with a Stories image of the circle", async ({ page
   const png = await readFile(path);
   expect(pngSize(png)).toEqual([1080, 1920]);
   expect(png.length).toBeGreaterThan(40_000);
+});
+
+/** Whether two colors match within a few steps (uploads are re-encoded as WebP, which shifts them slightly). */
+const near = (actual: number[], expected: number[]) => actual.every((value, i) => Math.abs(value - expected[i]!) <= 4);
+
+/** The color of one pixel of the dialog's preview image. */
+function pixel(preview: Locator, x: number, y: number) {
+  return preview.evaluate(
+    async (img: HTMLImageElement, [px, py]) => {
+      await img.decode();
+      const canvas = document.createElement("canvas");
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext("2d")!;
+      ctx.drawImage(img, 0, 0);
+      return Array.from(ctx.getImageData(px!, py!, 1, 1).data.slice(0, 3));
+    },
+    [x, y],
+  );
+}
+
+test("writers give a story a color; its Stories image uses it, with the cover and a chosen length", async ({ page, context }, testInfo) => {
+  test.setTimeout(150_000);
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await signInWithMagicLink(page, "en");
+  await startDraft(page);
+  const title = `A colored story ${Date.now()}`;
+  await writeStory(page, title);
+  await waitSaved(page);
+
+  // Publish with a cover and the teal color.
+  await page.getByTestId("open-publish").click();
+  const publish = page.getByTestId("publish-dialog");
+  await expect(publish.getByRole("button", { name: "No color: Fogata's own look" })).toHaveAttribute("aria-pressed", "true");
+  await page.getByTestId("cover-input").setInputFiles({ name: "cover.png", mimeType: "image/png", buffer: solidPng(1600, 900, [20, 120, 200]) });
+  await publish.getByLabel("Cover alt text").fill("A blue field");
+  await publish.getByRole("button", { name: "Color #0f766e" }).click();
+  await expect(publish.getByTestId("publish-preview")).toHaveCSS("background-color", "rgb(15, 118, 110)");
+  await page.getByTestId("publish-submit").click();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(title);
+
+  // The story page shows its color as a thin line and in the reading progress bar.
+  await expect(page.getByTestId("story-accent")).toHaveCSS("background-color", "rgb(15, 118, 110)");
+  await expect(page.getByTestId("reading-progress")).toHaveCSS("background-color", "rgb(15, 118, 110)");
+
+  // The image dialog: the story's color behind it, the cover near the top.
+  await page.getByTestId("story-actions").getByTestId("share-button").click();
+  await page.getByTestId("share-stories").click();
+  const dialog = page.getByTestId("share-image-dialog");
+  const preview = dialog.getByTestId("share-image-preview");
+  await expect(preview).toBeVisible();
+  await expect.poll(() => pixel(preview, 5, 5)).toEqual([15, 118, 110]);
+  await expect.poll(async () => near(await pixel(preview, 540, 600), [20, 120, 200])).toBe(true);
+  expect((await new AxeBuilder({ page }).include("[data-testid=share-image-dialog]").analyze()).violations.map((v) => v.id)).toEqual([]);
+
+  // Without the cover, and without the color (Fogata's dark paper).
+  await dialog.getByLabel("Include the cover").uncheck();
+  await expect.poll(async () => near(await pixel(preview, 540, 600), [20, 120, 200])).toBe(false);
+  await dialog.getByLabel("Use the story's color").uncheck();
+  await expect.poll(() => pixel(preview, 5, 5)).toEqual([27, 24, 20]);
+  await dialog.getByTitle("Long").click();
+  await expect(dialog.getByRole("radio", { name: "Long" })).toBeChecked();
+
+  const downloading = page.waitForEvent("download");
+  await dialog.getByTestId("share-image-confirm").click();
+  const download = await downloading;
+  expect(download.suggestedFilename()).toMatch(/^fogata-a-colored-story-\d+\.png$/);
+  await expect(dialog).toBeHidden();
+  const path = testInfo.outputPath("colored-story.png");
+  await download.saveAs(path);
+  expect(pngSize(await readFile(path))).toEqual([1080, 1920]);
+
+  // The link preview card for a story with an uploaded cover is the cover itself; the color shows
+  // on the card for stories without a picture (checked by the unit tests of the card's colors).
+  await deleteFromMyStories(page, title);
 });

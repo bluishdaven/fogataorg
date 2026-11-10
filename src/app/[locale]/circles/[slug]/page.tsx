@@ -16,10 +16,10 @@ import { Link } from "@/i18n/navigation";
 import { getViewer } from "@/lib/auth";
 import { getCircle, getCircleViewerState, listSubmittableStories } from "@/lib/data/circles";
 import { circleImageFileName, circleShareUrl } from "@/lib/domain/circle-card";
+import { drawableImage } from "@/lib/domain/share-image";
 import { profilePath } from "@/lib/domain/handle-routes";
 import { OG_SIZE, ogPaths, previewVersion } from "@/lib/domain/og";
 import { localeAlternates } from "@/lib/domain/seo";
-import { storyImagePrefix } from "@/lib/domain/stories";
 import { isUnsplashImageUrl, unsplashShareImageUrl } from "@/lib/domain/unsplash";
 import { publicEnv } from "@/lib/env";
 
@@ -70,11 +70,8 @@ async function Circle({ params }: Pick<Props, "params">) {
   const [t, card] = await Promise.all([getTranslations("Circles"), getTranslations("ShareCard")]);
   const editors = circle.members.filter((m) => m.role === "owner" || m.role === "editor");
   const shareUrl = circleShareUrl(publicEnv.NEXT_PUBLIC_SITE_URL, circle.slug);
-  // Only a header we host goes into the Stories image; Unsplash photos stay hotlinked, never baked in.
-  const headerUrl =
-    circle.header && !isUnsplashImageUrl(circle.header.url) && circle.header.url.startsWith(storyImagePrefix(publicEnv.NEXT_PUBLIC_SUPABASE_URL))
-      ? circle.header.url
-      : null;
+  // The header for the Stories image: uploads as they are, Unsplash photos from Unsplash with credit.
+  const drawable = circle.header ? drawableImage(circle.header.url, circle.header.credit, publicEnv.NEXT_PUBLIC_SUPABASE_URL) : null;
 
   return (
     <>
@@ -103,7 +100,9 @@ async function Circle({ params }: Pick<Props, "params">) {
                 name: circle.name,
                 description: circle.description,
                 accentColor: circle.accentColor,
-                headerUrl,
+                header: drawable
+                  ? { url: drawable.url, credit: drawable.photographer ? card("photoCredit", { name: drawable.photographer }) : null }
+                  : null,
                 eyebrow: card(circle.isPrivate ? "circlePrivateEyebrow" : "circleEyebrow"),
                 // A new circle shows who's in it rather than "0 stories".
                 stats: circle.stories.length

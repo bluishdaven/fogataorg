@@ -1,6 +1,6 @@
 "use client";
 
-import { Camera, ImagePlus, X } from "lucide-react";
+import { Ban, Camera, Check, ImagePlus, X } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRef, useState, type FormEvent } from "react";
 import { toast } from "sonner";
@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { UnsplashCredit } from "@/components/unsplash/unsplash-credit";
 import { UnsplashPicker } from "@/components/unsplash/unsplash-picker";
+import { ACCENT_PRESETS, readableTextOn } from "@/lib/domain/circles";
 import type { Locale } from "@/lib/domain/locale";
 import { MAX_TOPICS_PER_STORY } from "@/lib/domain/schemas";
 import {
@@ -35,6 +36,8 @@ export type PublishDialogStory = {
   language: Locale;
   publishedAt: Date | null;
   cover: { url: string; alt: string; credit: ImageCredit | null } | null;
+  /** Optional story color for share images and link previews. */
+  accentColor: string | null;
   seoTitle: string;
   seoDescription: string;
   canonicalUrl: string;
@@ -75,6 +78,7 @@ export function PublishDialog({
   const locale = useLocale();
   const state = storyState(story, new Date());
   const [cover, setCover] = useState(story.cover);
+  const [accent, setAccent] = useState<string | null>(story.accentColor);
   const [selected, setSelected] = useState<string[]>(story.topics);
   const [language, setLanguage] = useState<Locale>(story.language);
   const [visibility, setVisibility] = useState<"public" | "unlisted">(story.status === "unlisted" ? "unlisted" : "public");
@@ -122,6 +126,7 @@ export function PublishDialog({
       const result = await publishStory({
         id: story.id,
         cover: cover ? { url: cover.url, alt: cover.alt, credit: cover.credit } : null,
+        accentColor: accent,
         topics: selected,
         language,
         seoTitle,
@@ -241,18 +246,65 @@ export function PublishDialog({
                     }}
                   />
                 </div>
-                <div className="flex flex-col gap-1 rounded-lg bg-secondary/60 p-4">
-                  <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">{t("preview")}</p>
+                {/* Takes on the story color, like the share images will. */}
+                <div
+                  className={cn("flex flex-col gap-1 rounded-lg p-4", !accent && "bg-secondary/60")}
+                  style={accent ? { backgroundColor: accent, color: readableTextOn(accent) } : undefined}
+                  data-testid="publish-preview"
+                >
+                  <p className={cn("text-xs font-semibold tracking-wide uppercase", accent ? "opacity-85" : "text-muted-foreground")}>{t("preview")}</p>
                   <p className="font-serif text-lg leading-snug font-semibold text-balance" lang={language}>
                     {story.title.trim() || t("untitled")}
                   </p>
                   {story.subtitle ? (
-                    <p className="font-serif text-muted-foreground" lang={language}>
+                    <p className={cn("font-serif", accent ? "opacity-85" : "text-muted-foreground")} lang={language}>
                       {story.subtitle}
                     </p>
                   ) : null}
                 </div>
               </section>
+
+              <fieldset className="flex flex-col gap-2" data-testid="accent-picker">
+                <legend className="mb-1 text-sm font-semibold">{t("accent")}</legend>
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setAccent(null)}
+                    aria-pressed={accent === null}
+                    aria-label={t("accentNone")}
+                    title={t("accentNone")}
+                    className={cn(
+                      "flex size-9 items-center justify-center rounded-full border-2 bg-background text-muted-foreground",
+                      accent === null ? "border-foreground" : "border-border",
+                    )}
+                  >
+                    <Ban className="size-4" aria-hidden />
+                  </button>
+                  {ACCENT_PRESETS.map((color) => (
+                    <button
+                      key={color}
+                      type="button"
+                      onClick={() => setAccent(color)}
+                      aria-pressed={accent === color}
+                      aria-label={t("accentOption", { color })}
+                      className={cn("flex size-9 items-center justify-center rounded-full border-2", accent === color ? "border-foreground" : "border-transparent")}
+                      style={{ backgroundColor: color, color: readableTextOn(color) }}
+                    >
+                      {accent === color ? <Check className="size-4" aria-hidden /> : null}
+                    </button>
+                  ))}
+                  <label className="flex min-h-10 items-center gap-2 text-sm text-muted-foreground sm:min-h-8">
+                    <input
+                      type="color"
+                      value={accent ?? "#c2410c"}
+                      onChange={(event) => setAccent(event.target.value.toLowerCase())}
+                      className="size-9 cursor-pointer rounded border border-input bg-transparent"
+                    />
+                    {t("accentCustom")}
+                  </label>
+                </div>
+                <p className="text-xs text-muted-foreground">{t("accentHint")}</p>
+              </fieldset>
 
               <fieldset className="flex flex-col gap-2">
                 <legend className="mb-2 text-sm font-semibold">

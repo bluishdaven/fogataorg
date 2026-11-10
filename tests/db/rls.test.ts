@@ -289,6 +289,29 @@ describe("story covers", () => {
   });
 });
 
+describe("story colors", () => {
+  it("are optional hex colors set by the story's author", async () => {
+    await scenario(async (h) => {
+      const author = await h.createUser();
+      const other = await h.createUser();
+      const story = await makeStory(h, author);
+      expect(story.accentColor).toBeNull();
+      const [updated] = await h.as(h.claimsFor(author), (tx) =>
+        tx.update(stories).set({ accentColor: "#0f766e" }).where(eq(stories.id, story.id)).returning({ accentColor: stories.accentColor }),
+      );
+      expect(updated?.accentColor).toBe("#0f766e");
+      await expectPgError(
+        h.savepoint(() => h.as(h.claimsFor(author), (tx) => tx.update(stories).set({ accentColor: "red" }).where(eq(stories.id, story.id)))),
+        PG.checkViolation,
+      );
+      const changed = await h.as(h.claimsFor(other), (tx) =>
+        tx.update(stories).set({ accentColor: "#000000" }).where(eq(stories.id, story.id)).returning({ id: stories.id }),
+      );
+      expect(changed).toHaveLength(0);
+    });
+  });
+});
+
 describe("story editing", () => {
   it("lets drafts be untitled but never publishes an untitled story", async () => {
     await scenario(async (h) => {

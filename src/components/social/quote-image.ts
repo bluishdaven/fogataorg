@@ -1,10 +1,11 @@
 import { fitTitle, readableProfileUrl, wrapLines } from "@/lib/domain/story-card";
-import { EMBER, EMBER_TEXT, FLAME_INNER, FLAME_OUTER, fontFamily, GLOW, INK, MUTED, PAPER } from "./story-image";
+import { accentPalette, DARK_PALETTE, EMBER_TEXT, fontFamily, paintBackground, paintBrand, toPng } from "./story-image";
 
 /**
  * Draws a quote card in the browser: 1080×1350 (portrait, fits feeds and chats), the passage in
  * the site's serif, who wrote it and which story, and where to read it. Same paper and glow as
- * the Stories image; uses the fonts the page already loaded.
+ * the Stories image, or the story's own color when the writer chose one; uses the fonts the page
+ * already loaded.
  */
 
 export type QuoteImageInput = {
@@ -13,6 +14,8 @@ export type QuoteImageInput = {
   title: string;
   url: string;
   lang: string;
+  /** The story's color, if the writer chose one. */
+  accent: string | null;
 };
 
 export const QUOTE_IMAGE = { width: 1080, height: 1350, margin: 104 } as const;
@@ -35,28 +38,10 @@ export async function renderQuoteImage(input: QuoteImageInput): Promise<Blob> {
   ctx.textBaseline = "alphabetic";
   (ctx as CanvasRenderingContext2D & { lang?: string }).lang = input.lang;
 
-  ctx.fillStyle = INK;
-  ctx.fillRect(0, 0, W, H);
-  const glow = ctx.createRadialGradient(W * 0.15, H + 200, 0, W * 0.15, H + 200, 1100);
-  glow.addColorStop(0, "rgba(232, 89, 12, 0.32)");
-  glow.addColorStop(0.5, "rgba(232, 89, 12, 0.1)");
-  glow.addColorStop(1, "rgba(232, 89, 12, 0)");
-  ctx.fillStyle = glow;
-  ctx.fillRect(0, 0, W, H);
-
+  const palette = input.accent ? accentPalette(input.accent) : DARK_PALETTE;
+  paintBackground(ctx, palette, W, H);
   // Brand.
-  const flameScale = 1.4;
-  ctx.save();
-  ctx.translate(M, 96);
-  ctx.scale(flameScale, flameScale);
-  ctx.fillStyle = EMBER;
-  ctx.fill(new Path2D(FLAME_OUTER));
-  ctx.fillStyle = GLOW;
-  ctx.fill(new Path2D(FLAME_INNER));
-  ctx.restore();
-  ctx.fillStyle = PAPER;
-  ctx.font = `600 42px ${serif}`;
-  ctx.fillText("Fogata", M + 32 * flameScale + 16, 96 + 40 * flameScale - 12);
+  paintBrand(ctx, palette, serif, M, 96, 1.4, 42);
 
   // The passage, as large as it fits.
   const textWidth = W - M * 2;
@@ -74,7 +59,7 @@ export async function renderQuoteImage(input: QuoteImageInput): Promise<Blob> {
   const bottom = H - 190;
   let y = Math.max(top, top + (bottom - top - blockHeight) / 2);
 
-  ctx.fillStyle = PAPER;
+  ctx.fillStyle = palette.text;
   ctx.font = `400 ${quote.size}px ${serif}`;
   for (const line of quote.lines) {
     y += leading;
@@ -83,22 +68,22 @@ export async function renderQuoteImage(input: QuoteImageInput): Promise<Blob> {
 
   // Who and where.
   y += 64;
-  ctx.fillStyle = EMBER;
+  ctx.fillStyle = palette.rule;
   ctx.fillRect(M, y - 14, 56, 4);
-  ctx.fillStyle = PAPER;
+  ctx.fillStyle = palette.text;
   ctx.font = `600 34px ${sans}`;
   ctx.fillText(wrapLines(input.author, textWidth - 76, (text) => ctx.measureText(text).width, 1)[0] ?? "", M + 76, y);
   y += 44;
-  ctx.fillStyle = MUTED;
+  ctx.fillStyle = palette.muted;
   ctx.font = `italic 400 36px ${serif}`;
   for (const line of titleLines) {
     y += 48;
     ctx.fillText(line, M, y - 14);
   }
 
-  ctx.fillStyle = EMBER_TEXT;
+  ctx.fillStyle = input.accent ? palette.text : EMBER_TEXT;
   ctx.font = `600 32px ${sans}`;
   ctx.fillText(readableProfileUrl(input.url), M, H - 96);
 
-  return new Promise((resolve, reject) => canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error("Couldn't draw the card"))), "image/png"));
+  return toPng(canvas);
 }

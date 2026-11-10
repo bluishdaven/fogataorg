@@ -20,6 +20,7 @@ export async function StoryResponses({
   title,
   authorName,
   language,
+  accent,
 }: {
   storyId: string;
   storyAuthorId: string;
@@ -29,6 +30,8 @@ export async function StoryResponses({
   title: string;
   authorName: string;
   language: "en" | "es";
+  /** The story's color, for quote cards. */
+  accent: string | null;
 }) {
   const viewer = await getViewer();
   const [list, highlights, locale] = await Promise.all([listResponses(viewer, storyId), listStoryHighlights(viewer, storyId), getLocale()]);
@@ -47,7 +50,7 @@ export async function StoryResponses({
         signedIn={Boolean(viewer)}
         loginHref={`/${locale}/login?next=${encodeURIComponent(storyPath(authorUsername, slug))}`}
         initialHighlights={highlights}
-        share={{ url: storyUrl, slug, title, author: authorName, lang: language }}
+        share={{ url: storyUrl, slug, title, author: authorName, lang: language, accent }}
       />
       <ResponsesSection
         storyId={storyId}

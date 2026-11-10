@@ -51,6 +51,7 @@ export async function getStoryForEditing(viewer: Viewer, id: string) {
       content: (working?.content ?? story.content) as TiptapDoc,
       hasPendingChanges: Boolean(working),
       cover: story.coverUrl ? { url: story.coverUrl, alt: story.coverAlt, credit: story.coverCredit ?? null } : null,
+      accentColor: story.accentColor,
       seoTitle: story.seoTitle,
       seoDescription: story.seoDescription,
       canonicalUrl: story.canonicalUrl ?? "",

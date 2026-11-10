@@ -254,11 +254,21 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   reader's UI. Making the image also copies the story's link (started in the same tap, before any
   await, since clipboard writes need one) for the Story's link sticker. Phones hand the PNG to the share sheet (rendering starts when the menu opens, because
   iOS only allows sharing shortly after a tap); desktops download it. Only our avatars bucket (CORS
-  enabled) is drawn, so the canvas can't be tainted. Circles have the same menu on their page
-  (`ShareButton` takes `image: { kind: "story" | "circle", input }`): `circle-image.ts` draws the
-  circle on its accent with `readableTextOn()` text, includes only an uploaded header from our
-  bucket (never an Unsplash photo, which must stay hotlinked), and shares the unprefixed
-  `/circles/<slug>` (the proxy redirects by language; helpers in `src/lib/domain/circle-card.ts`).
+  enabled) and pictures from `drawableImage()` are drawn, so the canvas can't be tainted.
+  "Image for Stories" opens `ShareImageDialog` (live preview, redrawn when an option changes, so the
+  blob is ready when Share is tapped): include the cover, use the story's color, and the preview
+  length S/M/L (`PREVIEW_LINES` in `src/lib/domain/share-image.ts`; the cover shrinks to a banner to
+  make room). Circles have the same menu on their page (`ShareButton` takes
+  `image: { kind: "story" | "circle", input }`): `circle-image.ts` draws the circle on its accent
+  with `readableTextOn()` text and an optional header, and shares the unprefixed `/circles/<slug>`
+  (the proxy redirects by language; helpers in `src/lib/domain/circle-card.ts`). Drawing helpers and
+  palettes (`DARK_PALETTE`, `accentPalette()`) live in `story-image.ts` and are shared with circle
+  images and quote cards.
+- **Story colors** (`stories.accent_color`, optional hex, DB check; picked in the publish dialog
+  from `ACCENT_PRESETS` or any color). Used decoratively on the story page (a thin line above the
+  title, the reading progress bar), as the background of the Stories image and quote cards
+  (`accentPalette()`, white or black text), and on the link preview card for stories without a
+  picture (`StoryCard` `tint`). The OG `previewVersion` only includes the color when set.
 - **Badges** (`src/lib/domain/badges.ts`, `src/components/badges/`, plan in `docs/plans/badges.md`).
   Writing tiers come from a live count of published, public stories (`publishedCountSql` in
   `src/lib/data/badge-sql.ts`, carried by every author query as `badges`); ten tiers from 1 to 1,000.
@@ -307,7 +317,9 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   Their API guidelines are conditions of use, so keep all four: (1) the access key stays on the
   server (`/api/unsplash/search` proxies searches, signed-in only, cached for hours); (2) images are
   hotlinked from `images.unsplash.com`, resized with `unsplashImageUrl()` which keeps the `ixid`
-  param (use `UnsplashImage`, never re-host or proxy through `/_next/image`); (3) picking a photo
+  param (use `UnsplashImage`, never re-host or proxy through `/_next/image`; share images drawn in
+  the reader's browser load the photo from Unsplash and print "Photo: X / Unsplash" under it, the
+  way design apps export Unsplash photos in people's designs); (3) picking a photo
   calls `trackUnsplashSelection()` (their "download" event); (4) every displayed Unsplash photo gets
   `UnsplashCredit` ("Photo by X on Unsplash" with UTM links). Store `ImageCredit` next to the image
   (`stories.cover_credit`; inline images will carry it as a node attr).
