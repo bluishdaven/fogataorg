@@ -7,6 +7,8 @@ afterAll(closeDb);
 describe("rate limits", () => {
   it("allow up to the limit per subject, then refuse until the window passes", async () => {
     await scenario(async (h) => {
+      // Clear hits left by earlier runs (rolled back with the scenario), so the count below is ours.
+      await h.tx.execute(sql`select public.prune_rate_limits()`);
       const user = await h.createUser();
       const take = async (subject: string) =>
         (
