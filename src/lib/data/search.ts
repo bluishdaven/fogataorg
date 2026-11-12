@@ -33,6 +33,7 @@ type StoryRow = {
   pronouns: string;
   published_count: number;
   donor_active: boolean;
+  founding_number: number | null;
 };
 
 type PersonRow = {
@@ -43,6 +44,7 @@ type PersonRow = {
   pronouns: string;
   published_count: number;
   donor_active: boolean;
+  founding_number: number | null;
   /** The influence that matched the search, when it wasn't the name. */
   influence_kind: string | null;
   influence: string | null;
@@ -69,7 +71,7 @@ export async function search(query: string, lang: "all" | Locale) {
       )
       select s.title, s.subtitle, s.slug, s.language, s.reading_time, s.published_at,
              left(s.content_text, 400) as content_text, s.thumbnail_url, s.thumbnail_alt,
-             p.username, p.display_name, p.avatar_url, p.pronouns, ${donorActiveRaw("p")} as donor_active,
+             p.username, p.display_name, p.avatar_url, p.pronouns, ${donorActiveRaw("p")} as donor_active, p.founding_number,
              ${publishedCountRaw("p")} as published_count
       from public.stories s
       join public.profiles p on p.id = s.author_id
@@ -94,7 +96,7 @@ export async function search(query: string, lang: "all" | Locale) {
     // Data API) simply doesn't match. Queries under 3 characters only match names.
     const people = await tx.execute<PersonRow>(sql`
       with query as (select public.f_unaccent(lower(${q})) as plain)
-      select pr.username, pr.display_name, pr.bio, pr.avatar_url, pr.pronouns, ${donorActiveRaw("pr")} as donor_active,
+      select pr.username, pr.display_name, pr.bio, pr.avatar_url, pr.pronouns, ${donorActiveRaw("pr")} as donor_active, pr.founding_number,
              ${publishedCountRaw("pr")} as published_count, inf.kind as influence_kind, inf.item as influence
       from public.profiles pr
       cross join query
@@ -172,7 +174,7 @@ export async function search(query: string, lang: "all" | Locale) {
           displayName: row.display_name,
           avatarUrl: row.avatar_url,
           pronouns: row.pronouns,
-          badges: badgeData({ publishedCount: row.published_count, donorActive: row.donor_active }),
+          badges: badgeData({ publishedCount: row.published_count, donorActive: row.donor_active, foundingNumber: row.founding_number }),
         },
       })),
       people: people.map((row) => {
@@ -186,7 +188,7 @@ export async function search(query: string, lang: "all" | Locale) {
           bio: row.bio,
           avatarUrl: row.avatar_url,
           pronouns: row.pronouns,
-          badges: badgeData({ publishedCount: row.published_count, donorActive: row.donor_active }),
+          badges: badgeData({ publishedCount: row.published_count, donorActive: row.donor_active, foundingNumber: row.founding_number }),
           influence: kind && row.influence && !nameMatched ? { kind, item: row.influence } : null,
         };
       }),

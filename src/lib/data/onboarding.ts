@@ -38,6 +38,7 @@ type WriterRow = {
   bio: string;
   published_count: number;
   donor_active: boolean;
+  founding_number: number | null;
   new_voice: boolean;
 };
 
@@ -52,7 +53,7 @@ export async function getSuggestedWriters(viewer: Viewer, topicSlugs: string[], 
       with candidates as (
         select p.id, p.username, p.display_name, p.avatar_url, p.pronouns, p.bio,
           ${publishedCountRaw("p")} as published_count,
-          ${donorActiveRaw("p")} as donor_active,
+          ${donorActiveRaw("p")} as donor_active, p.founding_number,
           exists (
             select 1 from public.stories s join public.story_topics st on st.story_id = s.id
             join public.topics t on t.id = st.topic_id
@@ -103,6 +104,6 @@ export async function getSuggestedWriters(viewer: Viewer, topicSlugs: string[], 
     pronouns: row.pronouns,
     bio: row.bio,
     newVoice: row.new_voice,
-    badges: badgeData({ publishedCount: row.published_count, donorActive: row.donor_active }),
+    badges: badgeData({ publishedCount: row.published_count, donorActive: row.donor_active, foundingNumber: row.founding_number }),
   }));
 }

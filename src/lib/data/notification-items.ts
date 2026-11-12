@@ -41,6 +41,7 @@ export async function selectNotificationItems(
         order by cs.decided_at desc nulls last limit 1
       ) end`,
       recipient: sql<string>`(select p.username from public.profiles p where p.id = ${notifications.userId})`,
+      foundingNumber: sql<number | null>`(select p.founding_number from public.profiles p where p.id = ${notifications.userId})`,
     })
     .from(notifications)
     .leftJoin(stories, eq(stories.id, notifications.storyId))
@@ -70,7 +71,7 @@ export async function selectNotificationItems(
       story: row.storySlug && row.storyAuthor ? { title: row.storyTitle ?? "", slug: row.storySlug, author: row.storyAuthor } : null,
       responseExcerpt: row.responseBody ? excerpt(row.responseBody, 90) : null,
       circle: row.circleSlug && row.circleName ? { slug: row.circleSlug, name: row.circleName } : null,
-      badge: row.badge ? { key: row.badge, username: row.recipient } : null,
+      badge: row.badge ? { key: row.badge, username: row.recipient, number: row.foundingNumber } : null,
       note: row.note,
     };
   });

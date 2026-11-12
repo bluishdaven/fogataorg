@@ -8,7 +8,7 @@ import { badgeData } from "@/lib/domain/badges";
 import { excerpt } from "@/lib/domain/content";
 import { imageCreditSchema } from "@/lib/domain/unsplash";
 import { isAllowedStoryImage } from "@/lib/story-images";
-import { donorActiveSql, publishedCountSql } from "./badge-sql";
+import { donorActiveSql, foundingNumberSql, publishedCountSql } from "./badge-sql";
 import { notModerated } from "./moderation-sql";
 
 /**
@@ -63,6 +63,7 @@ export async function getCircle(slug: string) {
         displayName: profiles.displayName,
         publishedCount: publishedCountSql(),
         donorActive: donorActiveSql(),
+        foundingNumber: foundingNumberSql(),
       })
       .from(circleMembers)
       .innerJoin(profiles, eq(profiles.id, circleMembers.userId))
@@ -86,6 +87,7 @@ export async function getCircle(slug: string) {
         pronouns: profiles.pronouns,
         publishedCount: publishedCountSql(),
         donorActive: donorActiveSql(),
+        foundingNumber: foundingNumberSql(),
       })
       .from(circleSubmissions)
       .innerJoin(stories, eq(stories.id, circleSubmissions.storyId))
@@ -103,10 +105,10 @@ export async function getCircle(slug: string) {
       isPrivate: circle.isPrivate,
       header: header(circle),
       createdAt: circle.createdAt,
-      members: members.map(({ publishedCount, donorActive, ...m }) => ({
+      members: members.map(({ publishedCount, donorActive, foundingNumber, ...m }) => ({
         ...m,
         displayName: m.displayName || m.username,
-        badges: badgeData({ publishedCount, donorActive }),
+        badges: badgeData({ publishedCount, donorActive, foundingNumber }),
       })),
       stories: rows.map((row) => ({
         title: row.title,
@@ -207,6 +209,7 @@ export async function getCircleForManage(viewer: Viewer, slug: string) {
         displayName: profiles.displayName,
         publishedCount: publishedCountSql(),
         donorActive: donorActiveSql(),
+        foundingNumber: foundingNumberSql(),
       })
       .from(circleMembers)
       .innerJoin(profiles, eq(profiles.id, circleMembers.userId))
@@ -238,6 +241,7 @@ export async function getCircleForManage(viewer: Viewer, slug: string) {
         displayName: profiles.displayName,
         publishedCount: publishedCountSql(),
         donorActive: donorActiveSql(),
+        foundingNumber: foundingNumberSql(),
       })
       .from(circleJoinRequests)
       .innerJoin(profiles, eq(profiles.id, circleJoinRequests.userId))
@@ -254,15 +258,15 @@ export async function getCircleForManage(viewer: Viewer, slug: string) {
       isPrivate: circle.isPrivate,
       header: header(circle),
       role: membership.role,
-      members: members.map(({ publishedCount, donorActive, ...m }) => ({
+      members: members.map(({ publishedCount, donorActive, foundingNumber, ...m }) => ({
         ...m,
         displayName: m.displayName || m.username,
-        badges: badgeData({ publishedCount, donorActive }),
+        badges: badgeData({ publishedCount, donorActive, foundingNumber }),
       })),
-      joinRequests: joinRequests.map(({ publishedCount, donorActive, ...r }) => ({
+      joinRequests: joinRequests.map(({ publishedCount, donorActive, foundingNumber, ...r }) => ({
         ...r,
         displayName: r.displayName || r.username,
-        badges: badgeData({ publishedCount, donorActive }),
+        badges: badgeData({ publishedCount, donorActive, foundingNumber }),
       })),
       pending: submissions.filter((s) => s.status === "pending"),
       accepted: submissions.filter((s) => s.status === "accepted"),

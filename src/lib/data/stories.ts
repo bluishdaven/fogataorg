@@ -7,7 +7,7 @@ import { badgeData } from "@/lib/domain/badges";
 import { excerpt } from "@/lib/domain/content";
 import { readInfluences } from "@/lib/domain/profile";
 import { isAllowedStoryImage } from "@/lib/story-images";
-import { donorActiveSql, publishedCountSql } from "./badge-sql";
+import { donorActiveSql, foundingNumberSql, publishedCountSql } from "./badge-sql";
 import { moderationReasonSql, moderationStatusSql, notModerated, notRemoved } from "./moderation-sql";
 
 /**
@@ -35,6 +35,7 @@ export const cardColumns = {
   authorPronouns: profiles.pronouns,
   authorPublishedCount: publishedCountSql(),
   authorDonorActive: donorActiveSql(),
+  authorFoundingNumber: foundingNumberSql(),
   moderation: moderationStatusSql,
 };
 
@@ -55,6 +56,7 @@ type CardRow = {
   authorPronouns: string;
   authorPublishedCount: number;
   authorDonorActive: boolean;
+  authorFoundingNumber: number | null;
   moderation: "nsfw" | "removed" | null;
 };
 
@@ -79,7 +81,7 @@ export function toCard(row: CardRow) {
       displayName: row.authorDisplayName,
       avatarUrl: row.authorAvatarUrl,
       pronouns: row.authorPronouns,
-      badges: badgeData({ publishedCount: row.authorPublishedCount, donorActive: row.authorDonorActive }),
+      badges: badgeData({ publishedCount: row.authorPublishedCount, donorActive: row.authorDonorActive, foundingNumber: row.authorFoundingNumber }),
     },
   };
 }
@@ -142,6 +144,7 @@ export async function getStory(handle: string, slug: string) {
         authorAvatarUrl: profiles.avatarUrl,
         authorPublishedCount: publishedCountSql(),
         authorDonorActive: donorActiveSql(),
+        authorFoundingNumber: foundingNumberSql(),
         authorBio: profiles.bio,
         authorPronouns: profiles.pronouns,
         wordCount: sql<number>`"stories"."word_count"`,
@@ -206,6 +209,7 @@ export async function getProfileWithStories(handle: string) {
         avatarUrl: profiles.avatarUrl,
         publishedCount: publishedCountSql(),
         donorActive: donorActiveSql(),
+        foundingNumber: foundingNumberSql(),
         bio: profiles.bio,
         links: profiles.links,
         pronouns: profiles.pronouns,

@@ -227,7 +227,7 @@ async function Story({ params }: Pick<Props, "params">) {
               <NextLink href={profilePath(story.authorUsername)} className="font-medium text-foreground hover:text-ember-text">
                 {authorName}
               </NextLink>
-              <UserBadges badges={badgeData({ publishedCount: story.authorPublishedCount, donorActive: story.authorDonorActive })} />
+              <UserBadges badges={badgeData({ publishedCount: story.authorPublishedCount, donorActive: story.authorDonorActive, foundingNumber: story.authorFoundingNumber })} />
               {story.authorPronouns ? (
                 <span className="text-sm text-muted-foreground" data-testid="byline-pronouns">
                   {story.authorPronouns}
@@ -296,7 +296,7 @@ async function Story({ params }: Pick<Props, "params">) {
             username: story.authorUsername,
             displayName: story.authorDisplayName,
             avatarUrl: story.authorAvatarUrl,
-            badges: badgeData({ publishedCount: story.authorPublishedCount, donorActive: story.authorDonorActive }),
+            badges: badgeData({ publishedCount: story.authorPublishedCount, donorActive: story.authorDonorActive, foundingNumber: story.authorFoundingNumber }),
             bio: story.authorBio,
             pronouns: story.authorPronouns,
             now: story.authorNowText ? { focus: story.authorNowFocus, text: story.authorNowText } : null,

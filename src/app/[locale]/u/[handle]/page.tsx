@@ -26,6 +26,7 @@ import { INFLUENCE_KINDS } from "@/lib/domain/profile";
 import { safeHref } from "@/lib/domain/story-doc";
 import { RssLink } from "@/components/rss-link";
 import { rssPaths } from "@/lib/domain/rss";
+import { getFoundingPlacesLeft } from "@/lib/data/founding";
 
 type Props = PageProps<"/[locale]/u/[handle]">;
 
@@ -95,7 +96,7 @@ async function Profile({ params }: Pick<Props, "params">) {
   const profile = await getProfileWithStories(handle);
   if (!profile) notFound();
 
-  const [t, format] = await Promise.all([getTranslations("Profile"), getFormatter()]);
+  const [t, format, foundingLeft] = await Promise.all([getTranslations("Profile"), getFormatter(), getFoundingPlacesLeft()]);
   const name = profile.displayName || profile.username;
 
   const site = publicEnv.NEXT_PUBLIC_SITE_URL.replace(/\/$/, "");
@@ -134,7 +135,7 @@ async function Profile({ params }: Pick<Props, "params">) {
             </>
           ) : null}
         </p>
-        <BadgeChips badges={badgeData(profile)} name={name} className="mt-1" />
+        <BadgeChips badges={badgeData(profile)} name={name} foundingLeft={foundingLeft} className="mt-1" />
         {profile.bio ? <p className="max-w-prose font-serif text-lg text-pretty">{profile.bio}</p> : null}
         {profile.nowText ? <NowLine focus={profile.nowFocus} text={profile.nowText} /> : null}
         {profile.links.length ? (

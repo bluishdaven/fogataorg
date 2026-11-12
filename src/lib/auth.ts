@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { connection } from "next/server";
 import { cache } from "react";
 import { profiles } from "@/lib/db/schema";
-import { donorActiveSql, publishedCountSql } from "@/lib/data/badge-sql";
+import { donorActiveSql, foundingNumberSql, publishedCountSql } from "@/lib/data/badge-sql";
 import { withRls, type RlsClaims } from "@/lib/db/rls";
 import { badgeData, isAdminClaims, type BadgeData } from "@/lib/domain/badges";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -46,6 +46,7 @@ export const getViewer = cache(async (): Promise<Viewer | null> => {
         createdAt: profiles.createdAt,
         publishedCount: publishedCountSql(),
         donorActive: donorActiveSql(),
+        foundingNumber: foundingNumberSql(),
       })
       .from(profiles)
       .where(eq(profiles.id, claims.sub))

@@ -5,7 +5,7 @@ import type { Viewer } from "@/lib/auth";
 import { asAnon, withRls } from "@/lib/db/rls";
 import { profiles, series, stories } from "@/lib/db/schema";
 import { badgeData } from "@/lib/domain/badges";
-import { donorActiveSql, publishedCountSql } from "./badge-sql";
+import { donorActiveSql, foundingNumberSql, publishedCountSql } from "./badge-sql";
 import { notRemoved } from "./moderation-sql";
 import { cardColumns, toCard } from "./stories";
 
@@ -47,6 +47,7 @@ export async function getSeriesPage(handle: string, slug: string) {
         authorPronouns: profiles.pronouns,
         authorPublishedCount: publishedCountSql(),
         authorDonorActive: donorActiveSql(),
+        authorFoundingNumber: foundingNumberSql(),
       })
       .from(series)
       .innerJoin(profiles, eq(profiles.id, series.authorId))
@@ -66,7 +67,7 @@ export async function getSeriesPage(handle: string, slug: string) {
         displayName: row.authorDisplayName,
         avatarUrl: row.authorAvatarUrl,
         pronouns: row.authorPronouns,
-        badges: badgeData({ publishedCount: row.authorPublishedCount, donorActive: row.authorDonorActive }),
+        badges: badgeData({ publishedCount: row.authorPublishedCount, donorActive: row.authorDonorActive, foundingNumber: row.authorFoundingNumber }),
       },
       parts: parts.map(toCard),
     };

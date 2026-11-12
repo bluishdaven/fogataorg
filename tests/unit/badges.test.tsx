@@ -50,9 +50,9 @@ describe("writing tiers", () => {
   });
 
   it("are read from query rows", () => {
-    expect(badgeData({ publishedCount: 7, donorActive: false })).toEqual({ stories: 7, donor: false });
-    expect(badgeData({ publishedCount: null, donorActive: true })).toEqual({ stories: 0, donor: true });
-    expect(badgeData({ publishedCount: 3, donorActive: null })).toEqual({ stories: 3, donor: false });
+    expect(badgeData({ publishedCount: 7, donorActive: false })).toEqual({ stories: 7, donor: false, founding: null });
+    expect(badgeData({ publishedCount: null, donorActive: true })).toEqual({ stories: 0, donor: true, founding: null });
+    expect(badgeData({ publishedCount: 3, donorActive: null })).toEqual({ stories: 3, donor: false, founding: null });
   });
 });
 
@@ -75,7 +75,7 @@ describe("donor admin rules", () => {
 function renderBadges(badges: BadgeData, locale: "en" | "es" = "en", chips = false) {
   return render(
     <NextIntlClientProvider locale={locale} messages={locale === "en" ? en : es} timeZone="UTC">
-      {chips ? <BadgeChips badges={badges} name="Dana" /> : <UserBadges badges={badges} />}
+      {chips ? <BadgeChips badges={badges} name="Dana" foundingLeft={63} /> : <UserBadges badges={badges} />}
     </NextIntlClientProvider>,
   );
 }
@@ -150,5 +150,29 @@ describe("BadgeChips", () => {
   it("put the donor chip first on profiles", () => {
     renderBadges({ stories: 30, donor: true }, "en", true);
     expect(screen.getAllByTestId("badge-chip").map((el) => el.closest("li")?.getAttribute("data-badge"))).toEqual(["donor", "torch"]);
+  });
+});
+
+describe("founding writer badge", () => {
+  it("comes after the donor badge and before the writing tier, with its number", () => {
+    const { container } = renderBadges({ stories: 6, donor: true, founding: 12 });
+    expect([...container.querySelectorAll("[data-badge]")].map((el) => el.getAttribute("data-badge"))).toEqual(["donor", "founding", "candle"]);
+    expect(screen.getByRole("img", { name: "Founding writer #12: one of the first 100 writers to publish five stories on Fogata" })).toBeInTheDocument();
+  });
+
+  it("explains itself on profiles and says how many places are left, in Spanish too", () => {
+    renderBadges({ stories: 5, donor: false, founding: 3 }, "es", true);
+    fireEvent.click(screen.getByRole("button", { name: /^Pluma fundadora #3/ }));
+    const dialog = screen.getByRole("dialog", { name: "Pluma fundadora" });
+    expect(within(dialog).getByText(/Dana tiene la pluma fundadora #3/)).toBeInTheDocument();
+    expect(within(dialog).getByTestId("founding-left")).toHaveTextContent("Quedan 63 de 100 lugares.");
+    expect(dialog.querySelector('[data-tier="founding"]')).toHaveAttribute("data-earned", "true");
+  });
+
+  it("only takes numbers from 1 to 100", () => {
+    expect(badgeData({ publishedCount: 5, donorActive: false, foundingNumber: 7 }).founding).toBe(7);
+    expect(badgeData({ publishedCount: 5, donorActive: false, foundingNumber: 0 }).founding).toBeNull();
+    expect(badgeData({ publishedCount: 5, donorActive: false, foundingNumber: 101 }).founding).toBeNull();
+    expect(badgeData({ publishedCount: 5, donorActive: false }).founding).toBeNull();
   });
 });

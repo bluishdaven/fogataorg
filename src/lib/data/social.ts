@@ -17,7 +17,7 @@ import {
 } from "@/lib/db/schema";
 import { badgeData, type BadgeData } from "@/lib/domain/badges";
 import { excerpt } from "@/lib/domain/content";
-import { donorActiveSql, publishedCountSql } from "./badge-sql";
+import { donorActiveSql, foundingNumberSql, publishedCountSql } from "./badge-sql";
 import { moderationStatusSql, notRemoved } from "./moderation-sql";
 import { selectNotificationItems } from "./notification-items";
 import { isAllowedStoryImage } from "@/lib/story-images";
@@ -110,6 +110,7 @@ export async function listResponses(viewer: Viewer | null, storyId: string): Pro
         pronouns: profiles.pronouns,
         publishedCount: publishedCountSql(),
         donorActive: donorActiveSql(),
+        foundingNumber: foundingNumberSql(),
       })
       .from(responses)
       .innerJoin(profiles, eq(profiles.id, responses.authorId))
@@ -251,6 +252,7 @@ export async function listSaved(viewer: Viewer, listId: string | null = null) {
         pronouns: profiles.pronouns,
         publishedCount: publishedCountSql(),
         donorActive: donorActiveSql(),
+        foundingNumber: foundingNumberSql(),
         moderation: moderationStatusSql,
       })
       .from(bookmarks)

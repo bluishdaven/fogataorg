@@ -131,3 +131,14 @@ export function DonorIcon({ className }: { className?: string }) {
     </svg>
   );
 }
+
+/** The founding writer badge: the flame on a gold seal with a stitched inner ring. */
+export function FoundingIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 40 40" className={className} aria-hidden focusable="false">
+      <circle cx={20} cy={20} r={17.5} fill={CREAM} stroke={GOLD} strokeWidth={3} />
+      <circle cx={20} cy={20} r={13.2} fill="none" stroke={GOLD} strokeWidth={1.1} strokeDasharray="1.4 2.2" />
+      <Flame x={11.2} y={8.6} s={0.55} glow />
+    </svg>
+  );
+}

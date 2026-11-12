@@ -804,7 +804,8 @@
       "join_request": "{others, plural, =0 {{actor} asked to join {circle}} one {{actor} and # other asked to join {circle}} other {{actor} and # others asked to join {circle}}}",
       "join_accepted": "{actor} accepted you into {circle}. Your stories go straight in now.",
       "circle_owner": "{actor} handed {circle} over to you. You're its owner now.",
-      "featured": "Your story “{title}” was featured in the weekly spark. It's at the top of the spark's page now."
+      "featured": "Your story “{title}” was featured in the weekly spark. It's at the top of the spark's page now.",
+      "founding": "You're founding writer #{number}: one of the first 100 writers to publish five stories on Fogata. Thank you for lighting the fire."
     },
     "savedTitle": "Saved",
     "savedLede": "Stories you've kept for later. Only you can see your lists.",
@@ -1105,7 +1106,15 @@
     "donorHeading": "Donor badge",
     "donorInfo": "For people who support Fogata with a donation. Lasts two months per donation.",
     "support": "Support Fogata",
-    "close": "Close"
+    "close": "Close",
+    "founding": "Founding writer",
+    "foundingChip": "Founding writer #{number}",
+    "foundingLabel": "{name} #{number}: one of the first 100 writers to publish five stories on Fogata",
+    "foundingMeaning": "{name} is founding writer #{number}: one of the first {writers} writers to publish {count} public stories on Fogata. This badge is theirs for good.",
+    "foundingHeading": "Founding badge",
+    "foundingInfo": "For the first {writers} writers to publish {count} public stories. Kept for good.",
+    "foundingLeft": "{count, plural, one {# of {writers} places left.} other {# of {writers} places left.}}",
+    "foundingFull": "All {writers} places are taken."
   },
   "Admin": {
     "donorsTitle": "Firekeepers",

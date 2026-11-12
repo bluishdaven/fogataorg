@@ -21,14 +21,16 @@ export type NotificationItem = {
     | "join_request"
     | "join_accepted"
     | "circle_owner"
-    | "featured";
+    | "featured"
+    | "founding";
   actor: { username: string; name: string } | null;
   others: number;
   story: { title: string; slug: string; author: string } | null;
   responseExcerpt: string | null;
   circle: { slug: string; name: string } | null;
-  /** Badge notifications: the writing tier key or "donor", and whose profile shows it. */
-  badge?: { key: string; username: string } | null;
+  /** Badge notifications: the writing tier key, "donor" or "founding", whose profile shows it and
+   * (founding) their number. */
+  badge?: { key: string; username: string; number?: number | null } | null;
   /** Declined submissions: the editors' note to the writer, if they left one. */
   note?: string | null;
 };
@@ -54,6 +56,7 @@ export function notificationMessage(t: SocialTranslator, item: NotificationItem)
     circle: item.circle?.name ?? "",
     badge: tier?.key ?? "other",
     count: tier?.min ?? 0,
+    number: item.badge?.number ?? 0,
   };
   if (item.type === "spark" && item.responseExcerpt) return t("notice.sparkResponse", values);
   return t(`notice.${item.type}`, values);
@@ -61,7 +64,7 @@ export function notificationMessage(t: SocialTranslator, item: NotificationItem)
 
 /** Site-relative link for a notification (locale prefix only where the UI needs one). */
 export function notificationPath(item: NotificationItem, locale: string): string {
-  if ((item.type === "badge" || item.type === "donor") && item.badge) return profilePath(item.badge.username);
+  if ((item.type === "badge" || item.type === "donor" || item.type === "founding") && item.badge) return profilePath(item.badge.username);
   if ((item.type === "submission" || item.type === "join_request" || item.type === "circle_owner") && item.circle) {
     return `/${locale}/circles/${item.circle.slug}/manage`;
   }

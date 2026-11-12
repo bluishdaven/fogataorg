@@ -27,3 +27,8 @@ export function donorActiveSql(column: SQL = sql.raw('"profiles"."donor_until"')
 export function donorActiveRaw(alias: string) {
   return sql.raw(`coalesce(${alias}.donor_until > now(), false)`);
 }
+
+/** The person's founding writer number (1–100), or null. */
+export function foundingNumberSql(column: SQL = sql.raw('"profiles"."founding_number"')) {
+  return sql<number | null>`${column}`;
+}

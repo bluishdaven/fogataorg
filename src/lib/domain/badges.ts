@@ -34,11 +34,24 @@ export function nextWritingTier(publishedStories: number): { tier: WritingTier; 
   return tier ? { tier, remaining: tier.min - Math.max(0, publishedStories) } : null;
 }
 
-/** What badge components need about a person. */
-export type BadgeData = { stories: number; donor: boolean };
+/** The founding writer badge: the first 100 writers to publish five public stories (set in SQL). */
+export const FOUNDING_WRITERS = 100;
+export const FOUNDING_STORIES = 5;
 
-export function badgeData(row: { publishedCount: number | null | undefined; donorActive: boolean | null | undefined }): BadgeData {
-  return { stories: Number(row.publishedCount ?? 0), donor: row.donorActive === true };
+/** What badge components need about a person. `founding` is their founding writer number, if any. */
+export type BadgeData = { stories: number; donor: boolean; founding?: number | null };
+
+export function badgeData(row: {
+  publishedCount: number | null | undefined;
+  donorActive: boolean | null | undefined;
+  foundingNumber?: number | null;
+}): BadgeData {
+  const founding = Number(row.foundingNumber ?? 0);
+  return {
+    stories: Number(row.publishedCount ?? 0),
+    donor: row.donorActive === true,
+    founding: founding >= 1 && founding <= FOUNDING_WRITERS ? founding : null,
+  };
 }
 
 export const donorGrantSchema = z.object({

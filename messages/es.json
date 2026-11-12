@@ -804,7 +804,8 @@
       "join_request": "{others, plural, =0 {{actor} pidió unirse a {circle}} one {{actor} y # persona más pidieron unirse a {circle}} other {{actor} y # personas más pidieron unirse a {circle}}}",
       "join_accepted": "{actor} te aceptó en {circle}. Ahora tus historias entran directo.",
       "circle_owner": "{actor} te entregó {circle}. Ahora lo administras tú.",
-      "featured": "Tu historia “{title}” fue destacada en la chispa de la semana. Ahora está al principio de la página de la chispa."
+      "featured": "Tu historia “{title}” fue destacada en la chispa de la semana. Ahora está al principio de la página de la chispa.",
+      "founding": "Tienes la pluma fundadora #{number}: eres una de las primeras 100 personas en publicar cinco historias en Fogata. Gracias por encender el fuego."
     },
     "savedTitle": "Leña guardada",
     "savedLede": "Historias que guardaste para después. Solo tú puedes ver tus listas.",
@@ -1105,7 +1106,15 @@
     "donorHeading": "Insignia de donación",
     "donorInfo": "Para quienes apoyan a Fogata con una donación. Dura dos meses por cada donación.",
     "support": "Apoyar a Fogata",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "founding": "Pluma fundadora",
+    "foundingChip": "Pluma fundadora #{number}",
+    "foundingLabel": "{name} #{number}: entre las primeras 100 personas en publicar cinco historias en Fogata",
+    "foundingMeaning": "{name} tiene la pluma fundadora #{number}: es una de las primeras {writers} personas en publicar {count} historias públicas en Fogata. Esta insignia es suya para siempre.",
+    "foundingHeading": "Insignia fundadora",
+    "foundingInfo": "Para las primeras {writers} personas que publiquen {count} historias públicas. Para siempre.",
+    "foundingLeft": "{count, plural, one {Queda # de {writers} lugares.} other {Quedan # de {writers} lugares.}}",
+    "foundingFull": "Los {writers} lugares ya están ocupados."
   },
   "Admin": {
     "donorsTitle": "Mecenas",
