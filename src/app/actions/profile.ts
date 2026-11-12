@@ -13,6 +13,7 @@ import {
   type ProfileUpdateInput,
   type ProfileUpdateResult,
 } from "@/lib/domain/profile";
+import { pgCode } from "@/lib/db/errors";
 
 const FIELD_ERRORS = new Set<ProfileErrorKey>([
   "displayName",
@@ -27,15 +28,6 @@ const FIELD_ERRORS = new Set<ProfileErrorKey>([
   "influence",
   "tooManyInfluences",
 ]);
-
-function pgCode(error: unknown): string | undefined {
-  let current: unknown = error;
-  for (let depth = 0; depth < 4 && current && typeof current === "object"; depth += 1) {
-    if ("code" in current && typeof current.code === "string") return current.code;
-    current = "cause" in current ? current.cause : undefined;
-  }
-  return undefined;
-}
 
 export async function updateProfile(input: ProfileUpdateInput): Promise<ProfileUpdateResult> {
   const viewer = await getViewer();

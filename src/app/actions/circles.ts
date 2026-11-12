@@ -22,19 +22,11 @@ import {
 } from "@/lib/domain/circles";
 import { allowAction } from "@/lib/limits";
 import { isAllowedStoryImage } from "@/lib/story-images";
+import { pgCode } from "@/lib/db/errors";
 
 type Result<T = object> = ({ ok: true } & T) | { ok: false; errors: CircleErrorKey[] };
 
 const FIELD_KEYS = new Set<CircleErrorKey>(["name", "slug", "description", "accent", "headerAlt", "username"]);
-
-function pgCode(error: unknown): string | undefined {
-  let current: unknown = error;
-  for (let depth = 0; depth < 4 && current && typeof current === "object"; depth += 1) {
-    if ("code" in current && typeof current.code === "string") return current.code;
-    current = "cause" in current ? current.cause : undefined;
-  }
-  return undefined;
-}
 
 function zodErrors(issues: { message: string }[]): CircleErrorKey[] {
   return [...new Set(issues.map((i) => (FIELD_KEYS.has(i.message as CircleErrorKey) ? (i.message as CircleErrorKey) : "invalid")))];
