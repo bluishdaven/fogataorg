@@ -63,8 +63,14 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   beacons `POST /api/reads` (text/plain JSON) at half the story and on leaving; the route stores,
   through `record_read()`, a daily HMAC (`readerHash()`, keyed from `EMAIL_SIGNING_SECRET`) of the
   user id or IP, never the IP itself, and skips writers' own reads. The daily cron prunes reads
-  after 13 months. The privacy policy describes this: keep the two in step. Nothing shows reads yet
-  (writer stats will).
+  after 13 months. The privacy policy describes this: keep the two in step.
+- **Writer stats** (`/me/stats`, `/me/stats/[id]`, `src/lib/data/stats.ts`, `src/lib/domain/stats.ts`,
+  `src/components/stats/`). Read only through `security definer` functions scoped to `auth.uid()`'s
+  stories: `writer_daily_reads()`, `writer_story_totals()`, `writer_read_depth()` and
+  `writer_loved_passages()` (paragraphs ≥ 2 readers kept as embers, count only). `read_ratio` is
+  `real`: compare against `0.9::real`, not `0.9`. Chart colors are `--chart-reads` /
+  `--chart-visits` per theme (checked with the dataviz palette validator); the chart has hover,
+  arrow-key focus and a table view. Totals only, never who: the privacy policy says so.
 - **Embers and quote cards** (`highlights`, `src/components/social/selection-toolbar.tsx`,
   `src/lib/domain/highlights.ts`, `/[locale]/me/embers`). Selecting words inside one paragraph
   of a story opens a toolbar: Highlight (keep as an ember; private to the reader, RLS own-only,
@@ -112,7 +118,24 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   sparks whose week has started, and triggers stop stories answering a future one. The home page
   shows this week's (`getCurrentPrompt()`, re-checked hourly) with "Write about it" (`createDraft`
   with `promptId`); the editor shows a banner with "Not for this spark"; stories carry a chip to the
-  spark's page, which lists its entries. Featuring the best entries isn't built yet.
+  spark's page, which lists its entries. Admins feature up to three entries from the spark's page
+  (`prompt_features`, `setFeatured`): triggers keep them on live entries of that spark, stamp the
+  admin and send the writer a `featured` notification (no actors; taking it back removes it while
+  unread). Featured entries show first (`.ember-glow`), the story chip says so and the home card
+  lists last week's (`getLastWeekFeatured()`).
+- **Growth surfaces.** Signed-out readers see `JoinInvitation` under the writer's card. A first
+  publish sets `sessionStorage["fogata:just-published"]` before opening the story, where
+  `PublishedMoment` (a modal: e2e tests call `closePublishedMoment()` before looking at the page)
+  offers share links and stats. RSS (`src/lib/domain/rss.ts`, `src/lib/rss/feeds.ts`) lives at
+  `/rss/@handle.xml`, `/rss/circles/<slug>.xml?lang=` and `/rss/topics/<slug>.xml?lang=`: the
+  `.xml` keeps them out of the proxy; excerpts only, no NSFW. Embeds (`src/lib/domain/embed.ts`)
+  are standalone HTML at `/embed/<handle>/<slug>`: the proxy lets `/embed/` through untouched, it
+  is the only path without `X-Frame-Options`, and its CSP allows any frame-ancestor but no scripts.
+- **Motion** lives at the end of `globals.css`, each effect inside
+  `prefers-reduced-motion: no-preference` so the still state is the final one: `.count-up` (CSS
+  integer counter; `<CountUp>` keeps the real number for screen readers), `.rise-in`,
+  `.chart-column`, `.meter-fill`, `.ember-glow`, `<EmberDrift>`, the publish burst and
+  `.bell-ring`. Never animate over story text. Axe checks in e2e wait for finite animations first.
 - **Circles** (`src/lib/data/circles.ts`, `src/app/actions/circles.ts`, `src/components/circles/`).
   `circles` (accent color, optional header), `circle_members` (one owner created by trigger, editors,
   writers) and `circle_submissions` (pending → accepted/declined; one active circle per story; members'
@@ -409,7 +432,10 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
 - Some corporate mail scanners prefetch links and can burn a magic link. If reported, switch
   `/auth/confirm` to a confirm-button page.
 - Google sign-in doesn't yet save the reader's locale on first sign-in (magic links do).
-- Phase 2 leftovers: circle RSS. Muting doesn't filter cached lists (topics, circles, search).
+- Muting doesn't filter cached lists (topics, circles, search).
+- Several e2e tests publish stories without deleting them, so after a few local runs the home
+  page's newest 20 no longer include the seed stories the reading tests look for. CI starts fresh;
+  locally, `npm run db:reset && npm run db:seed` clears them.
 - Unsplash thumbnails in lists show without a credit line (the credit is on the story page). Check
   this is acceptable when applying for Unsplash production access.
 - A long-running `next dev` can lose track of routes after many new route folders are added (all

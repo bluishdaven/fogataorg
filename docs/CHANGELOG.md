@@ -1,5 +1,30 @@
 # Changelog
 
+## Writer stats, featured sparks, RSS, embeds and a warmer welcome (2026-11-12)
+
+**Demo**: publish a story for the first time: it opens with **Your story is live** (sparks rise,
+share links, a link to its stats). Open the account menu → **Stats** for the last 30 days, a
+day-by-day chart and every story's numbers; open a story for how far readers got and the lines
+they loved. Sign out and open a story: an invitation to join waits under the writer's card.
+
+- **Writer stats** (`/me/stats`): visits, reads (past half), read ratio, average reading time and
+  new followers against the 30 days before; a chart you can hover or step through with the arrow
+  keys (or read as a table); sparks, responses, saves and embers per story. Per story: how far
+  visitors got and **Lines readers loved** (paragraphs two or more readers kept as embers). Totals
+  only, never who; the privacy policy says so.
+- **Featured weekly spark entries**: admins pick up to three entries on a spark's page; they show
+  first with a slow ember glow, the writer gets a notification, the story says "Featured in the
+  weekly spark" and the home page lists last week's featured entries.
+- **Join invitation** for signed-out readers at the end of every story, bringing them back to it
+  after sign-in.
+- **RSS** for writers (`/rss/@handle.xml`), circles and topics, with excerpts only (the story stays
+  on Fogata). Profile, circle and topic pages link to them.
+- **Embed card**: **Share → Copy embed code** gives an iframe of a "Read on Fogata" card (light or
+  dark, no scripts). Only `/embed/` pages can be framed by other sites.
+- **Motion** (off under reduced motion, never over story text): counting numbers and rising chart
+  columns, the publish moment, drifting embers on the weekly spark and the invitation, the featured
+  glow, the bell ringing once when something new arrives, and a flickering flame on embeds.
+
 ## Quote cards in Story size, with the cover (2026-11-09)
 
 - **Quote card** now opens the same preview dialog: choose **Post · 4:5** or **Story · 9:16**
