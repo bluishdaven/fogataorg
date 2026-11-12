@@ -76,6 +76,9 @@ export const profiles = pgTable(
     // Highest writing tier (its minimum story count) the writer was notified about, so a tier is
     // announced once even if stories are unpublished and published again. Set by trigger only.
     badgeTierNotified: integer("badge_tier_notified").notNull().default(0),
+    // Founding writer badge: the first 100 writers to reach five published stories, numbered in the
+    // order they got there (1–100). Set once by check_founding_writer(), kept for good.
+    foundingNumber: smallint("founding_number").unique(),
     // Set when the person finishes or skips onboarding (/welcome); null sends them there after sign-in.
     onboardedAt: timestamp("onboarded_at", { withTimezone: true }),
     // Languages they read; Latest shows stories in these when they're signed in.
@@ -92,6 +95,7 @@ export const profiles = pgTable(
     check("profiles_influences_shape", sql`jsonb_typeof(${t.influences}) = 'object' and octet_length(${t.influences}::text) <= 4000`),
     check("profiles_email_weekday_range", sql`${t.emailWeekday} between 0 and 6`),
     check("profiles_reading_languages_size", sql`cardinality(${t.readingLanguages}) between 1 and 2`),
+    check("profiles_founding_number_range", sql`${t.foundingNumber} between 1 and 100`),
     // Profile photos may only point into the owner's own folder of the avatars bucket (uploaded as
     // <user id>/<uuid>.webp), so no one can set an outside image or tracking pixel via the Data API.
     check(
@@ -351,6 +355,8 @@ export const notificationType = pgEnum("notification_type", [
   "circle_owner",
   // An admin featured the writer's entry on its weekly spark page. No actors, like badges.
   "featured",
+  // The writer became one of the first 100 founding writers (notifications.badge = "founding").
+  "founding",
 ]);
 
 /** A reader following a writer or a topic (circles later). Exactly one target is set. */

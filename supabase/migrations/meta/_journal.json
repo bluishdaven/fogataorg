@@ -449,6 +449,20 @@
       "when": 1794465370764,
       "tag": "20261112063610_writer_stats_and_features",
       "breakpoints": true
+    },
+    {
+      "idx": 64,
+      "version": "7",
+      "when": 1794489005508,
+      "tag": "20261112131005_founding_writers",
+      "breakpoints": true
+    },
+    {
+      "idx": 65,
+      "version": "7",
+      "when": 1794489006861,
+      "tag": "20261112131006_founding_writer_functions",
+      "breakpoints": true
     }
   ]
 }
