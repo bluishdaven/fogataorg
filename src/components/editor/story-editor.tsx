@@ -50,6 +50,7 @@ import { SelectionToolbar } from "./selection-toolbar";
 import { SlashCommand, type SlashItem } from "./slash-command";
 import { ACCEPTED_IMAGE_TYPES, UploadError, uploadStoryImage } from "./upload";
 import { readBackup, useAutosave, type SaveStatus } from "./use-autosave";
+import { JUST_PUBLISHED_KEY } from "@/components/social/published-moment";
 
 const BLOCK_TYPES = [
   "paragraph",
@@ -417,6 +418,14 @@ export function StoryEditor({
           if (result.scheduled) {
             router.push(`/${locale}/me/stories?published=scheduled`);
           } else {
+            // A first publish opens the story with its "it's live" moment (PublishedMoment).
+            if (story.status === "draft") {
+              try {
+                window.sessionStorage.setItem(JUST_PUBLISHED_KEY, story.id);
+              } catch {
+                // Private mode without storage: the story simply opens.
+              }
+            }
             router.push(result.path);
           }
         }}

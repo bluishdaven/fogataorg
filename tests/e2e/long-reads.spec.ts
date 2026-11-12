@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
-import { BODY, publishStory, startDraft, waitSaved, writeStory } from "./helpers";
+import { BODY, closePublishedMoment, publishStory, startDraft, waitSaved, writeStory } from "./helpers";
 import { signInWithMagicLink } from "./sign-in";
 
 const seriousViolations = async (page: Page) =>
@@ -82,6 +82,7 @@ test("stories with three or more sections get a table of contents", async ({ pag
   await waitSaved(page);
   await page.getByTestId("open-publish").click();
   await page.getByTestId("publish-submit").click();
+  await closePublishedMoment(page);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(title);
 
   const contents = page.getByTestId("story-contents");

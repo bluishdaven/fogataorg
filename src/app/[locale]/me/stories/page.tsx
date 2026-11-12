@@ -27,6 +27,9 @@ export default async function MyStoriesPage() {
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <h1 className="font-serif text-4xl font-semibold">{t("title")}</h1>
         <div className="flex flex-wrap gap-2">
+          <Link href="/me/stats" className={buttonVariants({ variant: "outline" })} data-testid="my-stats-link">
+            {t("stats")}
+          </Link>
           <Link href="/me/series" className={buttonVariants({ variant: "outline" })} data-testid="series-link">
             {t("series")}
           </Link>
@@ -110,6 +113,15 @@ async function MyStories() {
                         <NextLink href={storyPath(viewer.username, story.slug)} className={buttonVariants({ variant: "ghost", size: "sm" })}>
                           {t("view")}
                         </NextLink>
+                      ) : null}
+                      {live ? (
+                        <Link
+                          href={`/me/stats/${story.id}`}
+                          className={buttonVariants({ variant: "ghost", size: "sm" })}
+                          aria-label={t("statsFor", { title: story.title })}
+                        >
+                          {t("stats")}
+                        </Link>
                       ) : null}
                       <form action={deleteStory}>
                         <input type="hidden" name="id" value={story.id} />

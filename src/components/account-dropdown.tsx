@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, BookOpenText, Bookmark, Coffee, Flame, HandHeart, LogOut, Settings, ShieldAlert, UserRound, UsersRound } from "lucide-react";
+import { Bell, BookOpenText, Bookmark, ChartNoAxesColumn, Coffee, Flame, HandHeart, LogOut, Settings, ShieldAlert, UserRound, UsersRound } from "lucide-react";
 import NextLink from "next/link";
 import { useTranslations } from "next-intl";
 import { signOut } from "@/app/actions/auth";
@@ -71,6 +71,12 @@ export function AccountDropdown({
           <Link href="/me/stories">
             <BookOpenText />
             {t("Nav.myStories")}
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/me/stats" data-testid="stats-link">
+            <ChartNoAxesColumn />
+            {t("Nav.stats")}
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>

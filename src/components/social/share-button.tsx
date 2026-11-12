@@ -1,6 +1,6 @@
 "use client";
 
-import { ImageIcon, Link2, Share } from "lucide-react";
+import { Code, ImageIcon, Link2, Share } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState, useSyncExternalStore } from "react";
 import { toast } from "sonner";
@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { embedCode } from "@/lib/domain/embed";
 import { SHARE_NETWORKS, shareLink } from "@/lib/domain/share";
 import { ShareImageDialog, type ShareImage } from "./share-image-dialog";
 
@@ -58,6 +59,7 @@ export function ShareButton({
   allowImage = true,
   appearance = "icon",
   side = "top",
+  embedUrl,
 }: {
   url: string;
   title: string;
@@ -69,15 +71,17 @@ export function ShareButton({
   /** A round icon (the story action bar) or a labelled button (circle pages). */
   appearance?: "icon" | "button";
   side?: "top" | "bottom";
+  /** Stories: the "Read on Fogata" card for other sites (see /embed). */
+  embedUrl?: string;
 }) {
   const t = useTranslations("Social");
   const shareSheet = useSyncExternalStore(subscribe, hasShareSheet, () => false);
   const [imageOpen, setImageOpen] = useState(false);
 
-  const copy = async () => {
+  const copy = async (text = url, done = t("shareCopied")) => {
     try {
-      await navigator.clipboard.writeText(url);
-      toast.success(t("shareCopied"));
+      await navigator.clipboard.writeText(text);
+      toast.success(done);
     } catch {
       toast.error(t("shareCopyFailed"));
     }
@@ -130,6 +134,12 @@ export function ShareButton({
           <Link2 aria-hidden />
           {t("shareCopy")}
         </DropdownMenuItem>
+        {embedUrl ? (
+          <DropdownMenuItem onSelect={() => void copy(embedCode(embedUrl, title), t("embedCopied"))} data-testid="share-embed">
+            <Code aria-hidden />
+            {t("shareEmbed")}
+          </DropdownMenuItem>
+        ) : null}
         <DropdownMenuSeparator />
         {SHARE_NETWORKS.map((network) => (
           <DropdownMenuItem key={network} asChild>

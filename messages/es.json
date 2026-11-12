@@ -42,7 +42,8 @@
     "comingSoon": "Próximamente",
     "donors": "Mecenas",
     "donate": "Donar",
-    "moderation": "Moderación"
+    "moderation": "Moderación",
+    "stats": "Estadísticas"
   },
   "Theme": {
     "label": "Tema",
@@ -249,7 +250,12 @@
     "chip": "Escrita para la chispa de la semana",
     "banner": "Respondiendo a la chispa de la semana: “{prompt}”",
     "detach": "No es para esta chispa",
-    "detached": "Esta historia ya no responde a la chispa."
+    "detached": "Esta historia ya no responde a la chispa.",
+    "chipFeatured": "Destacada en la chispa de la semana",
+    "featuredTitle": "Destacadas",
+    "featuredLede": "Historias que Fogata eligió entre las respuestas a esta chispa.",
+    "moreEntries": "{count, plural, =0 {No hay más respuestas} one {# respuesta más} other {# respuestas más}}",
+    "lastWeekFeatured": "Destacadas de la chispa de la semana pasada:"
   },
   "StoryCard": {
     "byline": "{name}",
@@ -561,7 +567,9 @@
     "emptyTitle": "Tu primera historia empieza aquí.",
     "emptyBody": "Los borradores se guardan mientras escribes. Nada es público hasta que lo publicas.",
     "import": "Importar historias",
-    "series": "Series"
+    "series": "Series",
+    "stats": "Estadísticas",
+    "statsFor": "Estadísticas de “{title}”"
   },
   "Reader": {
     "label": "Opciones de lectura",
@@ -795,7 +803,8 @@
       "donor": "¡Ya eres Mecenas! Gracias por apoyar a Fogata con una donación.",
       "join_request": "{others, plural, =0 {{actor} pidió unirse a {circle}} one {{actor} y # persona más pidieron unirse a {circle}} other {{actor} y # personas más pidieron unirse a {circle}}}",
       "join_accepted": "{actor} te aceptó en {circle}. Ahora tus historias entran directo.",
-      "circle_owner": "{actor} te entregó {circle}. Ahora lo administras tú."
+      "circle_owner": "{actor} te entregó {circle}. Ahora lo administras tú.",
+      "featured": "Tu historia “{title}” fue destacada en la chispa de la semana. Ahora está al principio de la página de la chispa."
     },
     "savedTitle": "Leña guardada",
     "savedLede": "Historias que guardaste para después. Solo tú puedes ver tus listas.",
@@ -876,7 +885,9 @@
     "quoteCardDescription": "Este pasaje como imagen, para tu feed o tus historias. También copiamos el enlace al pasaje.",
     "quoteFormat": "Tamaño",
     "quoteFormatPost": "Publicación · 4:5",
-    "quoteFormatStory": "Historia · 9:16"
+    "quoteFormatStory": "Historia · 9:16",
+    "shareEmbed": "Copiar código para insertar",
+    "embedCopied": "Código copiado. Pégalo en el HTML de tu sitio."
   },
   "Circles": {
     "title": "Círculos",
@@ -1137,7 +1148,12 @@
       "text": "Escribe la propuesta en los dos idiomas (hasta 280 caracteres).",
       "failed": "Eso no funcionó. Inténtalo de nuevo."
     },
-    "promptsLink": "Chispas de la semana"
+    "promptsLink": "Chispas de la semana",
+    "feature": "Destacar",
+    "featureLabel": "Destacar “{title}”",
+    "featuredToast": "Destacada. Quien la escribió recibe una notificación.",
+    "unfeatured": "Ya no está destacada.",
+    "featureLimit": "Una chispa destaca como mucho tres historias."
   },
   "Moderation": {
     "nsfwLabel": "NSFW",
@@ -1213,7 +1229,7 @@
     "signature": "Fogata.org"
   },
   "Legal": {
-    "updated": "Última actualización: 6 de noviembre de 2026",
+    "updated": "Última actualización: 12 de noviembre de 2026",
     "contact": "Dudas sobre esta página: hola@fogata.org",
     "related": "Lee también",
     "terms": "Términos de uso",
@@ -1297,10 +1313,10 @@
           "items": [
             "Tu correo electrónico, para que entres con un enlace de un solo uso. Si eliges entrar con Google, Google nos comparte tu correo y tu nombre.",
             "Lo que decides mostrar en tu perfil: nombre de usuario, nombre, biografía corta, foto, enlaces, pronombres, tu línea de «Ahora» y tus referencias. Todo esto es público.",
-            "Lo que publicas y haces: historias, respuestas, chispas, brasas (pasajes que destacas), a quién sigues, círculos a los que perteneces y solicitudes para unirte, tus listas de lectura y las cuentas que silencias o bloqueas. Las historias y respuestas publicadas son públicas; tus borradores, tus historias guardadas y listas, tus brasas, las cuentas que silencias o bloqueas y tus notificaciones son privados.",
+            "Lo que publicas y haces: historias, respuestas, chispas, brasas (pasajes que destacas), a quién sigues, círculos a los que perteneces y solicitudes para unirte, tus listas de lectura y las cuentas que silencias o bloqueas. Las historias y respuestas publicadas son públicas; tus borradores, tus historias guardadas y listas, tus brasas, las cuentas que silencias o bloqueas y tus notificaciones son privados. Quienes escriben ven cuántas personas guardaron su historia y, cuando dos o más lectores guardan el mismo párrafo como brasa, cuántos lo hicieron: nunca quién, ni qué palabras.",
             "Tus preferencias: idioma de la interfaz y con qué frecuencia podemos escribirte. El tema y las preferencias de lectura se quedan en tu propio navegador.",
             "Las fotos que subes. Tu navegador las redimensiona y les quita los datos de ubicación y de cámara (EXIF/GPS) antes de que nos lleguen.",
-            "Conteo anónimo de lecturas: cuando lees una historia, anotamos hasta dónde llegaste y cuánto tiempo, más o menos, con un código que cambia cada día, así que tus lecturas no se pueden enlazar con el tiempo. No guardamos tu dirección IP con eso. Quienes escriben solo ven totales, nunca quién leyó.",
+            "Conteo anónimo de lecturas: cuando lees una historia, anotamos hasta dónde llegaste y cuánto tiempo, más o menos, con un código que cambia cada día, así que tus lecturas no se pueden enlazar con el tiempo. No guardamos tu dirección IP con eso. Quienes escriben ven totales (visitas, lecturas, hasta dónde se llegó y el tiempo medio de lectura), nunca quién leyó.",
             "Registros técnicos básicos que nuestro proveedor de alojamiento guarda por poco tiempo para mantener el sitio seguro y funcionando, como la dirección IP y el tipo de navegador."
           ]
         },
@@ -1443,5 +1459,89 @@
     "blockedTitle": "Cuentas silenciadas y bloqueadas",
     "blockedBody": "Lo que hagan las cuentas que silencias o bloqueas no llega a tus avisos, tu inicio ni las respuestas de las historias. Las bloqueadas además no pueden seguirte ni responder a lo que escribes. No se le avisa a nadie. Usa el menú … del perfil de una cuenta para sumarla aquí.",
     "blockedEmpty": "No has silenciado ni bloqueado a nadie."
+  },
+  "Stats": {
+    "title": "Estadísticas",
+    "lede": "Cómo se están leyendo tus historias. Solo totales: Fogata nunca te muestra quién leyó, guardó o subrayó.",
+    "period": "Últimos 30 días",
+    "lifetime": "Desde que se publicó",
+    "vsPrevious": "frente a los 30 días anteriores",
+    "up": "Sube {value}",
+    "down": "Baja {value}",
+    "flat": "Sin cambios",
+    "views": "Visitas",
+    "reads": "Lecturas",
+    "readRatio": "Tasa de lectura",
+    "readRatioHint": "Visitas que pasaron de la mitad de la historia",
+    "ratioOf": "{ratio} de las visitas",
+    "avgTime": "Tiempo medio de lectura",
+    "duration": "{minutes} min {seconds} s",
+    "newFollowers": "Nuevos seguidores",
+    "followersTotal": "{count, plural, one {# seguidor en total} other {# seguidores en total}}",
+    "chartTitle": "Visitas y lecturas, día a día",
+    "chartCaption": "Cada columna son las visitas de un día (UTC). La parte más oscura son las lecturas: visitas que pasaron de la mitad de la historia.",
+    "chartKeys": "Usa las flechas izquierda y derecha para moverte entre días.",
+    "legendVisits": "Visitas",
+    "legendReads": "Lecturas",
+    "tooltipVisits": "{count, plural, one {# visita} other {# visitas}}",
+    "tooltipReads": "{count, plural, one {# lectura} other {# lecturas}}",
+    "showTable": "Ver como tabla",
+    "date": "Fecha",
+    "emptyPeriod": "Aún no hay visitas en los últimos 30 días. Comparte una historia y aquí aparecerán las primeras.",
+    "storiesTitle": "Tus historias",
+    "storiesLede": "Desde que se publicó cada historia. Las lecturas cubren hasta 13 meses.",
+    "noStories": "Publica una historia y aquí aparecerán sus números.",
+    "sparks": "Chispas",
+    "sparkers": "{count, plural, =0 {Aún sin chispas} one {De # lector} other {De # lectores}}",
+    "responses": "Respuestas",
+    "saves": "Guardados",
+    "embers": "Brasas",
+    "embersHint": "Lectores que guardaron un pasaje",
+    "back": "Todas las estadísticas",
+    "viewStory": "Leer la historia",
+    "storyLede": "Publicada el {date}.",
+    "periodTotals": "Últimos 30 días: {views, plural, one {# visita} other {# visitas}}, {reads, plural, one {# lectura} other {# lecturas}}.",
+    "depthTitle": "Hasta dónde llegaron",
+    "depthLede": "{count, plural, one {De # visita, cuántas llegaron a cada punto de la página.} other {De # visitas, cuántas llegaron a cada punto de la página.}}",
+    "depthEmpty": "Aún no hay visitas.",
+    "depth": {
+      "quarter": "Un cuarto",
+      "half": "La mitad",
+      "threeQuarters": "Tres cuartos",
+      "finished": "El final"
+    },
+    "lovedTitle": "Las líneas favoritas",
+    "lovedLede": "Párrafos que dos o más lectores guardaron como brasas. Nunca ves quién los guardó ni qué palabras eligió.",
+    "lovedReaders": "{count, plural, one {# lector guardó esto} other {# lectores guardaron esto}}",
+    "lovedEmpty": "Cuando dos o más lectores guarden el mismo párrafo como brasa, aparecerá aquí.",
+    "lovedLink": "Abrir este pasaje"
+  },
+  "Join": {
+    "title": "Acércate al fuego",
+    "body": "Fogata es un hogar para la escritura larga en español e inglés: gratis para todo el mundo, sin anuncios ni muros de pago. Únete para darle chispas a esta historia, seguir a {name} y guardar las historias que te gusten.",
+    "join": "Únete a Fogata",
+    "why": "¿Por qué Fogata?"
+  },
+  "Rss": {
+    "writerTitle": "{name} en Fogata",
+    "writerDescription": "Historias de {name} en Fogata.org.",
+    "circleTitle": "{name}, un círculo en Fogata",
+    "circleDescription": "Historias publicadas en {name} en Fogata.org.",
+    "topicTitle": "{name} en Fogata",
+    "topicDescription": "Las historias más recientes sobre {name} en Fogata.org.",
+    "link": "RSS",
+    "linkLabel": "Canal RSS de {name}"
+  },
+  "Embed": {
+    "cta": "Leer en Fogata",
+    "warning": "Esta historia tiene una advertencia de contenido. Ábrela en Fogata para leerla."
+  },
+  "Published": {
+    "title": "Tu historia ya está publicada",
+    "body": "A quienes escriben se les descubre por la gente que comparte sus historias. Mándala a algunas personas a las que les vaya a gustar, o publícala donde ya están tus lectores.",
+    "networks": "Compartir en",
+    "tip": "Cualquiera a quien se la envíes puede leer la historia completa, gratis y sin registrarse.",
+    "stats": "Ver cómo se está leyendo",
+    "close": "Cerrar"
   }
 }

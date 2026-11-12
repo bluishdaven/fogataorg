@@ -1,4 +1,4 @@
-import { Flame } from "lucide-react";
+import { Flame, Star } from "lucide-react";
 import type { Metadata } from "next";
 import NextLink from "next/link";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
@@ -194,8 +194,8 @@ async function Story({ params }: Pick<Props, "params">) {
             lang={locale}
             data-testid="story-spark"
           >
-            <Flame className="size-4" aria-hidden />
-            {t("Spark.chip")}
+            {story.promptFeatured ? <Star className="size-4 fill-current" aria-hidden /> : <Flame className="size-4" aria-hidden />}
+            {story.promptFeatured ? t("Spark.chipFeatured") : t("Spark.chip")}
             <span className="sr-only">: {locale === "es" ? story.promptTextEs : story.promptTextEn}</span>
           </Link>
         ) : null}

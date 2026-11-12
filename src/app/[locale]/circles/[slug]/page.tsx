@@ -22,12 +22,14 @@ import { OG_SIZE, ogPaths, previewVersion } from "@/lib/domain/og";
 import { localeAlternates } from "@/lib/domain/seo";
 import { isUnsplashImageUrl, unsplashShareImageUrl } from "@/lib/domain/unsplash";
 import { publicEnv } from "@/lib/env";
+import { RssLink } from "@/components/rss-link";
+import { rssPaths } from "@/lib/domain/rss";
 
 type Props = PageProps<"/[locale]/circles/[slug]">;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const circle = await getCircle(slug);
+  const [circle, locale] = await Promise.all([getCircle(slug), getLocale()]);
   if (!circle) return {};
   const description = circle.description || undefined;
   // Share previews: the circle's header (Unsplash hotlinked as a JPEG crop, uploads re-encoded by the
@@ -44,7 +46,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: circle.name,
     description,
-    alternates: localeAlternates(await getLocale(), `/circles/${circle.slug}`),
+    alternates: {
+      ...localeAlternates(locale, `/circles/${circle.slug}`),
+      types: { "application/rss+xml": [{ url: rssPaths.circle(circle.slug, locale), title: circle.name }] },
+    },
     robots: circle.stories.length ? undefined : { index: false, follow: true },
     openGraph: { type: "website", siteName: "Fogata", title: circle.name, description, images: [image] },
     twitter: { card: "summary_large_image" },
@@ -123,9 +128,12 @@ async function Circle({ params }: Pick<Props, "params">) {
       </CircleHeader>
       <div className="mt-10 grid gap-10 md:grid-cols-[minmax(0,1fr)_14rem]">
         <section aria-labelledby="circle-stories">
-          <h2 id="circle-stories" className="border-b border-border pb-3 font-serif text-2xl font-semibold">
-            {t("stories")}
-          </h2>
+          <div className="flex items-baseline justify-between gap-3 border-b border-border pb-3">
+            <h2 id="circle-stories" className="font-serif text-2xl font-semibold">
+              {t("stories")}
+            </h2>
+            {circle.stories.length ? <RssLink href={rssPaths.circle(circle.slug, locale)} name={circle.name} /> : null}
+          </div>
           {circle.stories.length === 0 ? (
             <p className="py-8 text-muted-foreground">{t(circle.isPrivate ? "noStoriesPrivate" : "noStories")}</p>
           ) : (

@@ -8,8 +8,6 @@ const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), browsing-topics=()" },
-  // Story embeds (Phase 4) will opt specific routes back in to framing.
-  { key: "X-Frame-Options", value: "SAMEORIGIN" },
   // Writers' work isn't for AI training: the TDM opt-out on every response (see seo.ts).
   ...RIGHTS_RESERVED_HEADERS,
 ];
@@ -32,7 +30,11 @@ const nextConfig: NextConfig = {
     },
   },
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      // Everything but story embeds (/embed/…, framable anywhere through their own CSP) stays unframable.
+      { source: "/:path((?!embed/).*)", headers: [{ key: "X-Frame-Options", value: "SAMEORIGIN" }] },
+    ];
   },
 };
 

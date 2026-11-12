@@ -2,7 +2,7 @@
 
 import { Bell } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getUnreadNotificationCount } from "@/app/actions/social";
 import { buttonVariants } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
@@ -15,13 +15,19 @@ import { cn } from "@/lib/utils";
 export function NotificationBell({ userId, initialCount }: { userId: string; initialCount: number }) {
   const t = useTranslations("Social");
   const [count, setCount] = useState(initialCount);
+  // Bumped when the count grows, so the bell rings once (motion-safe, see `.bell-ring`).
+  const [rings, setRings] = useState(0);
+  const last = useRef(initialCount);
 
   useEffect(() => {
     let active = true;
     let unsubscribe = () => {};
     const refresh = async () => {
       const next = await getUnreadNotificationCount();
-      if (active) setCount(next);
+      if (!active) return;
+      if (next > last.current) setRings((value) => value + 1);
+      last.current = next;
+      setCount(next);
     };
     // The Supabase client is ~70 KB of JS that no page needs to render; load it after hydration.
     void import("@/lib/supabase/client").then(async ({ supabaseBrowser }) => {
@@ -52,16 +58,21 @@ export function NotificationBell({ userId, initialCount }: { userId: string; ini
   return (
     <Link
       href="/me/notifications"
-      className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "relative")}
+      className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "relative", rings > 0 && "bell-ring")}
       aria-label={count ? t("notificationsUnread", { count }) : t("notifications")}
       data-testid="notification-bell"
     >
-      <Bell aria-hidden />
+      <Bell key={rings} aria-hidden />
       {count > 0 ? (
         <span
+          key={`count-${rings}`}
           aria-hidden
-          className="absolute -top-0.5 -right-0.5 flex min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[0.625rem] leading-4 font-semibold text-primary-foreground"
+          className={cn(
+            "absolute -top-0.5 -right-0.5 flex min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[0.625rem] leading-4 font-semibold text-primary-foreground",
+            rings > 0 && "badge-pop",
+          )}
           data-testid="notification-count"
+          data-rings={rings}
         >
           {count > 99 ? "99+" : count}
         </span>

@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import postgres from "postgres";
-import { startDraft, waitSaved, writeStory } from "./helpers";
+import { closePublishedMoment, startDraft, waitSaved, writeStory } from "./helpers";
 import { solidPng } from "./png";
 import { signInWithMagicLink } from "./sign-in";
 
@@ -33,6 +33,7 @@ test("people can download their data and delete their account, photos included",
   await waitSaved(page);
   await page.getByTestId("open-publish").click();
   await page.getByTestId("publish-submit").click();
+  await closePublishedMoment(page);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(title);
   const storyUrl = page.url();
   expect((await countRows(email)).files).toBeGreaterThan(0);

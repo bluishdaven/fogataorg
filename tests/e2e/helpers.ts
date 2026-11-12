@@ -20,6 +20,14 @@ export async function writeStory(page: Page, title: string) {
   await page.keyboard.type(BODY);
 }
 
+/** A first publish opens the story with its "it's live" dialog (PublishedMoment); close it to carry on. */
+export async function closePublishedMoment(page: Page) {
+  const moment = page.getByTestId("published-moment");
+  await expect(moment).toBeVisible();
+  await moment.getByRole("button", { name: /^(Close|Cerrar)$/ }).click();
+  await expect(moment).toBeHidden();
+}
+
 /** Writes and publishes a short story; returns its URL. */
 export async function publishStory(page: Page, title: string): Promise<string> {
   await startDraft(page);
@@ -27,6 +35,7 @@ export async function publishStory(page: Page, title: string): Promise<string> {
   await waitSaved(page);
   await page.getByTestId("open-publish").click();
   await page.getByTestId("publish-submit").click();
+  await closePublishedMoment(page);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(title);
   return page.url();
 }

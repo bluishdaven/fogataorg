@@ -23,3 +23,13 @@ export async function becomeAdmin(page: Page, email: string) {
   await page.getByTestId("sign-out").click();
   await signInWithMagicLink(page, "en", email);
 }
+
+/** Local test database only: removes every featured entry of a week's spark, so runs start clean. */
+export async function clearFeatures(weekOf: string) {
+  const sql = postgres(process.env.DATABASE_URL!, { max: 1, onnotice: () => {} });
+  try {
+    await sql`delete from public.prompt_features where prompt_id in (select id from public.prompts where week_of = ${weekOf}::date)`;
+  } finally {
+    await sql.end();
+  }
+}

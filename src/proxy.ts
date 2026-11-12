@@ -16,6 +16,8 @@ const intl = createIntlMiddleware(routing);
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  // Story embeds live inside other sites' iframes: no locale, no session, no cookies.
+  if (pathname.startsWith("/embed/")) return NextResponse.next();
   const apply = await refreshSession(request);
 
   // Auth landing routes live outside the locale tree.

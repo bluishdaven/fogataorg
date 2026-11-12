@@ -24,3 +24,12 @@ export const promptInputSchema = z.object({
 export function promptText(prompt: { textEn: string; textEs: string }, locale: string): string {
   return locale === "es" ? prompt.textEs : prompt.textEn;
 }
+
+/** A spark features at most this many entries (the database enforces it too). */
+export const MAX_FEATURED = 3;
+
+export const featureInputSchema = z.object({
+  promptId: z.uuid(),
+  storyId: z.uuid(),
+  featured: z.boolean(),
+});

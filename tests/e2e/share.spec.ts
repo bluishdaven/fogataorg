@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Locator } from "@playwright/test";
-import { deleteFromMyStories, startDraft, waitSaved, writeStory } from "./helpers";
+import { closePublishedMoment, deleteFromMyStories, startDraft, waitSaved, writeStory } from "./helpers";
 import { solidPng } from "./png";
 import { signInWithMagicLink } from "./sign-in";
 
@@ -132,6 +132,7 @@ test("writers give a story a color; its Stories image uses it, with the cover an
   await publish.getByRole("button", { name: "Color #0f766e" }).click();
   await expect(publish.getByTestId("publish-preview")).toHaveCSS("background-color", "rgb(15, 118, 110)");
   await page.getByTestId("publish-submit").click();
+  await closePublishedMoment(page);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(title);
 
   // The story page shows its color as a thin line and in the reading progress bar.

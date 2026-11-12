@@ -149,6 +149,7 @@ export async function getStory(handle: string, slug: string) {
         promptWeek: prompts.weekOf,
         promptTextEn: prompts.textEn,
         promptTextEs: prompts.textEs,
+        promptFeatured: sql<boolean>`exists (select 1 from public.prompt_features pf where pf.story_id = "stories"."id")`,
         authorNowFocus: profiles.nowFocus,
         authorNowText: profiles.nowText,
         moderation: moderationStatusSql,

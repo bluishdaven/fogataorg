@@ -9,6 +9,8 @@ import { FollowButton } from "@/components/social/toggle-buttons";
 import { getViewer } from "@/lib/auth";
 import { getFollowState } from "@/lib/data/social";
 import { getTopicWithStories } from "@/lib/data/stories";
+import { RssLink } from "@/components/rss-link";
+import { rssPaths } from "@/lib/domain/rss";
 import { localeAlternates } from "@/lib/domain/seo";
 
 type Props = PageProps<"/[locale]/topics/[slug]">;
@@ -21,7 +23,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: name,
     description: t("topicLede", { name }),
-    alternates: localeAlternates(locale, `/topics/${topic.slug}`),
+    alternates: {
+      ...localeAlternates(locale, `/topics/${topic.slug}`),
+      types: { "application/rss+xml": [{ url: rssPaths.topic(topic.slug, locale), title: name }] },
+    },
     // An empty topic has nothing to find yet.
     robots: topic.stories.length ? undefined : { index: false, follow: true },
   };
@@ -55,7 +60,10 @@ async function Topic({ params }: Pick<Props, "params">) {
           <TopicFollow topicId={topic.id} slug={topic.slug} />
         </Suspense>
       </div>
-      <p className="mt-2 mb-6 border-b border-border pb-6 text-muted-foreground">{t("count", { count: topic.stories.length })}</p>
+      <p className="mt-2 mb-6 flex flex-wrap items-center gap-x-3 border-b border-border pb-6 text-muted-foreground">
+        <span>{t("count", { count: topic.stories.length })}</span>
+        {topic.stories.length ? <RssLink href={rssPaths.topic(topic.slug, locale)} name={name} /> : null}
+      </p>
       {topic.stories.length === 0 ? (
         <p className="text-muted-foreground">{t("empty", { name })}</p>
       ) : (

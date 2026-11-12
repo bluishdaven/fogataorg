@@ -10,10 +10,13 @@ import { getStorySocial } from "@/lib/data/social";
 import type { BadgeData } from "@/lib/domain/badges";
 import type { NowFocus } from "@/lib/domain/profile";
 import { profilePath, storyPath } from "@/lib/domain/handle-routes";
+import { embedPath } from "@/lib/domain/embed";
 import { storyImageFileName } from "@/lib/domain/story-card";
 import { publicEnv } from "@/lib/env";
 import { ShareButton } from "./share-button";
 import { SparkButton } from "./spark-button";
+import { JoinInvitation } from "./join-invitation";
+import { PublishedMoment } from "./published-moment";
 import { FollowButton, SaveButton } from "./toggle-buttons";
 
 /**
@@ -106,6 +109,7 @@ export async function StorySocial({
           text={t("shareText", { title, author: name })}
           fileName={storyImageFileName(slug)}
           allowImage={!nsfw}
+          embedUrl={nsfw ? undefined : new URL(embedPath(author.username, slug), publicEnv.NEXT_PUBLIC_SITE_URL).toString()}
           image={{
             kind: "story",
             input: {
@@ -159,6 +163,8 @@ export async function StorySocial({
           />
         )}
       </aside>
+      {social.signedIn ? null : <JoinInvitation authorName={name} loginHref={loginHref} />}
+      {social.isAuthor ? <PublishedMoment storyId={storyId} url={shareUrl} text={t("shareText", { title, author: name })} /> : null}
     </>
   );
 }

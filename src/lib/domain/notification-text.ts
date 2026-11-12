@@ -20,7 +20,8 @@ export type NotificationItem = {
     | "donor"
     | "join_request"
     | "join_accepted"
-    | "circle_owner";
+    | "circle_owner"
+    | "featured";
   actor: { username: string; name: string } | null;
   others: number;
   story: { title: string; slug: string; author: string } | null;
@@ -68,7 +69,7 @@ export function notificationPath(item: NotificationItem, locale: string): string
   if (item.type === "follow" && item.actor) return profilePath(item.actor.username);
   if (item.story) {
     const base = storyPath(item.story.author, item.story.slug);
-    return item.type === "spark" && !item.responseExcerpt ? base : `${base}#responses`;
+    return (item.type === "spark" && !item.responseExcerpt) || item.type === "featured" ? base : `${base}#responses`;
   }
   return `/${locale}/me/notifications`;
 }

@@ -1,3 +1,4 @@
+import { Star } from "lucide-react";
 import type { Metadata } from "next";
 import NextLink from "next/link";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
@@ -61,6 +62,7 @@ async function List() {
                   {item.unread ? <span className="mt-2 size-2 shrink-0 rounded-full bg-primary" aria-label={t("unread")} /> : null}
                   {tier ? <TierIcon tier={tier.key} className="mt-0.5 h-5 w-auto shrink-0" /> : null}
                   {item.type === "donor" ? <DonorIcon className="mt-0.5 h-5 w-auto shrink-0" /> : null}
+                  {item.type === "featured" ? <Star className="mt-0.5 size-5 shrink-0 fill-current text-ember-text" aria-hidden /> : null}
                   <span>{message}</span>
                 </span>
                 {item.responseExcerpt && item.type !== "spark" ? (

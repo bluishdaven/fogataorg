@@ -24,6 +24,8 @@ import { OG_SIZE, ogPaths, previewVersion } from "@/lib/domain/og";
 import { publicEnv } from "@/lib/env";
 import { INFLUENCE_KINDS } from "@/lib/domain/profile";
 import { safeHref } from "@/lib/domain/story-doc";
+import { RssLink } from "@/components/rss-link";
+import { rssPaths } from "@/lib/domain/rss";
 
 type Props = PageProps<"/[locale]/u/[handle]">;
 
@@ -52,7 +54,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${name} (@${profile.username})`,
     description,
-    alternates: { canonical: profilePath(profile.username) },
+    alternates: {
+      canonical: profilePath(profile.username),
+      types: { "application/rss+xml": [{ url: rssPaths.writer(profile.username), title: name }] },
+    },
     // A profile with no stories yet is thin; it becomes findable with the first one.
     robots: profile.storyCount ? undefined : { index: false, follow: true },
     openGraph: {
@@ -157,6 +162,8 @@ async function Profile({ params }: Pick<Props, "params">) {
             <>
               {" · "}
               <span data-testid="profile-word-count">{t("wordCount", { count: profile.wordCount })}</span>
+              {" · "}
+              <RssLink href={rssPaths.writer(profile.username)} name={name} />
             </>
           ) : null}
         </p>

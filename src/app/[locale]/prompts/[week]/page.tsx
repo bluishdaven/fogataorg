@@ -2,8 +2,11 @@ import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { Star } from "lucide-react";
 import { createDraft } from "@/app/actions/stories";
+import { AdminFeature } from "@/components/prompts/admin-feature";
 import { StoryCard } from "@/components/story-card";
+import { Toaster } from "@/components/ui/sonner";
 import { StoryListSkeleton } from "@/components/story-list-skeleton";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
@@ -20,13 +23,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${t("eyebrow")}: ${promptText(prompt, locale)}`,
     description: promptText(prompt, locale),
-    robots: prompt.stories.length ? undefined : { index: false, follow: true },
+    robots: prompt.total ? undefined : { index: false, follow: true },
   };
 }
 
 export default function PromptPage({ params }: Props) {
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
+      <Toaster position="bottom-center" />
       <Suspense fallback={<StoryListSkeleton count={3} />}>
         <PromptContent params={params} />
       </Suspense>
@@ -60,14 +64,42 @@ async function PromptContent({ params }: Pick<Props, "params">) {
           {t("allSparks")}
         </Link>
       </header>
-      <h2 className="text-sm font-semibold tracking-wide text-muted-foreground uppercase">{t("entries", { count: prompt.stories.length })}</h2>
+      {prompt.featured.length ? (
+        <section aria-labelledby="featured-title" className="mb-10" data-testid="prompt-featured">
+          <h2 id="featured-title" className="mb-1 flex items-center gap-2 text-sm font-semibold tracking-wide text-ember-text uppercase">
+            <Star className="size-4 fill-current" aria-hidden />
+            {t("featuredTitle")}
+          </h2>
+          <p className="mb-4 text-sm text-muted-foreground">{t("featuredLede")}</p>
+          <ol className="flex flex-col gap-4">
+            {prompt.featured.map((story) => (
+              <li key={story.id}>
+                <div className="ember-glow rounded-2xl px-3 sm:px-4" data-testid="featured-entry">
+                  <StoryCard story={story} />
+                </div>
+                <Suspense fallback={null}>
+                  <AdminFeature promptId={prompt.id} storyId={story.id} featured title={story.title} className="mt-2 mb-0" />
+                </Suspense>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ) : null}
+      <h2 className="text-sm font-semibold tracking-wide text-muted-foreground uppercase">
+        {prompt.featured.length ? t("moreEntries", { count: prompt.stories.length }) : t("entries", { count: prompt.total })}
+      </h2>
       {prompt.stories.length ? (
         <div data-testid="prompt-entries">
           {prompt.stories.map((story) => (
-            <StoryCard key={`${story.author.username}/${story.slug}`} story={story} />
+            <div key={story.id}>
+              <StoryCard story={story} />
+              <Suspense fallback={null}>
+                <AdminFeature promptId={prompt.id} storyId={story.id} featured={false} title={story.title} />
+              </Suspense>
+            </div>
           ))}
         </div>
-      ) : (
+      ) : prompt.total ? null : (
         <p className="py-6 text-muted-foreground">{t("noEntries")}</p>
       )}
     </>

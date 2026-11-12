@@ -5,10 +5,11 @@ import { updateTag } from "next/cache";
 import { z } from "zod";
 import { getViewer } from "@/lib/auth";
 import { withRls } from "@/lib/db/rls";
-import { prompts, stories } from "@/lib/db/schema";
-import { promptInputSchema } from "@/lib/domain/prompts";
+import { pgCode } from "@/lib/db/errors";
+import { profiles, promptFeatures, prompts, stories } from "@/lib/db/schema";
+import { featureInputSchema, promptInputSchema } from "@/lib/domain/prompts";
 
-type Result = { ok: true } | { ok: false; error: "unauthorized" | "weekOf" | "text" | "invalid" };
+type Result = { ok: true } | { ok: false; error: "unauthorized" | "weekOf" | "text" | "invalid" | "limit" };
 
 /** Adds or rewrites the spark for a week (admins only; RLS checks too). */
 export async function savePrompt(input: unknown): Promise<Result> {
@@ -47,5 +48,40 @@ export async function detachPrompt(input: unknown): Promise<Result> {
     tx.update(stories).set({ promptId: null }).where(and(eq(stories.id, parsed.data.storyId), eq(stories.authorId, viewer.id))),
   );
   updateTag("prompts");
+  return { ok: true };
+}
+
+/**
+ * Features a weekly spark entry on the spark's page, or takes it back (admins only; RLS checks too).
+ * The database keeps features on live entries of that spark, at most three, and tells the writer.
+ */
+export async function setFeatured(input: unknown): Promise<Result> {
+  const viewer = await getViewer();
+  if (!viewer?.isAdmin) return { ok: false, error: "unauthorized" };
+  const parsed = featureInputSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: "invalid" };
+  const { promptId, storyId, featured } = parsed.data;
+  let story: { handle: string; slug: string } | undefined;
+  try {
+    story = await withRls(viewer.claims, async (tx) => {
+      if (featured) {
+        await tx.insert(promptFeatures).values({ promptId, storyId }).onConflictDoNothing({ target: promptFeatures.storyId });
+      } else {
+        await tx.delete(promptFeatures).where(and(eq(promptFeatures.promptId, promptId), eq(promptFeatures.storyId, storyId)));
+      }
+      const [row] = await tx
+        .select({ handle: profiles.username, slug: stories.slug })
+        .from(stories)
+        .innerJoin(profiles, eq(profiles.id, stories.authorId))
+        .where(eq(stories.id, storyId))
+        .limit(1);
+      return row;
+    });
+  } catch (error) {
+    if (pgCode(error) === "23514") return { ok: false, error: "limit" };
+    throw error;
+  }
+  updateTag("prompts");
+  if (story) updateTag(`story:${story.handle.toLowerCase()}/${story.slug}`);
   return { ok: true };
 }

@@ -42,7 +42,8 @@
     "comingSoon": "Coming soon",
     "donors": "Donors",
     "donate": "Donate",
-    "moderation": "Moderation"
+    "moderation": "Moderation",
+    "stats": "Stats"
   },
   "Theme": {
     "label": "Theme",
@@ -249,7 +250,12 @@
     "chip": "Written for the weekly spark",
     "banner": "Answering the weekly spark: “{prompt}”",
     "detach": "Not for this spark",
-    "detached": "This story no longer answers the spark."
+    "detached": "This story no longer answers the spark.",
+    "chipFeatured": "Featured in the weekly spark",
+    "featuredTitle": "Featured",
+    "featuredLede": "Entries Fogata picked from this spark.",
+    "moreEntries": "{count, plural, =0 {No other entries} one {# more entry} other {# more entries}}",
+    "lastWeekFeatured": "Featured from last week's spark:"
   },
   "StoryCard": {
     "byline": "{name}",
@@ -561,7 +567,9 @@
     "emptyTitle": "Your first story starts here.",
     "emptyBody": "Drafts save as you type. Nothing is public until you publish it.",
     "import": "Import stories",
-    "series": "Series"
+    "series": "Series",
+    "stats": "Stats",
+    "statsFor": "Stats for “{title}”"
   },
   "Reader": {
     "label": "Reading settings",
@@ -795,7 +803,8 @@
       "donor": "You're a Firekeeper! Thank you for supporting Fogata with a donation.",
       "join_request": "{others, plural, =0 {{actor} asked to join {circle}} one {{actor} and # other asked to join {circle}} other {{actor} and # others asked to join {circle}}}",
       "join_accepted": "{actor} accepted you into {circle}. Your stories go straight in now.",
-      "circle_owner": "{actor} handed {circle} over to you. You're its owner now."
+      "circle_owner": "{actor} handed {circle} over to you. You're its owner now.",
+      "featured": "Your story “{title}” was featured in the weekly spark. It's at the top of the spark's page now."
     },
     "savedTitle": "Saved",
     "savedLede": "Stories you've kept for later. Only you can see your lists.",
@@ -876,7 +885,9 @@
     "quoteCardDescription": "This passage as a picture, for your feed or your Stories. The link to the passage is copied too.",
     "quoteFormat": "Size",
     "quoteFormatPost": "Post · 4:5",
-    "quoteFormatStory": "Story · 9:16"
+    "quoteFormatStory": "Story · 9:16",
+    "shareEmbed": "Copy embed code",
+    "embedCopied": "Embed code copied. Paste it into your site's HTML."
   },
   "Circles": {
     "title": "Circles",
@@ -1137,7 +1148,12 @@
       "text": "Write the prompt in both languages (up to 280 characters).",
       "failed": "That didn't work. Try again."
     },
-    "promptsLink": "Weekly sparks"
+    "promptsLink": "Weekly sparks",
+    "feature": "Feature",
+    "featureLabel": "Feature “{title}”",
+    "featuredToast": "Featured. The writer gets a notification.",
+    "unfeatured": "No longer featured.",
+    "featureLimit": "A spark features at most three entries."
   },
   "Moderation": {
     "nsfwLabel": "NSFW",
@@ -1213,7 +1229,7 @@
     "signature": "Fogata.org"
   },
   "Legal": {
-    "updated": "Last updated: November 6, 2026",
+    "updated": "Last updated: November 12, 2026",
     "contact": "Questions about this page: hola@fogata.org",
     "related": "Also read",
     "terms": "Terms of use",
@@ -1297,10 +1313,10 @@
           "items": [
             "Your email address, to sign you in with a one-time link. If you choose Google sign-in, Google shares your email address and name with us.",
             "What you choose to show on your profile: username, name, short bio, photo, links, pronouns, your \"Now\" line and your influences. All of it is public.",
-            "What you publish and do: stories, responses, sparks, embers (passages you highlight), follows, circle memberships and requests to join, reading lists, and the people you mute or block. Published stories and responses are public; drafts, your saved stories and reading lists, your embers, the people you mute or block and your notifications are private.",
+            "What you publish and do: stories, responses, sparks, embers (passages you highlight), follows, circle memberships and requests to join, reading lists, and the people you mute or block. Published stories and responses are public; drafts, your saved stories and reading lists, your embers, the people you mute or block and your notifications are private. Writers see how many people saved their story and, once two or more readers have kept the same paragraph as an ember, how many did: never who, and never which words.",
             "Your preferences: interface language and how often we may email you. Theme and reading preferences stay in your own browser.",
             "Photos you upload. Your browser resizes them and removes location and camera data (EXIF/GPS) before they reach us.",
-            "Anonymous reading counts: when you read a story, we note how far you got and roughly for how long, under a code that changes every day, so your reads can't be linked over time. We don't store your IP address with it. Writers only ever see totals, never who read.",
+            "Anonymous reading counts: when you read a story, we note how far you got and roughly for how long, under a code that changes every day, so your reads can't be linked over time. We don't store your IP address with it. Writers see totals (visits, reads, how far readers got and average reading time), never who read.",
             "Basic technical records that our hosting keeps for a short time to keep the site secure and working, such as IP address and browser type."
           ]
         },
@@ -1443,5 +1459,89 @@
     "blockedTitle": "Muted and blocked",
     "blockedBody": "People you mute or block can't reach your notifications, home page or story responses. Blocked people also can't follow you or respond to your writing. Nobody is told. Use the … menu on someone's profile to add them here.",
     "blockedEmpty": "You haven't muted or blocked anyone."
+  },
+  "Stats": {
+    "title": "Stats",
+    "lede": "How your stories are being read. Totals only: Fogata never shows you who read, saved or highlighted.",
+    "period": "Last 30 days",
+    "lifetime": "Since it was published",
+    "vsPrevious": "vs. the 30 days before",
+    "up": "Up {value}",
+    "down": "Down {value}",
+    "flat": "No change",
+    "views": "Visits",
+    "reads": "Reads",
+    "readRatio": "Read ratio",
+    "readRatioHint": "Visits that got past half the story",
+    "ratioOf": "{ratio} of visits",
+    "avgTime": "Average reading time",
+    "duration": "{minutes}m {seconds}s",
+    "newFollowers": "New followers",
+    "followersTotal": "{count, plural, one {# follower in all} other {# followers in all}}",
+    "chartTitle": "Visits and reads, day by day",
+    "chartCaption": "Each column is a day's visits (UTC). The darker part is reads: visits that got past half the story.",
+    "chartKeys": "Use the left and right arrow keys to move between days.",
+    "legendVisits": "Visits",
+    "legendReads": "Reads",
+    "tooltipVisits": "{count, plural, one {# visit} other {# visits}}",
+    "tooltipReads": "{count, plural, one {# read} other {# reads}}",
+    "showTable": "Show as a table",
+    "date": "Date",
+    "emptyPeriod": "No visits in the last 30 days yet. Share a story and the first ones will show up here.",
+    "storiesTitle": "Your stories",
+    "storiesLede": "Since each story was published. Reads go back 13 months.",
+    "noStories": "Publish a story and its numbers will show up here.",
+    "sparks": "Sparks",
+    "sparkers": "{count, plural, =0 {No sparks yet} one {From # reader} other {From # readers}}",
+    "responses": "Responses",
+    "saves": "Saves",
+    "embers": "Embers",
+    "embersHint": "Readers who kept a passage",
+    "back": "All stats",
+    "viewStory": "Read the story",
+    "storyLede": "Published {date}.",
+    "periodTotals": "Last 30 days: {views, plural, one {# visit} other {# visits}}, {reads, plural, one {# read} other {# reads}}.",
+    "depthTitle": "How far readers got",
+    "depthLede": "{count, plural, one {Of # visit, how many reached each point of the page.} other {Of # visits, how many reached each point of the page.}}",
+    "depthEmpty": "No visits yet.",
+    "depth": {
+      "quarter": "A quarter",
+      "half": "Halfway",
+      "threeQuarters": "Three quarters",
+      "finished": "The end"
+    },
+    "lovedTitle": "Lines readers loved",
+    "lovedLede": "Paragraphs that two or more readers kept as embers. You never see who kept them, or which words they picked.",
+    "lovedReaders": "{count, plural, one {# reader kept this} other {# readers kept this}}",
+    "lovedEmpty": "When two or more readers keep the same paragraph as an ember, it shows up here.",
+    "lovedLink": "Open this passage"
+  },
+  "Join": {
+    "title": "Pull up a seat by the fire",
+    "body": "Fogata is a home for long-form writing in English and Spanish: free for everyone, with no ads and no paywall. Join to spark this story, follow {name} and keep the stories you love.",
+    "join": "Join Fogata",
+    "why": "Why Fogata?"
+  },
+  "Rss": {
+    "writerTitle": "{name} on Fogata",
+    "writerDescription": "Stories by {name} on Fogata.org.",
+    "circleTitle": "{name}, a circle on Fogata",
+    "circleDescription": "Stories published in {name} on Fogata.org.",
+    "topicTitle": "{name} on Fogata",
+    "topicDescription": "The latest stories about {name} on Fogata.org.",
+    "link": "RSS",
+    "linkLabel": "RSS feed of {name}"
+  },
+  "Embed": {
+    "cta": "Read on Fogata",
+    "warning": "This story carries a content warning. Open it on Fogata to read it."
+  },
+  "Published": {
+    "title": "Your story is live",
+    "body": "New writers are found through the people who share them. Send it to a few friends who'd enjoy it, or post it where your readers already are.",
+    "networks": "Share on",
+    "tip": "Everyone you send it to can read the whole story, free, with no sign-up.",
+    "stats": "See how it's being read",
+    "close": "Close"
   }
 }

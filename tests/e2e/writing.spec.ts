@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { deleteFromMyStories, startDraft, waitSaved, writeStory } from "./helpers";
+import { closePublishedMoment, deleteFromMyStories, startDraft, waitSaved, writeStory } from "./helpers";
 import { solidPng } from "./png";
 import { signInWithMagicLink } from "./sign-in";
 
@@ -56,6 +56,7 @@ test("write, autosave, add an image, publish, then delete", async ({ page }) => 
 
   await expect(page).toHaveURL(/\/@e2e[a-z0-9_]+\/a-night-by-the-water-\d+$/);
   const storyUrl = page.url();
+  await closePublishedMoment(page);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(title);
   await expect(page.locator("article figure img")).toHaveAttribute("alt", "A small orange square");
   await expect(page.locator("article figure")).toHaveClass(/figure-small/);
@@ -122,11 +123,12 @@ test("edits to a live story stay private until published", async ({ page }) => {
   await waitSaved(page);
   await page.getByTestId("open-publish").click();
   await page.getByTestId("publish-submit").click();
+  await closePublishedMoment(page);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(title);
   const storyUrl = page.url();
 
   await page.goto("/en/me/stories");
-  await page.getByTestId("my-story").filter({ hasText: title }).getByRole("link", { name: "Edit" }).click();
+  await page.getByTestId("my-story").filter({ hasText: title }).getByRole("link", { name: "Edit", exact: true }).click();
   await expect(page.getByText("You're editing a published story.")).toBeVisible();
   await page.getByTestId("editor-title").fill(`${title} (revised)`);
   await waitSaved(page);
