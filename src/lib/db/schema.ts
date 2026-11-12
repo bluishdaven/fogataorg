@@ -349,6 +349,8 @@ export const notificationType = pgEnum("notification_type", [
   "join_accepted",
   // The owner handed a circle over to this member.
   "circle_owner",
+  // An admin featured the writer's entry on its weekly spark page. No actors, like badges.
+  "featured",
 ]);
 
 /** A reader following a writer or a topic (circles later). Exactly one target is set. */
@@ -966,3 +968,31 @@ export const moderationLog = pgTable(
   ],
 );
 
+
+/**
+ * Weekly spark entries an admin featured: shown first on the spark's page and, the week after, on
+ * the home page. Anyone reads them; only admins add or remove them. Triggers (hand-written
+ * migration) keep each one on a story that answers that spark, cap a spark at three and tell the
+ * writer.
+ */
+export const promptFeatures = pgTable(
+  "prompt_features",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    promptId: uuid("prompt_id")
+      .notNull()
+      .references(() => prompts.id, { onDelete: "cascade" }),
+    storyId: uuid("story_id")
+      .notNull()
+      .unique()
+      .references(() => stories.id, { onDelete: "cascade" }),
+    featuredBy: uuid("featured_by").references(() => profiles.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index("prompt_features_prompt_idx").on(t.promptId, t.createdAt),
+    pgPolicy("prompt_features_select_public", { for: "select", to: everyone, using: sql`true` }),
+    pgPolicy("prompt_features_insert_admin", { for: "insert", to: authenticatedRole, withCheck: IS_ADMIN }),
+    pgPolicy("prompt_features_delete_admin", { for: "delete", to: authenticatedRole, using: IS_ADMIN }),
+  ],
+);

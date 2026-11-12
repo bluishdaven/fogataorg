@@ -435,6 +435,20 @@
       "when": 1794268594813,
       "tag": "20261109235634_story_accent",
       "breakpoints": true
+    },
+    {
+      "idx": 62,
+      "version": "7",
+      "when": 1794465366095,
+      "tag": "20261112063606_prompt_features",
+      "breakpoints": true
+    },
+    {
+      "idx": 63,
+      "version": "7",
+      "when": 1794465370764,
+      "tag": "20261112063610_writer_stats_and_features",
+      "breakpoints": true
     }
   ]
 }
