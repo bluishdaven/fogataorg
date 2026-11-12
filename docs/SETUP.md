@@ -64,7 +64,7 @@ tests and a runtime dependency audit, then RLS and e2e tests against a throwaway
    ```bash
    npx supabase login
    npx supabase link --project-ref <project-ref>
-   npx supabase db push
+   npx supabase db push --linked
    ```
    Migrations also create the `story-images` storage bucket and its policies.
 3. **Authentication → URL configuration**: Site URL `https://fogata.org`; redirect URLs
@@ -141,7 +141,7 @@ summary goes out on a weekday assigned at random to each reader, only in weeks w
 2. Create an API key with **sending access** only, for that domain. Put it in Vercel as
    `RESEND_API_KEY`, and set `EMAIL_FROM`, `EMAIL_SIGNING_SECRET` and `CRON_SECRET` (table above).
    Set `RESEND_API_KEY` for **Production** only, so preview deploys can't email real readers.
-   Push new migrations (`npx supabase db push`) before deploying code that uses them.
+   Push new migrations (`npx supabase db push --linked`) before deploying code that uses them.
 3. Trigger a run by hand to check it (Vercel's **Settings → Cron Jobs** also has a Run button):
    `curl -H "Authorization: Bearer <CRON_SECRET>" https://fogata.org/api/cron/notification-emails`
    returns `{"sent":…,"failed":…,"skipped":…,"limited":…}` for today's readers; failures are logged
