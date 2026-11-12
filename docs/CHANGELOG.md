@@ -1,5 +1,12 @@
 # Changelog
 
+## Founding writers (2026-11-12)
+
+- The first 100 writers to publish five public stories get a numbered **Founding writer** badge
+  (*Pluma fundadora*), kept for good: a gold seal after their name, a chip on their profile and a
+  notification when they earn it. The badge guide shows how many of the 100 places are left.
+  Writers who already had five stories when this shipped were numbered in the order they got there.
+
 ## Writer stats, featured sparks, RSS, embeds and a warmer welcome (2026-11-12)
 
 **Demo**: publish a story for the first time: it opens with **Your story is live** (sparks rise,

@@ -1,7 +1,7 @@
 # Growth features and motion (2026-11-12)
 
-Status: built 2026-11-12 (see CHANGELOG). Not built: a "Founding writer" badge (needs the owner's call on
-who gets it).
+Status: built 2026-11-12 (see CHANGELOG), including the founding writer badge the owner defined
+the same day: the first 100 writers with five published stories.
 
 The owner asked for every product gap from the growth review, plus motion where it helps. Writers
 first: they bring readers through the share tools that already exist.

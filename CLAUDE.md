@@ -311,6 +311,13 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   donor. They're `badge`/`donor` notifications with no actors (`notifications.badge` holds the key),
   inserted by `notify_badge()`. SQL tier thresholds mirror `WRITING_TIERS` (a db test checks).
   The donor badge is a heart in flames.
+  **Founding writer** (`profiles.founding_number`, 1–100, no column grant): the first 100 writers to
+  reach five published, public stories, numbered in order and kept for good.
+  `check_founding_writer()` runs inside `check_writing_badge()` (so every tier trigger and the daily
+  cron cover it), takes numbers under an advisory lock and sends a `founding` notification. Author
+  queries carry it as `foundingNumber` (`foundingNumberSql()`); it shows after the donor badge and
+  before the tier. Profiles' badge guide says how many places are left (`getFoundingPlacesLeft()`).
+  In Spanish it's "Pluma fundadora", which doesn't assume anyone's gender.
 - **Abuse protection** (`src/lib/domain/limits.ts`, `src/lib/limits.ts`, `src/lib/turnstile.ts`).
   Rate limits count hits in `rate_limit_hits` (hand-written migration, outside the Drizzle schema,
   no grants: only `public.take_rate_limit()` touches it, under an advisory lock; the daily cron runs
