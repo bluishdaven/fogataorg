@@ -22,7 +22,7 @@ function availability(): Availability {
 }
 
 /** "Notifications on this device": the browser asks for permission only when it's switched on. */
-export function PushSettings() {
+export function PushSettings({ publicKey }: { publicKey: string }) {
   const t = useTranslations("PushSettings");
   const raw = useLocale();
   const locale = isLocale(raw) ? raw : "en";
@@ -58,7 +58,7 @@ export function PushSettings() {
       await disablePush();
       setState("off");
     } else {
-      const result = await enablePush(locale);
+      const result = await enablePush(locale, publicKey);
       setState(result === "on" ? "on" : result === "denied" ? "denied" : "failed");
     }
     setBusy(false);

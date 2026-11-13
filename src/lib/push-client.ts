@@ -2,7 +2,6 @@
 
 import { removePushSubscription, savePushSubscription } from "@/app/actions/push";
 import type { Locale } from "@/lib/domain/locale";
-import { publicEnv } from "@/lib/env";
 import { clearOffline, registerServiceWorker, serviceWorkerWanted } from "@/lib/offline";
 
 /**
@@ -10,10 +9,9 @@ import { clearOffline, registerServiceWorker, serviceWorkerWanted } from "@/lib/
  * forgetting the device on sign-out.
  */
 
-const publicKey = publicEnv.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
-
+/** Whether this browser can do push at all (the server's key comes separately, from the page). */
 export function pushSupported(): boolean {
-  return Boolean(publicKey) && serviceWorkerWanted() && "PushManager" in window && "Notification" in window;
+  return serviceWorkerWanted() && "PushManager" in window && "Notification" in window;
 }
 
 function applicationServerKey(base64: string): Uint8Array<ArrayBuffer> {
@@ -41,7 +39,7 @@ function toInput(subscription: PushSubscription, locale: Locale) {
 }
 
 /** Asks the browser (it shows its own prompt) and saves this device. */
-export async function enablePush(locale: Locale): Promise<"on" | "denied" | "failed"> {
+export async function enablePush(locale: Locale, publicKey: string): Promise<"on" | "denied" | "failed"> {
   if (!pushSupported() || !publicKey) return "failed";
   const permission = await Notification.requestPermission();
   if (permission !== "granted") return "denied";

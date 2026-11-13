@@ -9,6 +9,7 @@ import { safeNextPath } from "@/lib/domain/redirect";
 import { magicLinkSchema, oauthSchema } from "@/lib/domain/schemas";
 import { publicEnv } from "@/lib/env";
 import { allowAnonymous } from "@/lib/limits";
+import { googleSignInEnabled } from "@/lib/runtime-config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { verifyTurnstile } from "@/lib/turnstile";
 
@@ -95,7 +96,7 @@ export async function signInWithOAuth(formData: FormData): Promise<void> {
     locale,
     next: formData.get("next") || undefined,
   });
-  if (!parsed.success || !publicEnv.NEXT_PUBLIC_AUTH_GOOGLE_ENABLED) {
+  if (!parsed.success || !googleSignInEnabled()) {
     redirect(`/${locale}/login`);
   }
 

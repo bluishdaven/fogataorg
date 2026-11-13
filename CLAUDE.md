@@ -207,6 +207,11 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   `Home.headlines` entry is rendered so the page stays static; `HEADLINE_SCRIPT` (root layout, before
   paint) sets `<html data-headline>` to one that differs from the last visit's (localStorage) and CSS
   shows only that one. Adding or removing headlines: change both message files and `HEADLINE_COUNT`.
+- **Optional public settings** (`src/lib/runtime-config.ts`): Google sign-in, Turnstile and the push
+  key are read on the server per request (`requestPublicConfig()`, after `connection()`) and passed
+  to client components as props, never as `process.env.NEXT_PUBLIC_*` in code: those are frozen at
+  build time, and Vercel variables the build can't see came out as "off" (2026-11-12). Only
+  required values (site URL, Supabase) stay in `publicEnv`.
 - **Partial prefetching** also prerenders with the reader's cookies, where clock reads
   (`Date.now()`) are errors. Anything that checks a session or the current time must call
   `await connection()` first, as `getViewer()` does.

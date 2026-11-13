@@ -10,6 +10,7 @@ import { notifications, pushSubscriptions } from "@/lib/db/schema";
 import { isLocale, type Locale } from "@/lib/domain/locale";
 import type { SocialTranslator } from "@/lib/domain/notification-text";
 import { isPushServiceEndpoint, PUSH_BATCH, PUSH_WINDOW_MS, pushPayload } from "@/lib/domain/push";
+import { vapidPrivateKey, vapidPublicKey } from "@/lib/runtime-config";
 
 /**
  * Sends push notifications for notification groups that changed since they were last pushed
@@ -21,8 +22,8 @@ import { isPushServiceEndpoint, PUSH_BATCH, PUSH_WINDOW_MS, pushPayload } from "
 export type PushConfig = { publicKey: string; privateKey: string; subject: string };
 
 export function pushConfig(): PushConfig | null {
-  const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY?.trim();
-  const privateKey = process.env.VAPID_PRIVATE_KEY?.trim();
+  const publicKey = vapidPublicKey();
+  const privateKey = vapidPrivateKey();
   if (!publicKey || !privateKey) return null;
   return { publicKey, privateKey, subject: process.env.VAPID_SUBJECT?.trim() || "mailto:hola@fogata.org" };
 }

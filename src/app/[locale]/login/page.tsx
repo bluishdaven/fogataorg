@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 import { FlameLogo } from "@/components/flame-logo";
-import { publicEnv } from "@/lib/env";
+import { requestPublicConfig } from "@/lib/runtime-config";
 import { LoginForm } from "./login-form";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -31,7 +31,7 @@ async function LoginFormWithParams({
 }: {
   searchParams: PageProps<"/[locale]/login">["searchParams"];
 }) {
-  const [params, locale] = await Promise.all([searchParams, getLocale()]);
+  const [params, locale, config] = await Promise.all([searchParams, getLocale(), requestPublicConfig()]);
   const error = typeof params.error === "string" ? params.error : undefined;
   const next = typeof params.next === "string" ? params.next : undefined;
   return (
@@ -39,8 +39,8 @@ async function LoginFormWithParams({
       locale={locale}
       next={next}
       linkError={error === "link" || error === "oauth"}
-      googleEnabled={publicEnv.NEXT_PUBLIC_AUTH_GOOGLE_ENABLED}
-      turnstileSiteKey={publicEnv.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+      googleEnabled={config.googleEnabled}
+      turnstileSiteKey={config.turnstileSiteKey}
     />
   );
 }
