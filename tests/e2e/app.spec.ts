@@ -37,7 +37,7 @@ test("saved stories can be read offline, and signing out removes them", async ({
   await page.keyboard.press("Escape");
   const offlineList = () => page.evaluate(() => JSON.parse(window.localStorage.getItem("fogata:offline") ?? "[]") as { url: string; title: string }[]);
   await expect.poll(async () => (await offlineList()).map((item) => item.url), { timeout: 30_000 }).toContain(STORY);
-  await expect.poll(() => page.evaluate(() => window.localStorage.getItem("fogata:offline-pages")), { timeout: 30_000 }).not.toBeNull();
+  await expect.poll(() => page.evaluate(() => window.localStorage.getItem("fogata:offline-pages:2")), { timeout: 30_000 }).not.toBeNull();
 
   await context.setOffline(true);
   try {

@@ -17,7 +17,8 @@ import {
  */
 
 const OFFLINE_PAGES = ["/en/offline", "/es/offline"];
-const OFFLINE_PAGES_KEY = "fogata:offline-pages";
+// Versioned: bumping it re-downloads the offline page on every device (2: Vercel's immutable paths).
+const OFFLINE_PAGES_KEY = "fogata:offline-pages:2";
 const DAY_MS = 24 * 60 * 60_000;
 /** Dev servers only register the worker when asked (e2e), so hot reloading stays untouched. */
 export const SW_DEV_KEY = "fogata:sw-dev";

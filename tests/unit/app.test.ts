@@ -57,6 +57,11 @@ describe("offline downloads", () => {
     );
   });
 
+  it("finds Vercel's immutable static paths too", () => {
+    const html = '<script src="/_next/static/immutable/chunks/3dp0e9mmajvym.js" async></script><script>"static/immutable/chunks/0abc.js"</script>';
+    expect(staticAssetPaths(html).sort()).toEqual(["/_next/static/immutable/chunks/0abc.js", "/_next/static/immutable/chunks/3dp0e9mmajvym.js"]);
+  });
+
   it("keeps both spellings of chunk names with brackets", () => {
     const html = '<link href="/_next/static/chunks/%5Broot%5D__a._.css"><script>"static/chunks/[root]__a._.css"</script>';
     expect(staticAssetPaths(html).sort()).toEqual(["/_next/static/chunks/%5Broot%5D__a._.css", "/_next/static/chunks/[root]__a._.css"]);

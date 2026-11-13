@@ -71,13 +71,14 @@ export function withOfflineStory(list: OfflineStory[], story: OfflineStory): Off
 }
 
 /**
- * The `/_next/static/…` files a downloaded page needs (scripts, styles, fonts), as site paths.
+ * The `/_next/static/…` files a downloaded page needs (scripts, styles, fonts), as site paths
+ * (`/_next/static/immutable/…` on Vercel).
  * Pages name them both as attributes (`/_next/static/chunks/a.js`) and inside the inline RSC
  * payload, sometimes without the `/_next/` prefix or with escaped slashes.
  */
 export function staticAssetPaths(html: string): string[] {
   const found = new Set<string>();
-  const pattern = /(?:\/_next\/)?static\/(?:chunks|css|media)\/[A-Za-z0-9._~\-/%@[\]]+?\.(?:js|css|woff2?|ttf|otf|png|svg|webp|jpe?g)/g;
+  const pattern = /(?:\/_next\/)?static\/(?:immutable\/)?(?:chunks|css|media)\/[A-Za-z0-9._~\-/%@[\]]+?\.(?:js|css|woff2?|ttf|otf|png|svg|webp|jpe?g)/g;
   for (const match of html.replaceAll("\\/", "/").matchAll(pattern)) {
     const value = match[0].startsWith("/_next/") ? match[0] : `/_next/${match[0]}`;
     found.add(value);
