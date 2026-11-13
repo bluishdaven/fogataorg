@@ -240,7 +240,9 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
 - **Auth.** Supabase Auth via `@supabase/ssr`. The proxy refreshes the session on every request.
   `getViewer()` (`src/lib/auth.ts`) is the only way to get the signed-in user. Magic links use the
   token-hash flow (`/auth/confirm`) so they work across browsers; Google uses PKCE (`/auth/callback`).
-  Post-login redirects go through `safeNextPath()`.
+  Post-login redirects go through `safeNextPath()`. Magic links send the UI language as sign-up metadata; Google can't,
+  so `/auth/callback?locale=` saves it through `saveSignUpLocale()` (accounts created in the last ten
+  minutes only, so returning readers keep theirs).
 - **Profile photos** (`src/lib/domain/avatars.ts`, `src/components/profile/upload-avatar.ts`,
   `src/components/avatar.tsx`). The browser center-crops to a square, scales to ≤512px and re-encodes
   WebP (strips EXIF/GPS), uploads to the public `avatars` bucket under `<user id>/<uuid>.webp` (storage
@@ -464,7 +466,6 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   status (only page loads go through the proxy check); internal links always use current names.
 - Some corporate mail scanners prefetch links and can burn a magic link. If reported, switch
   `/auth/confirm` to a confirm-button page.
-- Google sign-in doesn't yet save the reader's locale on first sign-in (magic links do).
 - Muting doesn't filter cached lists (topics, circles, search).
 - Several e2e tests publish stories without deleting them, so after a few local runs the home
   page's newest 20 no longer include the seed stories the reading tests look for. CI starts fresh;

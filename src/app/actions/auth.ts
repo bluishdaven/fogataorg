@@ -106,7 +106,8 @@ export async function signInWithOAuth(formData: FormData): Promise<void> {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: parsed.data.provider,
     options: {
-      redirectTo: `${origin}/auth/callback?next=${encodeURIComponent(next)}`,
+      // Google can't carry sign-up data the way magic links do: the callback saves the language.
+      redirectTo: `${origin}/auth/callback?next=${encodeURIComponent(next)}&locale=${locale}`,
       queryParams: { prompt: "select_account" },
     },
   });

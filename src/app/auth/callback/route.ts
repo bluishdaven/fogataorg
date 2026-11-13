@@ -1,7 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { DEFAULT_LOCALE, LOCALES } from "@/lib/domain/locale";
+import { DEFAULT_LOCALE, isLocale, LOCALES } from "@/lib/domain/locale";
+import { localeOfPath } from "@/lib/domain/onboarding";
 import { safeNextPath } from "@/lib/domain/redirect";
-import { afterSignInPath } from "@/lib/onboarding";
+import { afterSignInPath, saveSignUpLocale } from "@/lib/onboarding";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 /** OAuth (Google) landing: exchanges the PKCE code for a session. */
@@ -14,6 +15,13 @@ export async function GET(request: NextRequest) {
     const supabase = await createSupabaseServerClient();
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
+      const wanted = searchParams.get("locale");
+      const locale = isLocale(wanted) ? wanted : localeOfPath(next);
+      if (data.user && locale) {
+        await saveSignUpLocale({ id: data.user.id, email: data.user.email }, locale).catch((cause: unknown) =>
+          console.error("[auth] saving the sign-up language failed", cause instanceof Error ? cause.message : cause),
+        );
+      }
       const destination = data.user ? await afterSignInPath(data.user.id, next) : next;
       return NextResponse.redirect(new URL(destination, origin));
     }
