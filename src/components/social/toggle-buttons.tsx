@@ -4,12 +4,13 @@ import { Bookmark, BookmarkCheck } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { Popover } from "radix-ui";
-import { useState, useTransition, type FormEvent } from "react";
+import { useEffect, useRef, useState, useTransition, type FormEvent } from "react";
 import { toast } from "sonner";
 import { createReadingList, getSaveLists, setBookmark, setFollow } from "@/app/actions/social";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { READING_LIST_NAME_MAX } from "@/lib/domain/social";
+import { downloadStory, offlineReady, offlineStories, removeStory } from "@/lib/offline";
 import { cn } from "@/lib/utils";
 
 type ListChoice = { id: string | null; name: string };
@@ -24,11 +25,14 @@ export function SaveButton({
   initialSaved,
   signedIn,
   loginHref,
+  offline,
 }: {
   storyId: string;
   initialSaved: boolean;
   signedIn: boolean;
   loginHref: string;
+  /** Saved stories are also kept on the device for reading offline (when the app's worker runs). */
+  offline?: { url: string; title: string; author: string };
 }) {
   const t = useTranslations("Social");
   const router = useRouter();
@@ -39,6 +43,7 @@ export function SaveButton({
   const [error, setError] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
   const saved = inLists.size > 0;
+  useKeepOffline(saved, offline);
 
   const toggleList = async (listId: string | null, next: boolean) => {
     setInLists((current) => {
@@ -235,4 +240,31 @@ export function FollowButton({
       {following ? t("following") : t("follow")}
     </Button>
   );
+}
+
+/** Copies older than this are refreshed when the reader opens the story again. */
+const OFFLINE_REFRESH_MS = 6 * 60 * 60_000;
+
+/**
+ * Saving keeps the story on this device; unsaving lets it go. Opening a saved story refreshes an old
+ * copy (or makes one, e.g. saved on another device), a few seconds in so it never competes with the page.
+ */
+function useKeepOffline(saved: boolean, offline: { url: string; title: string; author: string } | undefined) {
+  const wasSaved = useRef(saved);
+  const url = offline?.url;
+  const title = offline?.title ?? "";
+  const author = offline?.author ?? "";
+  useEffect(() => {
+    const before = wasSaved.current;
+    wasSaved.current = saved;
+    if (!url || !offlineReady()) return;
+    if (!saved) {
+      if (before) void removeStory(url);
+      return;
+    }
+    const copy = offlineStories().find((item) => item.url === url);
+    if (before && copy && Date.now() - new Date(copy.savedAt).getTime() < OFFLINE_REFRESH_MS) return;
+    const timer = setTimeout(() => void downloadStory({ url, title, author }), before ? 3000 : 0);
+    return () => clearTimeout(timer);
+  }, [saved, url, title, author]);
 }

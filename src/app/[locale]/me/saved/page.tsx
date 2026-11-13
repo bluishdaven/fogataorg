@@ -3,6 +3,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { z } from "zod";
+import { OfflineSync } from "@/components/app/offline-sync";
 import { ReadingListTools } from "@/components/social/reading-list-tools";
 import { StoryCard } from "@/components/story-card";
 import { StoryListSkeleton } from "@/components/story-list-skeleton";
@@ -24,6 +25,7 @@ export default async function SavedPage({ searchParams }: Props) {
     <div className="mx-auto max-w-3xl px-4 py-12">
       <h1 className="font-serif text-4xl font-semibold">{t("savedTitle")}</h1>
       <p className="mt-2 mb-6 text-muted-foreground">{t("savedLede")}</p>
+      <OfflineSync />
       <Suspense fallback={<StoryListSkeleton count={3} />}>
         <Saved searchParams={searchParams} />
       </Suspense>

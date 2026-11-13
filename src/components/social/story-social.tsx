@@ -101,7 +101,13 @@ export async function StorySocial({
           </span>
         </a>
         <span className="h-5 w-px bg-border" aria-hidden />
-        <SaveButton storyId={storyId} initialSaved={social.saved} signedIn={social.signedIn} loginHref={loginHref} />
+        <SaveButton
+          storyId={storyId}
+          initialSaved={social.saved}
+          signedIn={social.signedIn}
+          loginHref={loginHref}
+          offline={{ url: storyPath(author.username, slug), title, author: name }}
+        />
         <span className="h-5 w-px bg-border" aria-hidden />
         <ShareButton
           url={shareUrl}

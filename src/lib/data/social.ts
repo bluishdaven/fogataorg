@@ -18,7 +18,7 @@ import {
 import { badgeData, type BadgeData } from "@/lib/domain/badges";
 import { excerpt } from "@/lib/domain/content";
 import { donorActiveSql, foundingNumberSql, publishedCountSql } from "./badge-sql";
-import { moderationStatusSql, notRemoved } from "./moderation-sql";
+import { moderationStatusSql, notModerated, notRemoved } from "./moderation-sql";
 import { selectNotificationItems } from "./notification-items";
 import { isAllowedStoryImage } from "@/lib/story-images";
 
@@ -233,6 +233,31 @@ export async function getSaveState(viewer: Viewer, storyId: string) {
 }
 
 /** Stories in one of the reader's lists (null: the default Saved list), newest first. */
+/**
+ * The reader's newest saved stories across Saved and every list, once each, for keeping on a device
+ * offline (docs/plans/app.md). Live, visible stories only; NSFW ones stay out of downloads.
+ */
+export async function listOfflineCandidates(viewer: Viewer, limit: number) {
+  return withRls(viewer.claims, async (tx) => {
+    const rows = await tx
+      .select({
+        title: stories.title,
+        slug: stories.slug,
+        username: profiles.username,
+        displayName: profiles.displayName,
+        savedAt: sql<Date>`max(${bookmarks.createdAt})`,
+      })
+      .from(bookmarks)
+      .innerJoin(stories, eq(stories.id, bookmarks.storyId))
+      .innerJoin(profiles, eq(profiles.id, stories.authorId))
+      .where(and(eq(bookmarks.userId, viewer.id), isNull(stories.deletedAt), notModerated))
+      .groupBy(stories.id, profiles.id)
+      .orderBy(sql`max(${bookmarks.createdAt}) desc`)
+      .limit(limit);
+    return rows.map((row) => ({ title: row.title, slug: row.slug, username: row.username, author: row.displayName || row.username }));
+  });
+}
+
 export async function listSaved(viewer: Viewer, listId: string | null = null) {
   return withRls(viewer.claims, async (tx) => {
     const rows = await tx

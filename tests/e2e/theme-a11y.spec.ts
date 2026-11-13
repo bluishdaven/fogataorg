@@ -23,6 +23,8 @@ const pages = [
   ["profile", "/@danawrites"],
   ["manifesto", "/es/manifesto"],
   ["privacy", "/en/privacy"],
+  ["app", "/es/app"],
+  ["offline", "/en/offline"],
 ] as const;
 
 for (const theme of ["light", "dark", "sepia"] as const) {

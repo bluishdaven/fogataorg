@@ -34,6 +34,15 @@ const nextConfig: NextConfig = {
       { source: "/:path*", headers: securityHeaders },
       // Everything but story embeds (/embed/…, framable anywhere through their own CSP) stays unframable.
       { source: "/:path((?!embed/).*)", headers: [{ key: "X-Frame-Options", value: "SAMEORIGIN" }] },
+      // The service worker: always fetched fresh, and it may import no scripts but our own (its
+      // fetches stay open: it passes pictures through from Supabase and Unsplash).
+      {
+        source: "/sw.js",
+        headers: [
+          { key: "Cache-Control", value: "no-cache, no-store, must-revalidate" },
+          { key: "Content-Security-Policy", value: "script-src 'self'" },
+        ],
+      },
     ];
   },
 };

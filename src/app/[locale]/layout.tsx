@@ -5,10 +5,12 @@ import { Atkinson_Hyperlegible_Next, Inter, Source_Serif_4 } from "next/font/goo
 import { notFound } from "next/navigation";
 import Script from "next/script";
 import { locale as rootLocale } from "next/root-params";
+import { AppShell } from "@/components/app/app-shell";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { ThemeProvider } from "@/components/theme-provider";
 import { routing } from "@/i18n/routing";
+import { APP_THEME } from "@/lib/domain/app";
 import { HEADLINE_SCRIPT } from "@/lib/domain/headlines";
 import { OG_SIZE, ogPaths } from "@/lib/domain/og";
 import { READER_PREFS_SCRIPT } from "@/lib/domain/reader-prefs";
@@ -38,6 +40,8 @@ export async function generateMetadata(): Promise<Metadata> {
     title: { default: t("title"), template: t("titleTemplate") },
     description: t("description"),
     applicationName: "Fogata",
+    // Installed from Safari's Add to Home Screen: open full-screen, named Fogata.
+    appleWebApp: { capable: true, title: "Fogata", statusBarStyle: "default" },
     openGraph: {
       siteName: "Fogata",
       type: "website",
@@ -53,8 +57,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#faf6ee" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a0d14" },
+    { media: "(prefers-color-scheme: light)", color: APP_THEME.light },
+    { media: "(prefers-color-scheme: dark)", color: APP_THEME.dark },
   ],
 };
 
@@ -87,6 +91,7 @@ export default async function LocaleLayout({ children }: LayoutProps<"/[locale]"
               {children}
             </main>
             <SiteFooter />
+            <AppShell />
           </NextIntlClientProvider>
         </ThemeProvider>
       </body>

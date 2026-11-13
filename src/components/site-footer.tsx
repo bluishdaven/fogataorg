@@ -67,6 +67,13 @@ export function SiteFooter() {
               {t("Nav.comingSoon")}
             </span>
           </button>
+          <Link
+            href="/app"
+            className="inline-flex min-h-11 items-center underline-offset-4 hover:text-foreground hover:underline sm:min-h-0"
+            data-testid="app-link"
+          >
+            {t("App.footerLink")}
+          </Link>
           <Link href="/circles" className="inline-flex min-h-11 items-center underline-offset-4 hover:text-foreground hover:underline sm:min-h-0">
             {t("Nav.circles")}
           </Link>

@@ -1552,5 +1552,52 @@
     "tip": "Cualquiera a quien se la envíes puede leer la historia completa, gratis y sin registrarse.",
     "stats": "Ver cómo se está leyendo",
     "close": "Cerrar"
+  },
+  "App": {
+    "title": "Fogata en tu teléfono",
+    "description": "Agrega Fogata a tu pantalla de inicio: se abre como una app, guarda historias para leer sin conexión y puede avisarte.",
+    "lede": "Agrega Fogata a tu pantalla de inicio. Se abre como una app, guarda tus historias para leerlas sin conexión y puede avisarte cuando alguien te responde.",
+    "benefits": {
+      "home": {
+        "title": "A un toque",
+        "body": "Fogata tiene su propio ícono y se abre a pantalla completa, sin el navegador alrededor de tu historia."
+      },
+      "offline": {
+        "title": "Lee sin conexión",
+        "body": "Las historias que guardas se quedan en el dispositivo: para el metro, el avión o la cabaña sin señal."
+      },
+      "notify": {
+        "title": "Entérate cuando te responden",
+        "body": "Si quieres, un aviso cuando alguien te responde, te menciona o te sigue. Actívalo en Ajustes, en cada dispositivo."
+      }
+    },
+    "installTitle": "Instálala",
+    "installButton": "Instalar Fogata",
+    "installed": "Fogata está instalada en este dispositivo. Ábrela desde tu pantalla de inicio.",
+    "installedAfter": "Listo. Fogata está en tu pantalla de inicio.",
+    "iosTitle": "En iPhone o iPad (Safari)",
+    "iosStep1": "Toca el botón Compartir en la barra de Safari.",
+    "iosStep2": "Elige Agregar a inicio.",
+    "iosStep3": "Toca Agregar. Fogata aparece en tu pantalla de inicio.",
+    "manual": "Abre el menú de tu navegador y elige Instalar app o Agregar a la pantalla principal. En una computadora, Chrome y Edge muestran un ícono de instalar en la barra de direcciones.",
+    "free": "Sin tienda de apps y nada que actualizar: siempre es la Fogata más reciente, y es gratis como todo aquí.",
+    "notifySettings": "Ajustes de avisos",
+    "footerLink": "Instala la app"
+  },
+  "Offline": {
+    "title": "Leer sin conexión",
+    "lede": "Historias que este dispositivo guarda para leer sin conexión. Una historia se guarda aquí cuando la guardas o cuando abres una que guardaste.",
+    "offlineNow": "Estás sin conexión. Estas historias están en este dispositivo:",
+    "empty": "Todavía no hay nada en este dispositivo. Guarda una historia con el marcador y se quedará aquí.",
+    "savedAt": "Guardada {date}",
+    "remove": "Quitar {title} de este dispositivo",
+    "note": "Tu navegador puede borrar estas copias si el dispositivo se queda sin espacio. Cerrar sesión las quita.",
+    "unsupported": "Este navegador no puede guardar historias para leer sin conexión.",
+    "savedLink": "Tus historias guardadas",
+    "sync": "Guardar mis historias para leer sin conexión",
+    "syncing": "Descargando {done} de {total}…",
+    "synced": "{count, plural, =0 {No se pudo descargar ninguna historia. Inténtalo de nuevo con conexión.} one {# historia lista para leer sin conexión.} other {# historias listas para leer sin conexión.}}",
+    "syncHint": "Descarga tus {limit} historias guardadas más recientes en este dispositivo y suelta las que ya no guardas.",
+    "seeOffline": "Ver lo que hay en este dispositivo"
   }
 }

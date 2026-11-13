@@ -1552,5 +1552,52 @@
     "tip": "Everyone you send it to can read the whole story, free, with no sign-up.",
     "stats": "See how it's being read",
     "close": "Close"
+  },
+  "App": {
+    "title": "Fogata on your phone",
+    "description": "Add Fogata to your home screen: it opens like an app, keeps saved stories for reading offline and can notify you.",
+    "lede": "Add Fogata to your home screen. It opens like an app, keeps your saved stories for reading without a connection, and can let you know when someone answers you.",
+    "benefits": {
+      "home": {
+        "title": "One tap away",
+        "body": "Fogata gets its own icon and opens full-screen, without the browser around your story."
+      },
+      "offline": {
+        "title": "Read without a connection",
+        "body": "Stories you save are kept on the device, for the subway, the plane or the cabin with no signal."
+      },
+      "notify": {
+        "title": "Know when someone answers",
+        "body": "If you want, a notification when someone responds, mentions you or follows you. Turn it on in Settings, per device."
+      }
+    },
+    "installTitle": "Install it",
+    "installButton": "Install Fogata",
+    "installed": "Fogata is installed on this device. Open it from your home screen.",
+    "installedAfter": "Done. Fogata is on your home screen.",
+    "iosTitle": "On iPhone or iPad (Safari)",
+    "iosStep1": "Tap the Share button in Safari's toolbar.",
+    "iosStep2": "Choose Add to Home Screen.",
+    "iosStep3": "Tap Add. Fogata appears on your home screen.",
+    "manual": "Open your browser's menu and choose Install app or Add to Home screen. On a computer, Chrome and Edge show an install icon in the address bar.",
+    "free": "No app store and nothing to update: it's always the latest Fogata, and it's free like everything here.",
+    "notifySettings": "Notification settings",
+    "footerLink": "Get the app"
+  },
+  "Offline": {
+    "title": "Read offline",
+    "lede": "Stories this device keeps for reading without a connection. A story is kept here when you save it or open one you saved.",
+    "offlineNow": "You're offline. These stories are on this device:",
+    "empty": "Nothing on this device yet. Save a story with the bookmark and it will be kept here.",
+    "savedAt": "Kept {date}",
+    "remove": "Remove {title} from this device",
+    "note": "Your browser may clear these copies if the device runs low on space. Signing out removes them.",
+    "unsupported": "This browser can't keep stories for reading offline.",
+    "savedLink": "Your saved stories",
+    "sync": "Keep saved stories offline",
+    "syncing": "Downloading {done} of {total}…",
+    "synced": "{count, plural, =0 {No stories could be downloaded. Try again with a connection.} one {# story ready to read offline.} other {# stories ready to read offline.}}",
+    "syncHint": "Downloads your newest {limit} saved stories to this device, and lets go of ones you unsaved.",
+    "seeOffline": "See what's on this device"
   }
 }

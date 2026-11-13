@@ -5,7 +5,9 @@ import { allowAction } from "@/lib/limits";
 import { getViewer } from "@/lib/auth";
 import { withRls } from "@/lib/db/rls";
 import { bookmarks, follows, notifications, readingLists, responses, responseSparks, sparks, stories, userBlocks } from "@/lib/db/schema";
-import { getSaveState } from "@/lib/data/social";
+import { getSaveState, listOfflineCandidates } from "@/lib/data/social";
+import { OFFLINE_SAVED_LIMIT } from "@/lib/domain/app";
+import { storyPath } from "@/lib/domain/handle-routes";
 import type { TiptapDoc } from "@/lib/domain/content";
 import {
   blockSchema,
@@ -121,6 +123,14 @@ export async function setBookmark(input: unknown): Promise<Ok<{ saved: boolean }
 export type SaveLists = { lists: { id: string; name: string }[]; inLists: (string | null)[] };
 
 /** The reader's lists and which ones hold this story, for the save menu. */
+/** The saved stories this device should keep offline (newest first, each once). */
+export async function getOfflineStories(): Promise<Ok<{ stories: { url: string; title: string; author: string }[] }> | Fail> {
+  return asViewer(async (viewer) => {
+    const rows = await listOfflineCandidates(viewer, OFFLINE_SAVED_LIMIT);
+    return { ok: true as const, stories: rows.map((row) => ({ url: storyPath(row.username, row.slug), title: row.title, author: row.author })) };
+  });
+}
+
 export async function getSaveLists(storyId: string): Promise<Ok<SaveLists> | Fail> {
   if (!responseIdSchema.safeParse(storyId).success) return { ok: false, error: "invalid" };
   return asViewer(async (viewer) => ({ ok: true as const, ...(await getSaveState(viewer, storyId)) }));
@@ -253,7 +263,8 @@ export async function editResponse(input: unknown): Promise<Ok<{ body: string }>
         .where(and(eq(responses.id, id), eq(responses.authorId, viewer.id), isNull(responses.deletedAt)))
         .returning({ id: responses.id }),
     );
-    return rows.length ? { ok: true as const, body } : { ok: false as const, error: "not_allowed" as const };
+    if (!rows.length) return { ok: false as const, error: "not_allowed" as const };
+    return { ok: true as const, body };
   });
 }
 
