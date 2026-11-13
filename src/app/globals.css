@@ -62,20 +62,6 @@
   --text-reading: var(--reading-size);
   --text-reading--line-height: var(--reading-leading);
 
-  --animate-flicker: flicker 2.8s ease-in-out infinite;
-  --animate-flicker-inner: flicker-inner 1.9s ease-in-out infinite;
-
-  @keyframes flicker {
-    0%, 100% { transform: scale(1, 1) skewX(0deg); }
-    25% { transform: scale(0.97, 1.04) skewX(-1.5deg); }
-    50% { transform: scale(1.02, 0.97) skewX(1deg); }
-    75% { transform: scale(0.98, 1.03) skewX(-0.5deg); }
-  }
-  @keyframes flicker-inner {
-    0%, 100% { transform: scale(1, 1); opacity: 0.95; }
-    40% { transform: scale(0.92, 1.08); opacity: 0.8; }
-    70% { transform: scale(1.05, 0.95); opacity: 1; }
-  }
 }
 
 :root {
@@ -807,5 +793,135 @@ html[data-reader-font="readable"] .prose-fogata :is(h2, h3, blockquote, figcapti
 @keyframes badge-pop {
   from {
     transform: scale(0.3);
+  }
+}
+
+/* The living flame (FlameLogo with `flame-live`). Resting shape = the logo; every effect sits inside
+   no-preference, so reduced motion keeps the still flame. The outline itself moves (`d: path()`,
+   Chrome and Firefox; elsewhere the transforms alone): each pose keeps the same commands as the
+   logo, with the tip and the left tongue moved and the body untouched. Rhythms are coprime so the
+   fire never visibly loops. Nested groups so hover (transition) and animations never fight. */
+.flame-live :is(.flame-flare, .flame-ignite, .flame-sway, .flame-outer, .flame-core, .flame-spark) {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+.flame-spark {
+  opacity: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .flame-live {
+    animation: flame-glow 2.6s ease-in-out infinite;
+  }
+  .flame-live .flame-flare {
+    transition: transform 450ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  :is(a, button):is(:hover, :focus-visible) .flame-live .flame-flare,
+  .flame-live:hover .flame-flare {
+    transform: scale(1.07, 1.16);
+  }
+  :is(a, button):is(:hover, :focus-visible) .flame-live,
+  .flame-live:hover {
+    animation-duration: 1.3s;
+  }
+  .flame-live .flame-ignite {
+    animation: flame-ignite 750ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+  .flame-live .flame-sway {
+    animation: flame-sway 5.3s ease-in-out infinite;
+  }
+  .flame-live .flame-outer {
+    animation: flame-dance 3.1s ease-in-out infinite;
+  }
+  .flame-live .flame-core {
+    animation:
+      flame-heart 2.3s ease-in-out infinite,
+      flame-heat 1.7s ease-in-out infinite;
+  }
+  .flame-live .flame-spark {
+    animation: flame-spark 3.7s ease-out 1.2s infinite;
+    --spark-x: -3px;
+  }
+  .flame-live .flame-spark-2 {
+    animation-duration: 5.1s;
+    animation-delay: 2.6s;
+    --spark-x: 3.5px;
+  }
+}
+@keyframes flame-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 1.5px color-mix(in oklab, var(--ember) 30%, transparent));
+  }
+  50% {
+    filter: drop-shadow(0 -1px 5px color-mix(in oklab, var(--ember) 55%, transparent));
+  }
+}
+@keyframes flame-ignite {
+  from {
+    opacity: 0;
+    transform: scale(0.4, 0.2);
+  }
+  60% {
+    opacity: 1;
+  }
+}
+@keyframes flame-sway {
+  0%, 100% { transform: skewX(0deg) scale(1, 1); }
+  30% { transform: skewX(-2deg) scale(0.99, 1.02); }
+  55% { transform: skewX(1.5deg) scale(1.01, 0.99); }
+  80% { transform: skewX(-0.8deg) scale(1, 1.01); }
+}
+@keyframes flame-dance {
+  0%, 100% {
+    d: path("M16 1c1.2 6.4 6.6 9.6 9.8 15.2c3.6 6.4 2.3 14.4-3.2 18.6A11.5 11.5 0 0 1 4.3 30C1.8 23.8 4.6 18.4 8 15.2c.4 3 1.9 5 4.2 6C10.6 14.4 12.8 6.6 16 1Z");
+  }
+  20% {
+    d: path("M17.8 2.2c.4 6 5 8.6 8 14c3.6 6.4 2.3 14.4-3.2 18.6A11.5 11.5 0 0 1 4.3 30C1.8 23.6 4.2 17.6 7.4 14.2c.5 3.2 2.2 5.6 4.8 7C11.2 14.6 14.2 7.6 17.8 2.2Z");
+  }
+  42% {
+    d: path("M16.4 -.6c1.2 7 6.4 10.4 9.4 16.8c3.6 6.4 2.3 14.4-3.2 18.6A11.5 11.5 0 0 1 4.3 30C1.8 24 4.8 19 8.4 16c.4 2.6 1.6 4.4 3.8 5.2C10.8 14 12.6 5.4 16.4 -.6Z");
+  }
+  63% {
+    d: path("M14.4 1.8c2 6.6 8.2 9.8 11.4 14.4c3.6 6.4 2.3 14.4-3.2 18.6A11.5 11.5 0 0 1 4.3 30C1.8 23.8 4.6 18.4 8 15.2c.4 3 1.9 5 4.2 6C10 14.2 11.4 7.4 14.4 1.8Z");
+  }
+  82% {
+    d: path("M16 2.4c1.4 6 6.8 8.8 9.8 13.8c3.6 6.4 2.3 14.4-3.2 18.6A11.5 11.5 0 0 1 4.3 30C1.8 23.7 4.4 18 7.7 14.7c.45 3.1 2 5.3 4.5 6.5C10.8 14.6 13 7.6 16 2.4Z");
+  }
+}
+@keyframes flame-heart {
+  0%, 100% {
+    d: path("M16.5 17c.6 3.6 3.9 5.4 4.6 9a6.3 6.3 0 0 1-12.2 3.2c-.7-2.9.6-5.3 2.4-6.8c.3 1.6 1.1 2.6 2.4 3.1c-.6-3.4.8-6.4 2.8-8.5Z");
+  }
+  25% {
+    d: path("M15.5 16.4c.9 3.6 4.8 5.4 5.6 9.6a6.3 6.3 0 0 1-12.2 3.2c-.7-2.9.6-5.3 2.4-6.8c.3 1.6 1.1 2.6 2.4 3.1c-.8-3.4.2-6.6 1.8-9.1Z");
+  }
+  50% {
+    d: path("M16.6 15.4c.6 4 3.8 6 4.5 10.6a6.3 6.3 0 0 1-12.2 3.2c-.7-2.9.6-5.3 2.4-6.8c.3 1.6 1.1 2.6 2.4 3.1c-.6-3.8.9-7.2 2.9-10.1Z");
+  }
+  72% {
+    d: path("M17.6 16.2c.2 3.8 3 6 3.5 9.8a6.3 6.3 0 0 1-12.2 3.2c-.7-2.9.6-5.3 2.4-6.8c.3 1.6 1.1 2.6 2.4 3.1c-.4-3.6 1.4-6.8 3.9-9.3Z");
+  }
+  88% {
+    d: path("M16.4 18c.6 3.2 3.9 4.6 4.7 8a6.3 6.3 0 0 1-12.2 3.2c-.7-2.9.6-5.3 2.4-6.8c.3 1.6 1.1 2.6 2.4 3.1c-.6-3 .8-5.6 2.7-7.5Z");
+  }
+}
+@keyframes flame-heat {
+  0%, 100% { fill: #ffd27a; }
+  50% { fill: #ffe6a6; }
+}
+@keyframes flame-spark {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(1);
+  }
+  8% {
+    opacity: 0.95;
+  }
+  45% {
+    opacity: 0;
+    transform: translate(var(--spark-x), -12px) scale(0.3);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--spark-x), -12px) scale(0.3);
   }
 }

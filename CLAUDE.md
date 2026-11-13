@@ -135,7 +135,9 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   `prefers-reduced-motion: no-preference` so the still state is the final one: `.count-up` (CSS
   integer counter; `<CountUp>` keeps the real number for screen readers), `.rise-in`,
   `.chart-column`, `.meter-fill`, `.ember-glow`, `<EmberDrift>`, the publish burst and
-  `.bell-ring`. Never animate over story text. Axe checks in e2e wait for finite animations first.
+  `.bell-ring`, and the living flame (`flame-live`: the outline morphs between poses with CSS
+  `d: path()`, each pose keeping the logo's exact commands with only the tip and left tongue moved;
+  heart, glow, sparks, ignite on load, flare on hover). Never animate over story text. Axe checks in e2e wait for finite animations first.
 - **Circles** (`src/lib/data/circles.ts`, `src/app/actions/circles.ts`, `src/components/circles/`).
   `circles` (accent color, optional header), `circle_members` (one owner created by trigger, editors,
   writers) and `circle_submissions` (pending → accepted/declined; one active circle per story; members'
