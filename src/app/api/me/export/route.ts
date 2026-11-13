@@ -8,6 +8,7 @@ import {
   follows,
   highlights,
   profiles,
+  pushSubscriptions,
   readingLists,
   responses,
   series,
@@ -112,6 +113,11 @@ export async function GET() {
       .innerJoin(circles, eq(circles.id, circleMembers.circleId))
       .where(eq(circleMembers.userId, viewer.id));
 
+    const devices = await tx
+      .select({ endpoint: pushSubscriptions.endpoint, language: pushSubscriptions.locale, since: pushSubscriptions.createdAt, lastDelivered: pushSubscriptions.lastSuccessAt })
+      .from(pushSubscriptions)
+      .where(eq(pushSubscriptions.userId, viewer.id));
+
     const link = (author: string, slug: string) => `${site}${storyPath(author, slug)}`;
     return {
       exportedAt: new Date().toISOString(),
@@ -154,6 +160,8 @@ export async function GET() {
       circles: memberships,
       muted: blocks.filter((b) => b.kind === "mute").map((b) => ({ username: b.username, since: b.since })),
       blocked: blocks.filter((b) => b.kind === "block").map((b) => ({ username: b.username, since: b.since })),
+      // Devices with push notifications on: which push service, not the address itself.
+      notificationDevices: devices.map(({ endpoint, ...device }) => ({ pushService: new URL(endpoint).hostname, ...device })),
     };
   });
 

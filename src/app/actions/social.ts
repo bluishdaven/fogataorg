@@ -2,6 +2,7 @@
 
 import { and, eq, isNull, sql } from "drizzle-orm";
 import { allowAction } from "@/lib/limits";
+import { pushSoon } from "@/lib/push/soon";
 import { getViewer } from "@/lib/auth";
 import { withRls } from "@/lib/db/rls";
 import { bookmarks, follows, notifications, readingLists, responses, responseSparks, sparks, stories, userBlocks } from "@/lib/db/schema";
@@ -71,6 +72,7 @@ export async function setFollow(input: unknown): Promise<Ok<{ following: boolean
         await tx.delete(follows).where(condition);
       }
     });
+    if (follow) pushSoon();
     return { ok: true as const, following: follow };
   });
 }
@@ -91,6 +93,7 @@ export async function setSparks(input: unknown): Promise<Ok<{ count: number }> |
           .onConflictDoUpdate({ target: [sparks.userId, sparks.storyId], set: { count } });
       }
     });
+    if (count > 0) pushSoon();
     return { ok: true as const, count };
   });
 }
@@ -225,6 +228,7 @@ export async function postResponse(input: ResponseInput): Promise<Ok<{ response:
       return row ?? null;
     });
     if (!created) return { ok: false as const, error: "invalid" as const };
+    pushSoon();
     return {
       ok: true as const,
       response: {
@@ -264,6 +268,8 @@ export async function editResponse(input: unknown): Promise<Ok<{ body: string }>
         .returning({ id: responses.id }),
     );
     if (!rows.length) return { ok: false as const, error: "not_allowed" as const };
+    // New mentions notify.
+    pushSoon();
     return { ok: true as const, body };
   });
 }
@@ -289,6 +295,7 @@ export async function setResponseSpark(id: string, sparked: boolean): Promise<Ok
       if (sparked) await tx.insert(responseSparks).values({ userId: viewer.id, responseId: id }).onConflictDoNothing();
       else await tx.delete(responseSparks).where(and(eq(responseSparks.responseId, id), eq(responseSparks.userId, viewer.id)));
     });
+    if (sparked) pushSoon();
     return { ok: true as const };
   });
 }

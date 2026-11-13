@@ -1,9 +1,9 @@
 "use client";
 
-import { Bell, BookOpenText, Bookmark, ChartNoAxesColumn, Coffee, Flame, HandHeart, LogOut, Settings, ShieldAlert, UserRound, UsersRound } from "lucide-react";
+import { Bell, BookOpenText, Bookmark, ChartNoAxesColumn, Coffee, Flame, HandHeart, Settings, ShieldAlert, UserRound, UsersRound } from "lucide-react";
 import NextLink from "next/link";
 import { useTranslations } from "next-intl";
-import { signOut } from "@/app/actions/auth";
+import { SignOutForm } from "@/components/app/sign-out-form";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import {
@@ -142,13 +142,7 @@ export function AccountDropdown({
           </a>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <form action={signOut} className="w-full">
-            <input type="hidden" name="locale" value={locale} />
-            <button type="submit" className="flex w-full items-center gap-2" data-testid="sign-out">
-              <LogOut className="size-4 text-muted-foreground" />
-              {t("Nav.signOut")}
-            </button>
-          </form>
+          <SignOutForm locale={locale}>{t("Nav.signOut")}</SignOutForm>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

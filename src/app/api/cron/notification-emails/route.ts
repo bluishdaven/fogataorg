@@ -6,6 +6,7 @@ import { cronSecret, emailSigningSecret } from "@/lib/email/config";
 import { DEFAULT_DAILY_LIMIT, sendNotificationEmails } from "@/lib/email/notification-emails";
 import { EmailNotConfiguredError, sendEmail } from "@/lib/email/transport";
 import { publicEnv } from "@/lib/env";
+import { pushConfig, sendPendingPushes, webPushSender } from "@/lib/push/send";
 import { removeOrphanedUploads, storageSecretKey } from "@/lib/storage-cleanup";
 
 // Sends are spaced for Resend's rate limit; give a full run room to finish.
@@ -33,6 +34,15 @@ export async function GET(request: NextRequest) {
   // (once a day), before the summaries are built. Runs even when email isn't configured.
   const [badges] = await db.execute<{ checked: number }>(sql`select public.check_due_writing_badges() as checked`);
   console.info("[badges] writers checked", badges?.checked ?? 0);
+  // Badges from scheduled stories have no action to push them: push them here.
+  const push = pushConfig();
+  if (push) {
+    try {
+      console.info("[push]", await sendPendingPushes({ db, send: webPushSender(push) }));
+    } catch (error) {
+      console.error("[push] run failed", error);
+    }
+  }
   // Rate-limit records older than any window are forgotten.
   const [pruned] = await db.execute<{ removed: number }>(sql`select public.prune_rate_limits() as removed`);
   console.info("[limits] old hits removed", pruned?.removed ?? 0);

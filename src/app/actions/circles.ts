@@ -21,6 +21,7 @@ import {
   type UpdateCircleInput,
 } from "@/lib/domain/circles";
 import { allowAction } from "@/lib/limits";
+import { pushSoon } from "@/lib/push/soon";
 import { isAllowedStoryImage } from "@/lib/story-images";
 import { pgCode } from "@/lib/db/errors";
 
@@ -175,6 +176,7 @@ export async function submitToCircle(input: unknown): Promise<Result<{ status: "
     if (outcome.storySlug) updateTag(`story:${viewer.username.toLowerCase()}/${outcome.storySlug}`);
   }
   const status = outcome.status;
+  pushSoon();
   return { ok: true, status };
 }
 
@@ -194,6 +196,7 @@ export async function decideSubmission(input: unknown): Promise<Result> {
   );
   if (!row) return { ok: false, errors: ["not_allowed"] };
   await invalidateForSubmission(row.circleId, row.storyId);
+  pushSoon();
   return { ok: true };
 }
 
@@ -240,6 +243,7 @@ export async function requestToJoin(input: unknown): Promise<Result> {
     if (pgCode(error) === "42501") return { ok: false, errors: ["not_allowed"] };
     throw error;
   }
+  pushSoon();
   return { ok: true };
 }
 
@@ -277,6 +281,7 @@ export async function decideJoinRequest(input: unknown): Promise<Result> {
     throw error;
   }
   if (slug) invalidateCircle(slug);
+  pushSoon();
   return { ok: true };
 }
 
@@ -299,6 +304,7 @@ export async function transferCircle(input: unknown): Promise<Result> {
     throw error;
   }
   if (slug) invalidateCircle(slug);
+  pushSoon();
   return { ok: true };
 }
 

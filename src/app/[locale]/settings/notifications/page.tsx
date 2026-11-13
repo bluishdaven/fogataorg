@@ -7,7 +7,9 @@ import { SettingsNav } from "@/components/settings-nav";
 import { getViewer } from "@/lib/auth";
 import { withRls } from "@/lib/db/rls";
 import { profiles } from "@/lib/db/schema";
+import { publicEnv } from "@/lib/env";
 import { EmailFrequencyForm } from "./email-frequency-form";
+import { PushSettings } from "./push-settings";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("EmailSettings");
@@ -15,15 +17,30 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function NotificationSettingsPage() {
-  const t = await getTranslations("EmailSettings");
+  const [t, push] = await Promise.all([getTranslations("EmailSettings"), getTranslations("PushSettings")]);
   return (
     <div className="mx-auto max-w-xl px-4 py-12">
       <SettingsNav active="notifications" />
       <h1 className="font-serif text-4xl font-semibold">{t("title")}</h1>
-      <p className="mt-2 mb-8 text-muted-foreground">{t("lede")}</p>
-      <Suspense fallback={<div className="h-64 animate-pulse rounded-xl bg-muted" aria-hidden />}>
-        <Form />
-      </Suspense>
+      {/* Push needs keys on the server; without them there's nothing to switch on. */}
+      {publicEnv.NEXT_PUBLIC_VAPID_PUBLIC_KEY ? (
+        <section className="mt-8" aria-labelledby="push-title">
+          <h2 id="push-title" className="font-serif text-2xl font-semibold">
+            {push("title")}
+          </h2>
+          <p className="mt-2 mb-4 text-muted-foreground">{push("lede")}</p>
+          <PushSettings />
+        </section>
+      ) : null}
+      <section className="mt-10" aria-labelledby="email-title">
+        <h2 id="email-title" className="font-serif text-2xl font-semibold">
+          {t("emailTitle")}
+        </h2>
+        <p className="mt-2 mb-6 text-muted-foreground">{t("lede")}</p>
+        <Suspense fallback={<div className="h-64 animate-pulse rounded-xl bg-muted" aria-hidden />}>
+          <Form />
+        </Suspense>
+      </section>
     </div>
   );
 }

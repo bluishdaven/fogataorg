@@ -5,6 +5,7 @@ import { limitFor } from "@/lib/domain/limits";
 import { updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { getViewer } from "@/lib/auth";
+import { pushSoon } from "@/lib/push/soon";
 import { recordVersion } from "@/lib/data/versions";
 import { asAnon, withRls } from "@/lib/db/rls";
 import { prompts, stories, storyTopics, topics } from "@/lib/db/schema";
@@ -238,6 +239,8 @@ export async function publishStory(input: PublishInput): Promise<PublishResult> 
 
   if (!result.ok) return result;
   invalidateStoryCaches(viewer.username, result.slug, result.topicSlugs);
+  // A new writing tier or founding place rings the bell.
+  pushSoon();
   return { ok: true, path: storyPath(viewer.username, result.slug), scheduled: result.scheduled };
 }
 

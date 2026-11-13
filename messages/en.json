@@ -1040,7 +1040,7 @@
     "why": "You get this summary once a week at most, only when something new happened."
   },
   "EmailSettings": {
-    "title": "Email notifications",
+    "title": "Notifications",
     "lede": "Fogata only emails you sign-in links and, if you want it, one weekly summary of sparks, responses, follows and circle news.",
     "frequency": "Summary emails",
     "off": "Off",
@@ -1054,8 +1054,9 @@
     "unauthorized": "Your session ended. Sign in again.",
     "nav": "Settings sections",
     "profileTab": "Profile",
-    "notificationsTab": "Email",
-    "accountTab": "Account"
+    "notificationsTab": "Notifications",
+    "accountTab": "Account",
+    "emailTitle": "Email"
   },
   "Unsubscribe": {
     "title": "Stop summary emails?",
@@ -1323,7 +1324,8 @@
             "Your email address, to sign you in with a one-time link. If you choose Google sign-in, Google shares your email address and name with us.",
             "What you choose to show on your profile: username, name, short bio, photo, links, pronouns, your \"Now\" line and your influences. All of it is public.",
             "What you publish and do: stories, responses, sparks, embers (passages you highlight), follows, circle memberships and requests to join, reading lists, and the people you mute or block. Published stories and responses are public; drafts, your saved stories and reading lists, your embers, the people you mute or block and your notifications are private. Writers see how many people saved their story and, once two or more readers have kept the same paragraph as an ember, how many did: never who, and never which words.",
-            "Your preferences: interface language and how often we may email you. Theme and reading preferences stay in your own browser.",
+            "Your preferences: interface language and how often we may email you. Theme and reading preferences stay in your own browser, and so do stories you keep for reading offline: they're copied to your device only, and removed when you sign out there.",
+            "Push notifications, only if you turn them on for a device: the address your browser's push service gives us for that device (it identifies the subscription, not you), its keys and the language to write in. Turning notifications off or signing out on that device removes it.",
             "Photos you upload. Your browser resizes them and removes location and camera data (EXIF/GPS) before they reach us.",
             "Anonymous reading counts: when you read a story, we note how far you got and roughly for how long, under a code that changes every day, so your reads can't be linked over time. We don't store your IP address with it. Writers see totals (visits, reads, how far readers got and average reading time), never who read.",
             "Basic technical records that our hosting keeps for a short time to keep the site secure and working, such as IP address and browser type."
@@ -1358,7 +1360,7 @@
         {
           "title": "Who helps us run Fogata",
           "paragraphs": [
-            "We use a few service providers, each only for its job: Supabase (database, sign-in and file storage), Vercel (hosting), Resend (sending email) and Google (only if you sign in with Google). On the sign-in page, Cloudflare Turnstile checks that you're a person, without tracking cookies. Photos picked from Unsplash load directly from Unsplash's servers, so Unsplash can see the reader's IP address; it doesn't set cookies on those images. Listen mode uses your browser's own voices: voices on your device read the story right there, and if you pick a voice marked online, your browser sends what's being read to the company behind that voice (such as Google or Microsoft) to speak it. Fogata itself sends nothing. Donations happen on Buy Me a Coffee, under its own privacy policy. These providers may process data in the United States and other countries, under their own security and privacy commitments."
+            "We use a few service providers, each only for its job: Supabase (database, sign-in and file storage), Vercel (hosting), Resend (sending email) and Google (only if you sign in with Google). On the sign-in page, Cloudflare Turnstile checks that you're a person, without tracking cookies. Photos picked from Unsplash load directly from Unsplash's servers, so Unsplash can see the reader's IP address; it doesn't set cookies on those images. Listen mode uses your browser's own voices: voices on your device read the story right there, and if you pick a voice marked online, your browser sends what's being read to the company behind that voice (such as Google or Microsoft) to speak it. Fogata itself sends nothing. If you turn on notifications on a device, each notification's text goes through your browser's push service (Google, Apple, Mozilla or Microsoft, depending on the browser), encrypted so only your device can read it. Donations happen on Buy Me a Coffee, under its own privacy policy. These providers may process data in the United States and other countries, under their own security and privacy commitments."
           ]
         },
         {
@@ -1599,5 +1601,19 @@
     "synced": "{count, plural, =0 {No stories could be downloaded. Try again with a connection.} one {# story ready to read offline.} other {# stories ready to read offline.}}",
     "syncHint": "Downloads your newest {limit} saved stories to this device, and lets go of ones you unsaved.",
     "seeOffline": "See what's on this device"
+  },
+  "PushSettings": {
+    "title": "On this device",
+    "lede": "A notification on this phone or computer when someone responds, mentions you, follows you, sparks your story or has circle news. Each device asks separately, and the bell always has everything.",
+    "label": "Notifications on this device",
+    "on": "On. You'll get notifications here.",
+    "off": "Off.",
+    "denied": "Notifications are blocked for Fogata in this browser. Allow them in the browser's site settings, then try again.",
+    "ios": "On iPhone and iPad, notifications need Fogata on your Home Screen. Add it, open Fogata from there and turn this on.",
+    "iosLink": "How to add Fogata",
+    "unsupported": "This browser can't show notifications from Fogata.",
+    "failed": "Notifications couldn't be turned on. Try again.",
+    "working": "One moment…",
+    "appLink": "Get Fogata on your phone"
   }
 }

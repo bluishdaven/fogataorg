@@ -1040,7 +1040,7 @@
     "why": "Recibes este resumen como máximo una vez a la semana, solo cuando hubo algo nuevo."
   },
   "EmailSettings": {
-    "title": "Notificaciones por correo",
+    "title": "Notificaciones",
     "lede": "Fogata solo te envía enlaces para entrar y, si quieres, un resumen semanal de chispas, respuestas, seguidores y novedades de tus círculos.",
     "frequency": "Correos de resumen",
     "off": "Desactivados",
@@ -1054,8 +1054,9 @@
     "unauthorized": "Tu sesión terminó. Vuelve a entrar.",
     "nav": "Secciones de ajustes",
     "profileTab": "Perfil",
-    "notificationsTab": "Correo",
-    "accountTab": "Cuenta"
+    "notificationsTab": "Notificaciones",
+    "accountTab": "Cuenta",
+    "emailTitle": "Correo"
   },
   "Unsubscribe": {
     "title": "¿Dejar de recibir resúmenes?",
@@ -1323,7 +1324,8 @@
             "Tu correo electrónico, para que entres con un enlace de un solo uso. Si eliges entrar con Google, Google nos comparte tu correo y tu nombre.",
             "Lo que decides mostrar en tu perfil: nombre de usuario, nombre, biografía corta, foto, enlaces, pronombres, tu línea de «Ahora» y tus referencias. Todo esto es público.",
             "Lo que publicas y haces: historias, respuestas, chispas, brasas (pasajes que destacas), a quién sigues, círculos a los que perteneces y solicitudes para unirte, tus listas de lectura y las cuentas que silencias o bloqueas. Las historias y respuestas publicadas son públicas; tus borradores, tus historias guardadas y listas, tus brasas, las cuentas que silencias o bloqueas y tus notificaciones son privados. Quienes escriben ven cuántas personas guardaron su historia y, cuando dos o más lectores guardan el mismo párrafo como brasa, cuántos lo hicieron: nunca quién, ni qué palabras.",
-            "Tus preferencias: idioma de la interfaz y con qué frecuencia podemos escribirte. El tema y las preferencias de lectura se quedan en tu propio navegador.",
+            "Tus preferencias: idioma de la interfaz y con qué frecuencia podemos escribirte. El tema y las preferencias de lectura se quedan en tu propio navegador, igual que las historias que guardas para leer sin conexión: se copian solo en tu dispositivo y se borran cuando cierras sesión en él.",
+            "Avisos (notificaciones push), solo si los activas en un dispositivo: la dirección que el servicio de avisos de tu navegador nos da para ese dispositivo (identifica la suscripción, no a ti), sus claves y el idioma en que te escribimos. Desactivar los avisos o cerrar sesión en ese dispositivo la borra.",
             "Las fotos que subes. Tu navegador las redimensiona y les quita los datos de ubicación y de cámara (EXIF/GPS) antes de que nos lleguen.",
             "Conteo anónimo de lecturas: cuando lees una historia, anotamos hasta dónde llegaste y cuánto tiempo, más o menos, con un código que cambia cada día, así que tus lecturas no se pueden enlazar con el tiempo. No guardamos tu dirección IP con eso. Quienes escriben ven totales (visitas, lecturas, hasta dónde se llegó y el tiempo medio de lectura), nunca quién leyó.",
             "Registros técnicos básicos que nuestro proveedor de alojamiento guarda por poco tiempo para mantener el sitio seguro y funcionando, como la dirección IP y el tipo de navegador."
@@ -1358,7 +1360,7 @@
         {
           "title": "Quién nos ayuda a operar Fogata",
           "paragraphs": [
-            "Usamos algunos proveedores, cada uno solo para su tarea: Supabase (base de datos, acceso y almacenamiento de archivos), Vercel (alojamiento), Resend (envío de correos) y Google (solo si entras con Google). En la página para entrar, Cloudflare Turnstile comprueba que eres una persona, sin cookies de rastreo. Las fotos elegidas de Unsplash se cargan directamente desde los servidores de Unsplash, así que Unsplash puede ver la dirección IP de quien lee; no pone cookies en esas imágenes. El modo escuchar usa las voces de tu navegador: las voces de tu dispositivo leen la historia ahí mismo y, si eliges una voz marcada como en línea, tu navegador envía lo que se lee a la empresa que ofrece esa voz (como Google o Microsoft) para pronunciarlo. Fogata no envía nada. Las donaciones se hacen en Buy Me a Coffee, bajo su propio aviso de privacidad. Estos proveedores pueden tratar datos en Estados Unidos y otros países, con sus propios compromisos de seguridad y privacidad."
+            "Usamos algunos proveedores, cada uno solo para su tarea: Supabase (base de datos, acceso y almacenamiento de archivos), Vercel (alojamiento), Resend (envío de correos) y Google (solo si entras con Google). En la página para entrar, Cloudflare Turnstile comprueba que eres una persona, sin cookies de rastreo. Las fotos elegidas de Unsplash se cargan directamente desde los servidores de Unsplash, así que Unsplash puede ver la dirección IP de quien lee; no pone cookies en esas imágenes. El modo escuchar usa las voces de tu navegador: las voces de tu dispositivo leen la historia ahí mismo y, si eliges una voz marcada como en línea, tu navegador envía lo que se lee a la empresa que ofrece esa voz (como Google o Microsoft) para pronunciarlo. Fogata no envía nada. Si activas los avisos en un dispositivo, el texto de cada aviso pasa por el servicio de avisos de tu navegador (Google, Apple, Mozilla o Microsoft, según el navegador), cifrado para que solo tu dispositivo pueda leerlo. Las donaciones se hacen en Buy Me a Coffee, bajo su propio aviso de privacidad. Estos proveedores pueden tratar datos en Estados Unidos y otros países, con sus propios compromisos de seguridad y privacidad."
           ]
         },
         {
@@ -1599,5 +1601,19 @@
     "synced": "{count, plural, =0 {No se pudo descargar ninguna historia. Inténtalo de nuevo con conexión.} one {# historia lista para leer sin conexión.} other {# historias listas para leer sin conexión.}}",
     "syncHint": "Descarga tus {limit} historias guardadas más recientes en este dispositivo y suelta las que ya no guardas.",
     "seeOffline": "Ver lo que hay en este dispositivo"
+  },
+  "PushSettings": {
+    "title": "En este dispositivo",
+    "lede": "Un aviso en este teléfono o computadora cuando alguien te responde, te menciona, te sigue, le da chispas a tu historia o hay novedades en tus círculos. Cada dispositivo se activa por separado, y la campana siempre tiene todo.",
+    "label": "Avisos en este dispositivo",
+    "on": "Activados. Recibirás avisos aquí.",
+    "off": "Desactivados.",
+    "denied": "Los avisos de Fogata están bloqueados en este navegador. Permítelos en los ajustes del sitio del navegador y vuelve a intentarlo.",
+    "ios": "En iPhone y iPad, los avisos necesitan a Fogata en tu pantalla de inicio. Agrégala, abre Fogata desde ahí y activa esto.",
+    "iosLink": "Cómo agregar Fogata",
+    "unsupported": "Este navegador no puede mostrar avisos de Fogata.",
+    "failed": "No se pudieron activar los avisos. Inténtalo de nuevo.",
+    "working": "Un momento…",
+    "appLink": "Fogata en tu teléfono"
   }
 }

@@ -4,6 +4,7 @@ import { and, eq } from "drizzle-orm";
 import { updateTag } from "next/cache";
 import { z } from "zod";
 import { getViewer } from "@/lib/auth";
+import { pushSoon } from "@/lib/push/soon";
 import { withRls } from "@/lib/db/rls";
 import { pgCode } from "@/lib/db/errors";
 import { profiles, promptFeatures, prompts, stories } from "@/lib/db/schema";
@@ -83,5 +84,6 @@ export async function setFeatured(input: unknown): Promise<Result> {
   }
   updateTag("prompts");
   if (story) updateTag(`story:${story.handle.toLowerCase()}/${story.slug}`);
+  if (featured) pushSoon();
   return { ok: true };
 }

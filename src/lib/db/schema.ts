@@ -459,6 +459,37 @@ export const userBlocks = pgTable(
   ],
 );
 
+/**
+ * Devices where someone turned on push notifications (docs/plans/app.md): the browser maker's push
+ * address and keys. Private to their owner; saved only through `public.save_push_subscription()`
+ * (an address is a secret the browser hands out, so whoever has it owns it, e.g. after someone
+ * else signed out on a shared device). Read by the push sender on the owner connection.
+ */
+export const pushSubscriptions = pgTable(
+  "push_subscriptions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => profiles.id, { onDelete: "cascade" }),
+    endpoint: text("endpoint").notNull(),
+    p256dh: text("p256dh").notNull(),
+    auth: text("auth").notNull(),
+    // The language notifications on this device are written in.
+    locale: localeCode("locale").notNull().default("en"),
+    lastSuccessAt: timestamp("last_success_at", { withTimezone: true }),
+    ...timestamps,
+  },
+  (t) => [
+    uniqueIndex("push_subscriptions_endpoint_key").on(t.endpoint),
+    index("push_subscriptions_user_idx").on(t.userId),
+    check("push_subscriptions_endpoint_https", sql`${t.endpoint} like 'https://%' and length(${t.endpoint}) <= 1000`),
+    check("push_subscriptions_keys_length", sql`length(${t.p256dh}) between 40 and 200 and length(${t.auth}) between 10 and 100`),
+    pgPolicy("push_subscriptions_select_own", { for: "select", to: authenticatedRole, using: sql`${t.userId} = ${authUid}` }),
+    pgPolicy("push_subscriptions_delete_own", { for: "delete", to: authenticatedRole, using: sql`${t.userId} = ${authUid}` }),
+  ],
+);
+
 /** A reader's own named reading lists, next to the default "Saved" list. Private. */
 export const readingLists = pgTable(
   "reading_lists",
@@ -681,6 +712,8 @@ export const notifications = pgTable(
     readAt: timestamp("read_at", { withTimezone: true }),
     // Set once the notification has been included in a summary email.
     emailedAt: timestamp("emailed_at", { withTimezone: true }),
+    // When the group was last pushed to the person's devices; pending again once updated_at passes it.
+    pushedAt: timestamp("pushed_at", { withTimezone: true }),
     ...timestamps,
   },
   (t) => [

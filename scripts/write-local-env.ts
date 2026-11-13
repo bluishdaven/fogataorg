@@ -5,6 +5,7 @@
  */
 import { execFileSync } from "node:child_process";
 import { randomBytes } from "node:crypto";
+import webpush from "web-push";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 
 const raw = execFileSync("npx", ["supabase", "status", "-o", "json"], { encoding: "utf8" });
@@ -37,6 +38,12 @@ for (const key of ["EMAIL_SIGNING_SECRET", "CRON_SECRET"]) {
   if (!kept.some((line) => line.split("=")[0]?.trim() === key)) {
     kept.push(`${key}=${randomBytes(32).toString("base64url")}`);
   }
+}
+
+// Local push notification keys (VAPID), generated once as a pair.
+if (!kept.some((line) => line.startsWith("VAPID_PRIVATE_KEY="))) {
+  const keys = webpush.generateVAPIDKeys();
+  kept.push(`NEXT_PUBLIC_VAPID_PUBLIC_KEY=${keys.publicKey}`, `VAPID_PRIVATE_KEY=${keys.privateKey}`);
 }
 
 const body = [

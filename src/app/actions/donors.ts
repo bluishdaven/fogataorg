@@ -3,6 +3,7 @@
 import { eq, sql } from "drizzle-orm";
 import { updateTag } from "next/cache";
 import { getViewer } from "@/lib/auth";
+import { pushSoon } from "@/lib/push/soon";
 import { withRls } from "@/lib/db/rls";
 import { profiles } from "@/lib/db/schema";
 import { donorGrantSchema, donorRemoveSchema, type DonorActionResult } from "@/lib/domain/badges";
@@ -37,6 +38,7 @@ export async function grantDonorBadge(input: unknown): Promise<DonorActionResult
   if (!person) return { ok: false, error: "notFound" };
 
   refresh(person.username);
+  pushSoon();
   return { ok: true, name: person.display_name || person.username, until: person.until };
 }
 
