@@ -1584,7 +1584,15 @@
     "manual": "Open your browser's menu and choose Install app or Add to Home screen. On a computer, Chrome and Edge show an install icon in the address bar.",
     "free": "No app store and nothing to update: it's always the latest Fogata, and it's free like everything here.",
     "notifySettings": "Notification settings",
-    "footerLink": "Get the app"
+    "footerLink": "Get the app",
+    "invite": {
+      "title": "Fogata works like an app",
+      "body": "Add it to your home screen: one tap to open, saved stories readable offline, and notifications if you want them.",
+      "install": "Install",
+      "how": "Show me how",
+      "dismiss": "Hide this",
+      "label": "Install Fogata"
+    }
   },
   "Offline": {
     "title": "Read offline",

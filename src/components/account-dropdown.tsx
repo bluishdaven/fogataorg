@@ -1,8 +1,9 @@
 "use client";
 
-import { Bell, BookOpenText, Bookmark, ChartNoAxesColumn, Coffee, Flame, HandHeart, Settings, ShieldAlert, UserRound, UsersRound } from "lucide-react";
+import { Bell, BookOpenText, Bookmark, ChartNoAxesColumn, Coffee, Flame, HandHeart, Settings, ShieldAlert, Smartphone, UserRound, UsersRound } from "lucide-react";
 import NextLink from "next/link";
 import { useTranslations } from "next-intl";
+import { useInstallState } from "@/components/app/app-shell";
 import { SignOutForm } from "@/components/app/sign-out-form";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
@@ -38,6 +39,8 @@ export function AccountDropdown({
 }) {
   const t = useTranslations();
   const letters = initials(displayName);
+  // Already running installed: nothing to offer.
+  const installState = useInstallState();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -134,6 +137,14 @@ export function AccountDropdown({
           </DropdownMenuItem>
         ) : null}
         <DropdownMenuSeparator />
+        {installState !== "installed" ? (
+          <DropdownMenuItem asChild>
+            <Link href="/app" data-testid="menu-app-link">
+              <Smartphone />
+              {t("App.footerLink")}
+            </Link>
+          </DropdownMenuItem>
+        ) : null}
         {/* Donations keep Fogata free (there is no paid tier). */}
         <DropdownMenuItem asChild>
           <a href={SUPPORT_URL} target="_blank" rel="noopener noreferrer" data-testid="donate-link">

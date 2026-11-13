@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Suspense } from "react";
+import { AppInvite } from "@/components/app/app-invite";
 import { JsonLd } from "@/components/json-ld";
 import { HomeHeadline } from "@/components/home-headline";
 import { HomeFeed } from "@/components/home-feed";
@@ -59,6 +60,7 @@ export default async function HomePage({ searchParams }: PageProps<"/[locale]">)
       <Suspense fallback={<FeedSkeleton />}>
         <HomeFeed searchParams={searchParams} />
       </Suspense>
+      <AppInvite />
     </div>
   );
 }

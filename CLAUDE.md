@@ -167,7 +167,9 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   and the push sender are the only app code that uses the owner `db` (addresses live in
   `auth.users`; no session).
 - **Installable app / PWA** (`src/app/manifest.ts`, `src/lib/domain/app.ts`, `public/sw.js`,
-  `src/lib/offline.ts`, `src/components/app/`, plan in `docs/plans/app.md`). Icons in `public/app/`
+  `src/lib/offline.ts`, `src/components/app/`, plan in `docs/plans/app.md`). Entry points: footer and
+  account menu link to `/app`; `<AppInvite>` floats on the home page on touch devices (or wherever
+  the browser offers install) until installed or closed (`localStorage["fogata:app-invite"]`). Icons in `public/app/`
   come from `scripts/make-app-icons.ts`. `<AppShell>` (locale layout) registers the worker on
   production builds; dev only with `localStorage["fogata:sw-dev"] = "on"` (e2e sets it). The worker
   never decides what to keep: online it passes everything to the network; when that fails it answers

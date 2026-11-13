@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { devices, expect, test } from "@playwright/test";
 import { signInWithMagicLink } from "./sign-in";
 
 const STORY = "/@danawrites/the-heron-knows-something-i-dont";
@@ -79,4 +79,37 @@ test("notification settings offer push on this device", async ({ page }) => {
   const toggle = page.getByRole("switch", { name: "Notifications on this device" });
   await expect(toggle).toHaveAttribute("aria-checked", "false");
   await expect(page.getByRole("heading", { name: "Email" })).toBeVisible();
+});
+
+// A describe group can't switch browsers, so take the phone's screen and touch only.
+const { viewport, userAgent, deviceScaleFactor, isMobile, hasTouch } = devices["Pixel 7"];
+const pixel = { viewport, userAgent, deviceScaleFactor, isMobile, hasTouch };
+
+test.describe("on a phone", () => {
+  test.use(pixel);
+
+  test("the home page invites readers to install Fogata until they close it", async ({ page }) => {
+    await page.goto("/en");
+    const invite = page.getByTestId("app-invite");
+    await expect(invite).toBeVisible();
+    await expect(invite).toContainText("Fogata works like an app");
+    if (await invite.getByTestId("app-invite-how").isVisible()) {
+      await invite.getByTestId("app-invite-how").click();
+      await expect(page).toHaveURL(/\/en\/app$/);
+      await page.goto("/en");
+    }
+    await page.getByTestId("app-invite-dismiss").click();
+    await expect(invite).toBeHidden();
+    await page.reload();
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await expect(page.getByTestId("app-invite")).toBeHidden();
+  });
+});
+
+test("the account menu links to the app page", async ({ page }) => {
+  await signInWithMagicLink(page, "en");
+  await page.goto("/en");
+  await page.getByTestId("account-menu").click();
+  await page.getByTestId("menu-app-link").click();
+  await expect(page).toHaveURL(/\/en\/app$/);
 });

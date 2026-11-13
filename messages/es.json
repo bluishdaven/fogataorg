@@ -1584,7 +1584,15 @@
     "manual": "Abre el menú de tu navegador y elige Instalar app o Agregar a la pantalla principal. En una computadora, Chrome y Edge muestran un ícono de instalar en la barra de direcciones.",
     "free": "Sin tienda de apps y nada que actualizar: siempre es la Fogata más reciente, y es gratis como todo aquí.",
     "notifySettings": "Ajustes de avisos",
-    "footerLink": "Instala la app"
+    "footerLink": "Instala la app",
+    "invite": {
+      "title": "Fogata funciona como una app",
+      "body": "Agrégala a tu pantalla de inicio: se abre con un toque, tus historias guardadas se leen sin conexión y, si quieres, te avisa.",
+      "install": "Instalar",
+      "how": "Muéstrame cómo",
+      "dismiss": "Ocultar",
+      "label": "Instalar Fogata"
+    }
   },
   "Offline": {
     "title": "Leer sin conexión",

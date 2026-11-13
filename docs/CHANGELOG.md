@@ -8,6 +8,8 @@ In Settings → Notifications, switch on **Notifications on this device** and ha
 
 - **Installable**: a web app manifest, app icons (any, maskable, status-bar badge) and the
   "Fogata on your phone" page (`/app`) with the browser's own install button or Safari's steps.
+  Phones see a small "Fogata works like an app" card on the home page until they install or close
+  it; the account menu and footer link to the app page.
 - **Read offline**: a service worker keeps saved stories on the device. Saving a story keeps it,
   unsaving lets it go, opening a saved story refreshes an old copy, and **Keep saved stories
   offline** on the Saved page downloads the newest 50. Without a connection, any other page shows
