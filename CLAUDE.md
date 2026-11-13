@@ -163,8 +163,27 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   when `RESEND_API_KEY` is set, else Mailpit (`MAILPIT_URL`). Wording and links come from
   `src/lib/domain/notification-text.ts`, shared with the notifications page. Unsubscribe tokens are
   HMAC-signed (`EMAIL_SIGNING_SECRET`); POST `/api/email/unsubscribe` is RFC 8058 one-click, and the
-  footer link opens a confirm page because scanners prefetch GET links. The job and token unsubscribe
-  are the only app code that uses the owner `db` (addresses live in `auth.users`; no session).
+  footer link opens a confirm page because scanners prefetch GET links. The job, token unsubscribe
+  and the push sender are the only app code that uses the owner `db` (addresses live in
+  `auth.users`; no session).
+- **Installable app / PWA** (`src/app/manifest.ts`, `src/lib/domain/app.ts`, `public/sw.js`,
+  `src/lib/offline.ts`, `src/components/app/`, plan in `docs/plans/app.md`). Icons in `public/app/`
+  come from `scripts/make-app-icons.ts`. `<AppShell>` (locale layout) registers the worker on
+  production builds; dev only with `localStorage["fogata:sw-dev"] = "on"` (e2e sets it). The worker
+  never decides what to keep: online it passes everything to the network; when that fails it answers
+  page loads from downloaded pages (else the precached `/[locale]/offline`) and `/_next/static` and
+  pictures from the cache. Pages download (`downloadStory()`: the HTML, the static files it names
+  plus those the tab loaded via `performance`, CORS pictures) into `OFFLINE_CACHE` and list them in
+  `localStorage["fogata:offline"]`. `SaveButton` keeps saved stories, `/me/saved` syncs the newest
+  50, sign-out (`SignOutForm` → `forgetDevice()`) clears caches and push. Keep `CACHE` in `sw.js`
+  equal to `OFFLINE_CACHE` (a unit test checks). `next dev` pages don't hydrate offline (HMR).
+  **Push** (`push_subscriptions`, saved only via `save_push_subscription()`: an address is owned by
+  whoever has it; ≤ 10 per person; `isPushServiceEndpoint()` allowlists push services because the
+  server POSTs there; `notifications.pushed_at`). Server actions that can notify call `pushSoon()`
+  (`after()` → `sendPendingPushes()` on the owner `db`: groups unread, changed in the last hour and
+  not pushed since, text from `notificationMessage()`, `tag` per group, 404/410 drops the device);
+  the daily cron runs it too. New notifying actions must call `pushSoon()`. Hidden without
+  `NEXT_PUBLIC_VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY`. `web-push` pinned at 3.6 (4.0 was days old).
 - **Notification times:** `notifications.updated_at` means "last new activity". Its trigger fires only
   on `actor_ids`/`actor_count` changes, so marking read or emailed never re-dates a group.
 - **Raw SQL inside Drizzle selects:** on single-table queries Drizzle renders `${table.column}` unqualified,

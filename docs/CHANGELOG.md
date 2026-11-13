@@ -1,5 +1,23 @@
 # Changelog
 
+## Fogata as an app (2026-11-12)
+
+**Demo**: open **Get the app** in the footer and install Fogata (Chrome/Edge/Android: Install
+button; iPhone: Share → Add to Home Screen). Save a story, turn on airplane mode and open it again.
+In Settings → Notifications, switch on **Notifications on this device** and have someone follow you.
+
+- **Installable**: a web app manifest, app icons (any, maskable, status-bar badge) and the
+  "Fogata on your phone" page (`/app`) with the browser's own install button or Safari's steps.
+- **Read offline**: a service worker keeps saved stories on the device. Saving a story keeps it,
+  unsaving lets it go, opening a saved story refreshes an old copy, and **Keep saved stories
+  offline** on the Saved page downloads the newest 50. Without a connection, any other page shows
+  **Read offline** with what the device has. Signing out removes the copies.
+- **Push notifications**, opt-in per device: the same words and links as the bell, one
+  notification per group (new people joining replace it quietly), in the device's language.
+  Sent when the action that caused them happens, and by the daily job for scheduled-story badges.
+  Needs the VAPID keys in Vercel (docs/SETUP.md); hidden until they're set.
+- The privacy policy and the data download cover push devices and offline copies.
+
 ## Founding writers (2026-11-12)
 
 - The first 100 writers to publish five public stories get a numbered **Founding writer** badge

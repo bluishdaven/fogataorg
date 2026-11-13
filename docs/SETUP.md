@@ -106,6 +106,14 @@ Never run `npm run db:seed` against production; it refuses unless you pass `--al
    | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Cloudflare Turnstile site key (sign-in person check; optional) |
    | `TURNSTILE_SECRET_KEY` | the matching Turnstile secret key |
    | `SUPABASE_SECRET_KEY` | Supabase secret key (Secret); lets the daily job delete unused uploads |
+   | `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | push notifications public key (optional; see below) |
+   | `VAPID_PRIVATE_KEY` | the matching private key (Secret) |
+   | `VAPID_SUBJECT` | `mailto:hola@fogata.org` |
+
+   **Push notifications** (free, no account): run `npx web-push generate-vapid-keys` once and put
+   the public and private keys in the two variables above, then redeploy (the public key is built
+   into the page). Without them, Settings → Notifications shows only email. Keep the pair stable:
+   a new pair silently stops pushes to every device until people turn notifications on again.
 
    **Turnstile** (free): in the Cloudflare dashboard, open Turnstile → Add widget, name it Fogata,
    add the hostname `fogata.org` (and `www.fogata.org` if used), widget mode **Managed**. Copy the
