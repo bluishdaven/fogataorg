@@ -5,7 +5,8 @@ import type { MetadataRoute } from "next";
  * worker and pages share about what a device keeps offline.
  */
 
-export const APP_THEME = { light: "#faf6ee", dark: "#0a0d14" } as const;
+/** Each theme's page background (`--background` in globals.css), for the browser's own bars. */
+export const APP_THEME = { light: "#faf6ee", dark: "#0a0d14", sepia: "#f4ecd8" } as const;
 
 /** One manifest for both languages: `start_url` goes through the proxy, which picks the reader's. */
 export const APP_MANIFEST: MetadataRoute.Manifest = {

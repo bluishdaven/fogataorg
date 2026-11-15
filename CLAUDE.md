@@ -365,6 +365,11 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   reason, no image in previews or lists, noindex, and off feeds (home, topics, circles, search) but
   still on the writer's profile and saved lists with a label. Queries over stories must use
   `notRemoved` (all lists) or `notModerated` (feeds).
+- **Phone bars** (`viewport.viewportFit: "cover"` in the locale layout, `ThemeColorSync`). The page
+  draws behind the phone's gesture bar and notch so they show the theme's own background (html and
+  body are `bg-background`); anything fixed or sticky at the bottom adds `env(safe-area-inset-bottom)`
+  (action bar, listen player, app invite, toasts, footer padding). `ThemeColorSync` sets the
+  `theme-color` metas to the chosen theme (`APP_THEME`, incl. sepia), not just the system scheme.
 - **Touch targets.** Buttons and inputs are 44px on phones and compact from `sm:` up (sizes in
   `components/ui/button.tsx` / `input.tsx`). Custom controls follow the same rule (`min-h-11` /
   `min-h-10 … sm:min-h-8`), or get an invisible `after:` hit area when they must stay small visually.

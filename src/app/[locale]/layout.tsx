@@ -56,6 +56,9 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export const viewport: Viewport = {
+  // Draw behind the phone's gesture bar and notch, so they show the page's own background in every
+  // theme; anything fixed to the bottom keeps clear with env(safe-area-inset-bottom).
+  viewportFit: "cover",
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: APP_THEME.light },
     { media: "(prefers-color-scheme: dark)", color: APP_THEME.dark },

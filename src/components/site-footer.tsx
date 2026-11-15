@@ -7,7 +7,7 @@ import { SUPPORT_URL } from "@/lib/domain/links";
 export function SiteFooter() {
   const t = useTranslations();
   return (
-    <footer className="mt-16 border-t border-border">
+    <footer className="mt-16 border-t border-border pb-[env(safe-area-inset-bottom)]">
       <div className="mx-auto flex max-w-5xl flex-col gap-4 px-4 py-10 text-sm text-muted-foreground sm:flex-row sm:items-start sm:justify-between">
         <div className="flex max-w-md gap-3">
           <FlameLogo className="h-6 shrink-0" animated={false} />

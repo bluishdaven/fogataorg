@@ -48,7 +48,7 @@ export function AppInvite() {
   return (
     <aside
       aria-label={t("invite.label")}
-      className="rise-in fixed inset-x-3 bottom-3 z-40 mx-auto max-w-md rounded-2xl border border-border bg-card p-4 shadow-lg sm:bottom-6"
+      className="rise-in fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom))] z-40 mx-auto max-w-md rounded-2xl border border-border bg-card p-4 shadow-lg sm:bottom-[calc(1.5rem+env(safe-area-inset-bottom))]"
       data-testid="app-invite"
     >
       <div className="flex items-start gap-3">

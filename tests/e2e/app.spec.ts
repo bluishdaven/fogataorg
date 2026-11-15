@@ -113,3 +113,12 @@ test("the account menu links to the app page", async ({ page }) => {
   await page.getByTestId("menu-app-link").click();
   await expect(page).toHaveURL(/\/en\/app$/);
 });
+
+test("the browser's bars take the theme the reader chose, and the page can draw behind the phone's bars", async ({ page }) => {
+  await page.emulateMedia({ colorScheme: "light" });
+  await page.addInitScript(() => window.localStorage.setItem("theme", "sepia"));
+  await page.goto("/en");
+  await expect(page.locator('meta[name="viewport"]')).toHaveAttribute("content", /viewport-fit=cover/);
+  const colors = () => page.locator('meta[name="theme-color"]').evaluateAll((metas) => metas.map((meta) => (meta as HTMLMetaElement).content));
+  await expect.poll(colors).toEqual(["#f4ecd8", "#f4ecd8"]);
+});

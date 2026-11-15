@@ -199,7 +199,8 @@ html[data-reader-font="readable"] .prose-fogata :is(h2, h3, blockquote, figcapti
     @apply border-border outline-ring/50;
   }
   html {
-    @apply font-sans;
+    /* Also behind the phone's bars and overscroll, which the page now draws under (viewport-fit=cover). */
+    @apply bg-background font-sans;
     -webkit-text-size-adjust: 100%;
     /* Keeps anchors and keyboard-focused elements clear of the sticky header (WCAG 2.4.11). */
     scroll-padding-top: 5rem;
@@ -211,6 +212,8 @@ html[data-reader-font="readable"] .prose-fogata :is(h2, h3, blockquote, figcapti
   body {
     @apply bg-background text-foreground antialiased;
     text-rendering: optimizeLegibility;
+    /* Landscape phones: keep content out from under the notch and rounded corners. */
+    padding-inline: env(safe-area-inset-left) env(safe-area-inset-right);
   }
   button:not(:disabled),
   [role="button"]:not(:disabled) {

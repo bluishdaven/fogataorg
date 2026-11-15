@@ -15,6 +15,9 @@ const Toaster = ({ ...props }: ToasterProps) => {
       theme={theme as ToasterProps["theme"]}
       className="toaster group"
       containerAriaLabel={t("toastRegion")}
+      // The page draws behind the phone's gesture bar (viewport-fit=cover): keep toasts above it.
+      offset={{ bottom: "calc(24px + env(safe-area-inset-bottom))" }}
+      mobileOffset={{ bottom: "calc(16px + env(safe-area-inset-bottom))" }}
       icons={{
         success: (
           <CircleCheckIcon className="size-4" />
