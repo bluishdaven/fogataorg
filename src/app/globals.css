@@ -803,8 +803,13 @@ html[data-reader-font="readable"] .prose-fogata :is(h2, h3, blockquote, figcapti
    no-preference, so reduced motion keeps the still flame. The outline itself moves (`d: path()`,
    Chrome and Firefox; elsewhere the transforms alone): each pose keeps the same commands as the
    logo, with the tip and the left tongue moved and the body untouched. Rhythms are coprime so the
-   fire never visibly loops. Nested groups so hover (transition) and animations never fight. */
-.flame-live :is(.flame-flare, .flame-ignite, .flame-sway, .flame-outer, .flame-core, .flame-spark) {
+   fire never visibly loops. Nested groups so hover (transition) and animations never fight.
+   Cost: the outline, the heart's color and the sparks repaint on the main thread every frame, so
+   they play only for two cycles after the ignite (ending on the resting pose), while pointed at or focused,
+   and in `.flame-continuous` (listen mode while reading). The rest of the time only the breathing
+   sway runs, a transform on the HTML wrapper that the compositor animates without repainting
+   (2026-11-18: an always-dancing flame kept phones painting 60 times a second). */
+.flame-live :is(.flame-flare, .flame-ignite, .flame-outer, .flame-core, .flame-spark) {
   transform-box: fill-box;
   transform-origin: 50% 100%;
 }
@@ -813,35 +818,50 @@ html[data-reader-font="readable"] .prose-fogata :is(h2, h3, blockquote, figcapti
 }
 @media (prefers-reduced-motion: no-preference) {
   .flame-live {
-    animation: flame-glow 2.6s ease-in-out infinite;
+    --flame-cycles: 2;
+    --spark-cycles: 1;
+    transform-origin: 50% 100%;
+    filter: drop-shadow(0 0 2.5px color-mix(in oklab, var(--ember) 40%, transparent));
+    animation: flame-breathe 4.7s ease-in-out infinite;
+    transition: filter 300ms ease;
+  }
+  :is(a, button):is(:hover, :focus-visible) .flame-live,
+  .flame-live:hover,
+  .flame-live.flame-continuous {
+    --flame-cycles: infinite;
+    --spark-cycles: infinite;
+  }
+  :is(a, button):is(:hover, :focus-visible) .flame-live,
+  .flame-live:hover {
+    filter: drop-shadow(0 -1px 5px color-mix(in oklab, var(--ember) 60%, transparent));
   }
   .flame-live .flame-flare {
     transition: transform 450ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  /* The publish moment's flame swells in first, then breathes like any other. */
+  .flame-live.publish-flame {
+    animation:
+      publish-flame 900ms cubic-bezier(0.34, 1.56, 0.64, 1) both,
+      flame-breathe 4.7s ease-in-out 900ms infinite;
   }
   :is(a, button):is(:hover, :focus-visible) .flame-live .flame-flare,
   .flame-live:hover .flame-flare {
     transform: scale(1.07, 1.16);
   }
-  :is(a, button):is(:hover, :focus-visible) .flame-live,
-  .flame-live:hover {
-    animation-duration: 1.3s;
-  }
   .flame-live .flame-ignite {
     animation: flame-ignite 750ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
   }
-  .flame-live .flame-sway {
-    animation: flame-sway 5.3s ease-in-out infinite;
-  }
   .flame-live .flame-outer {
-    animation: flame-dance 3.1s ease-in-out infinite;
+    /* Starts once the ignite is done, so the dance doesn't compete with the page loading. */
+    animation: flame-dance 3.1s ease-in-out 0.9s var(--flame-cycles);
   }
   .flame-live .flame-core {
     animation:
-      flame-heart 2.3s ease-in-out infinite,
-      flame-heat 1.7s ease-in-out infinite;
+      flame-heart 2.3s ease-in-out 0.9s var(--flame-cycles),
+      flame-heat 1.7s ease-in-out 0.9s var(--flame-cycles);
   }
   .flame-live .flame-spark {
-    animation: flame-spark 3.7s ease-out 1.2s infinite;
+    animation: flame-spark 3.7s ease-out 1.2s var(--spark-cycles);
     --spark-x: -3px;
   }
   .flame-live .flame-spark-2 {
@@ -850,13 +870,11 @@ html[data-reader-font="readable"] .prose-fogata :is(h2, h3, blockquote, figcapti
     --spark-x: 3.5px;
   }
 }
-@keyframes flame-glow {
-  0%, 100% {
-    filter: drop-shadow(0 0 1.5px color-mix(in oklab, var(--ember) 30%, transparent));
-  }
-  50% {
-    filter: drop-shadow(0 -1px 5px color-mix(in oklab, var(--ember) 55%, transparent));
-  }
+@keyframes flame-breathe {
+  0%, 100% { transform: rotate(0deg) scale(1, 1); }
+  30% { transform: rotate(-1.6deg) scale(0.99, 1.025); }
+  60% { transform: rotate(1.2deg) scale(1.01, 0.985); }
+  80% { transform: rotate(-0.6deg) scale(1, 1.01); }
 }
 @keyframes flame-ignite {
   from {
@@ -866,12 +884,6 @@ html[data-reader-font="readable"] .prose-fogata :is(h2, h3, blockquote, figcapti
   60% {
     opacity: 1;
   }
-}
-@keyframes flame-sway {
-  0%, 100% { transform: skewX(0deg) scale(1, 1); }
-  30% { transform: skewX(-2deg) scale(0.99, 1.02); }
-  55% { transform: skewX(1.5deg) scale(1.01, 0.99); }
-  80% { transform: skewX(-0.8deg) scale(1, 1.01); }
 }
 @keyframes flame-dance {
   0%, 100% {

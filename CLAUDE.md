@@ -137,7 +137,10 @@ Run `npm run check` (and `test:db` / `test:e2e` when touching data or UI flows) 
   `.chart-column`, `.meter-fill`, `.ember-glow`, `<EmberDrift>`, the publish burst and
   `.bell-ring`, and the living flame (`flame-live`: the outline morphs between poses with CSS
   `d: path()`, each pose keeping the logo's exact commands with only the tip and left tongue moved;
-  heart, glow, sparks, ignite on load, flare on hover). Never animate over story text. Axe checks in e2e wait for finite animations first.
+  heart, sparks, ignite on load, flare on hover). The morph repaints on the main thread, so it runs
+  two cycles and then only while hovered/focused or `continuous` (listen mode); the idle sway is a
+  transform on the HTML wrapper so the compositor runs it (transforms on the `<svg>` itself aren't
+  composited). Never animate `d`, `fill` or `filter` forever. Never animate over story text. Axe checks in e2e wait for finite animations first.
 - **Circles** (`src/lib/data/circles.ts`, `src/app/actions/circles.ts`, `src/components/circles/`).
   `circles` (accent color, optional header), `circle_members` (one owner created by trigger, editors,
   writers) and `circle_submissions` (pending → accepted/declined; one active circle per story; members'

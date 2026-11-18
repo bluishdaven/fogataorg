@@ -207,7 +207,7 @@ export function ListenMode({ lang }: { lang: string }) {
           </Button>
           {/* A small fire burns while it reads, and sinks to embers when paused. */}
           <span aria-hidden className={cn("listen-fire", state !== "playing" && "opacity-45")} data-testid="listen-fire">
-            <FlameLogo className="h-5" animated={state === "playing"} />
+            <FlameLogo className="h-5" animated={state === "playing"} continuous />
             <span className="listen-spark" />
             <span className="listen-spark" />
             <span className="listen-spark" />
